@@ -96,13 +96,13 @@ export async function fetchOptimizedKPIsWithDateFilter(
       totalRevenue: data.totalRevenue || 0,
       totalProfit: data.totalProfit || 0,
       profitMargin: data.profitMargin || 0,
-      taxableSales: data.totalTaxableSales || 0,
+      taxableSales: data.taxableSales || 0,
       totalQuantity: data.totalQuantity || 0,
       totalCost: data.totalCost || 0,
       averageOrderValue: data.averageOrderValue || 0,
       totalInvoices: data.uniqueInvoices || 0,
-      grossProfit: (data.totalTaxableSales || 0) - (data.totalCost || 0),
-      grossProfitPercentage: data.totalTaxableSales > 0 ? ((data.totalTaxableSales - data.totalCost) / data.totalTaxableSales) * 100 : 0,
+      grossProfit: (data.taxableSales || 0) - (data.totalCost || 0),
+      grossProfitPercentage: data.taxableSales > 0 ? ((data.taxableSales - data.totalCost) / data.taxableSales) * 100 : 0,
       totalStockValue: 0, // TODO: Need to add stock data to RPC
       dailyAvgSales: 0, // TODO: Need to calculate based on date range
       totalPayables: 0, // TODO: Need actual payables data

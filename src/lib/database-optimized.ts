@@ -171,7 +171,8 @@ export async function getOptimizedKPIs(
     })
 
     // If 2025 function doesn't exist or returns no data, try the original function
-    if (error || !data || data.length === 0) {
+    // Note: RPC functions return JSONB, not arrays, so don't check .length
+    if (error || !data) {
       console.log('⚠️ 2025 function failed, trying original function:', error?.message)
       const fallback = await supabase.rpc('get_dashboard_kpis', {
         start_date: startDate || null,
@@ -192,12 +193,13 @@ export async function getOptimizedKPIs(
       return null
     }
 
-    // The function returns JSON with camelCase keys: {totalRevenue, totalProfit, ...}
+    // The function returns JSON with camelCase keys: {totalRevenue, taxableSales, totalProfit, ...}
     // We need to convert to snake_case to match OptimizedKPIs interface
     const rawKpis = Array.isArray(data) ? data[0] : data
+    console.log('🔍 DEBUG rawKpis:', JSON.stringify(rawKpis, null, 2))
     const kpis = {
-      total_revenue: rawKpis.totalRevenue || 0,
-      total_taxable_sales: rawKpis.totalRevenue || 0, // Same as revenue for now
+      total_revenue: rawKpis.totalRevenue || 0, // Total sales WITH VAT
+      total_taxable_sales: rawKpis.taxableSales || 0, // Total sales WITHOUT VAT
       total_cost: (rawKpis.totalRevenue || 0) - (rawKpis.totalProfit || 0),
       total_profit: rawKpis.totalProfit || 0,
       profit_margin_percent: rawKpis.profitMargin || 0,
@@ -217,6 +219,7 @@ export async function getOptimizedKPIs(
 
     console.log('✅ Optimized KPIs loaded:', {
       totalRevenue: kpis.total_revenue,
+      taxableSales: kpis.total_taxable_sales,
       totalProfit: kpis.total_profit,
       totalInvoices: kpis.total_invoices,
       recordsUsed: 'All (no 1000 record limit)'
@@ -491,7 +494,8 @@ export async function getOptimizedProfitByInvoice(
     })
 
     // If 2025 function doesn't exist or returns no data, try the original function
-    if (error || !data || data.length === 0) {
+    // Note: Check for empty array properly
+    if (error || !data || (Array.isArray(data) && data.length === 0)) {
       console.log('⚠️ get_profit_by_invoice_2025_filtered failed, trying original function:', error?.message)
 
       const fallback = await supabase.rpc('get_profit_by_invoice_filtered', {
@@ -532,20 +536,27 @@ export async function getOptimizedProfitByInvoice(
     console.log('✅ Profit by invoice loaded:', { records: paginatedData.length, totalCount })
 
     // Map the RPC response fields to match our interface
-    const mappedData = paginatedData.map((item: Record<string, unknown>) => ({
-      invoice_no: item.invoice_number || item.inv_no || item.invoice_no,
-      inv_date: item.invoice_date || item.inv_date,
-      customer_name: item.customer_name,
-      branch_name: item.branch_name,
-      line_items_count: 1, // RPC doesn't return this, default to 1
-      total_quantity: 1, // RPC doesn't return this
-      total_sale_price: item.sale_value || item.total_sale_price || 0,
-      total_sale_with_vat: item.sale_value || item.total_sale_with_vat || 0,
-      total_cost: (item.sale_value as number || 0) - (item.profit as number || 0), // Calculate from sale_value - profit
-      total_profit: item.profit || item.total_profit || 0,
-      profit_margin_percent: item.margin || item.profit_margin_percent || 0,
-      total_count: totalCount
-    }))
+    const mappedData = paginatedData.map((item: Record<string, unknown>) => {
+      const saleWithVat = item.sale_value as number || 0
+      const taxableSales = saleWithVat / 1.15 // Remove 15% VAT to get taxable amount
+      const profit = item.profit as number || 0
+      const cost = taxableSales - profit // Cost = taxable sales - profit
+
+      return {
+        invoice_no: item.invoice_number || item.inv_no || item.invoice_no,
+        inv_date: item.invoice_date || item.inv_date,
+        customer_name: item.customer_name,
+        branch_name: item.branch_name,
+        line_items_count: 1, // RPC doesn't return this, default to 1
+        total_quantity: 1, // RPC doesn't return this
+        total_sale_price: taxableSales, // Taxable sales WITHOUT VAT
+        total_sale_with_vat: saleWithVat, // Sale value WITH VAT
+        total_cost: cost, // Cost = taxable sales - profit
+        total_profit: profit,
+        profit_margin_percent: item.margin || item.profit_margin_percent || 0,
+        total_count: totalCount
+      }
+    })
 
     return {
       data: mappedData,

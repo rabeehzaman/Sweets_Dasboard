@@ -116,7 +116,7 @@ export function TabbedTables({ dateRange, branchFilter }: TabbedTablesProps) {
 
   const profitByInvoice = React.useMemo(() => {
     if (!profitData) return []
-    
+
     interface InvoiceProfit {
       date: string
       invoiceNo: string
@@ -138,6 +138,7 @@ export function TabbedTables({ dateRange, branchFilter }: TabbedTablesProps) {
           profit: 0
         }
       }
+      // Use Sale Price (without VAT) for taxable sales
       acc[invoiceNo].salePrice += item['Sale Price'] || 0
       acc[invoiceNo].cost += item.Cost || 0
       acc[invoiceNo].profit += item.Profit || 0

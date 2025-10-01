@@ -141,9 +141,9 @@ export function useDashboardKPIs(
         }
         
         // Try optimized hybrid approach
-        const startDate = formatDateLocal(dateRange.from)
-        const endDate = formatDateLocal(dateRange.to)
-        
+        const startDate = dateRange?.from ? formatDateLocal(dateRange.from) : undefined
+        const endDate = dateRange?.to ? formatDateLocal(dateRange.to) : undefined
+
         console.log('🚀 Attempting optimized KPI calculation with branch filter:', branchFilter)
         const result = await fetchKPIsHybrid(startDate, endDate, branchFilter)
         
