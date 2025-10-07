@@ -371,28 +371,74 @@ ORDER BY branch_taxable_sales DESC;
 -- Function: get_dashboard_kpis
 CREATE OR REPLACE FUNCTION get_dashboard_kpis(
     start_date DATE DEFAULT NULL,
-    end_date DATE DEFAULT NULL
+    end_date DATE DEFAULT NULL,
+    branch_filter TEXT DEFAULT NULL
 )
 RETURNS JSON AS $$
 DECLARE
     result JSON;
+    total_taxable_sales NUMERIC;
+    total_revenue NUMERIC;
+    total_cost NUMERIC;
+    gross_profit NUMERIC;
+    total_expenses NUMERIC;
+    net_profit NUMERIC;
+    gross_profit_margin NUMERIC;
+    net_profit_margin NUMERIC;
 BEGIN
+    -- Calculate sales and cost from profit_analysis_view_current
+    SELECT
+        COALESCE(SUM("Sale Price"), 0),
+        COALESCE(SUM("SaleWithVAT"), 0),
+        COALESCE(SUM("Cost"), 0),
+        COALESCE(SUM("Profit"), 0)
+    INTO
+        total_taxable_sales,
+        total_revenue,
+        total_cost,
+        gross_profit
+    FROM profit_analysis_view_current
+    WHERE (start_date IS NULL OR "Inv Date" >= start_date)
+        AND (end_date IS NULL OR "Inv Date" <= end_date)
+        AND (branch_filter IS NULL OR "Branch Name" = branch_filter);
+
+    -- Calculate total expenses from expense_details_view
+    SELECT COALESCE(SUM(amount), 0)
+    INTO total_expenses
+    FROM expense_details_view
+    WHERE (start_date IS NULL OR date >= start_date)
+        AND (end_date IS NULL OR date <= end_date)
+        AND (branch_filter IS NULL OR branch_name = branch_filter);
+
+    -- Calculate net profit and margins
+    net_profit := gross_profit - total_expenses;
+
+    gross_profit_margin := CASE
+        WHEN total_taxable_sales > 0 THEN (gross_profit / total_taxable_sales) * 100
+        ELSE 0
+    END;
+
+    net_profit_margin := CASE
+        WHEN total_taxable_sales > 0 THEN (net_profit / total_taxable_sales) * 100
+        ELSE 0
+    END;
+
+    -- Build result JSON
     SELECT json_build_object(
-        'totalTaxableSales', COALESCE(SUM("Sale Price"), 0),
-        'totalRevenue', COALESCE(SUM("SaleWithVAT"), 0),
-        'totalCost', COALESCE(SUM("Cost"), 0),
-        'totalProfit', COALESCE(SUM("Profit"), 0),
+        'totalTaxableSales', total_taxable_sales,
+        'totalRevenue', total_revenue,
+        'totalCost', total_cost,
+        'grossProfit', gross_profit,
+        'totalExpenses', total_expenses,
+        'netProfit', net_profit,
+        'grossProfitMargin', gross_profit_margin,
+        'netProfitMargin', net_profit_margin,
         'totalInvoices', COUNT(*),
         'uniqueInvoices', COUNT(DISTINCT "Inv No"),
         'totalQuantity', COALESCE(SUM("Qty"), 0),
         'averageOrderValue', CASE
             WHEN COUNT(DISTINCT "Inv No") > 0
-            THEN COALESCE(SUM("SaleWithVAT"), 0) / COUNT(DISTINCT "Inv No")
-            ELSE 0
-        END,
-        'profitMargin', CASE
-            WHEN SUM("SaleWithVAT") > 0
-            THEN (SUM("Profit") / SUM("SaleWithVAT")) * 100
+            THEN total_revenue / COUNT(DISTINCT "Inv No")
             ELSE 0
         END,
         'dateRange', json_build_object(
@@ -404,7 +450,8 @@ BEGIN
     ) INTO result
     FROM profit_analysis_view_current
     WHERE (start_date IS NULL OR "Inv Date" >= start_date)
-        AND (end_date IS NULL OR "Inv Date" <= end_date);
+        AND (end_date IS NULL OR "Inv Date" <= end_date)
+        AND (branch_filter IS NULL OR "Branch Name" = branch_filter);
 
     RETURN result;
 END;

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { TrendingUp, TrendingDown, DollarSign, Percent, ShoppingCart, Receipt, Package, Warehouse, Calendar, Eye } from "lucide-react"
+import { TrendingUp, TrendingDown, DollarSign, Percent, ShoppingCart, Receipt, Package, Warehouse, Calendar, Eye, Target } from "lucide-react"
 import { useOptimizedKPIs } from "@/hooks/use-optimized-data"
 import { formatCurrency, formatNumber } from "@/lib/formatting"
 import { useLocale } from "@/i18n/locale-provider"
@@ -152,15 +152,15 @@ export function KPICards({ dateRange, branchFilter }: KPICardsProps = {}) {
           delay={100}
         />
         <KPICard
-          title={t("kpi.net_profit")}
-          value={formatCurrency(kpis?.total_profit || 0)}
+          title={t("kpi.gross_profit")}
+          value={formatCurrency(kpis?.gross_profit || 0)}
           icon={<TrendingUp className="h-4 w-4" />}
           loading={loading}
           delay={200}
         />
         <KPICard
-          title={t("kpi.profit_margin")}
-          value={`${(kpis?.profit_margin_percent || 0).toFixed(1)}%`}
+          title={t("kpi.gp_percentage")}
+          value={`${(kpis?.gross_profit_percentage || 0).toFixed(1)}%`}
           icon={<Percent className="h-4 w-4" />}
           loading={loading}
           delay={300}
@@ -184,18 +184,18 @@ export function ExtendedKPICards({ dateRange, branchFilter }: KPICardsProps = {}
 
   return (
     <div className="space-y-4">
-      {/* First row - Original extended KPIs */}
+      {/* First row - Extended KPIs */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <KPICard
-          title={t("kpi.gross_profit")}
-          value={formatCurrency(kpis?.gross_profit || 0)}
-          icon={<TrendingUp className="h-4 w-4" />}
+          title={t("kpi.total_expenses")}
+          value={formatCurrency(kpis?.total_expenses || 0)}
+          icon={<Receipt className="h-4 w-4" />}
           loading={loading}
         />
         <KPICard
-          title={t("kpi.gp_percentage")}
-          value={`${(kpis?.gross_profit_percentage || 0).toFixed(1)}%`}
-          icon={<Percent className="h-4 w-4" />}
+          title={t("kpi.net_profit")}
+          value={formatCurrency(kpis?.net_profit || 0)}
+          icon={<Target className="h-4 w-4" />}
           loading={loading}
         />
         <KPICard

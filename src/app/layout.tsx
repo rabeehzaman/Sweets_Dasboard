@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { DynamicThemeColor } from "@/components/dynamic-theme-color";
 import { LocaleProvider } from "@/i18n/locale-provider";
+import { AuthProvider } from "@/contexts/auth-context";
 import { headers } from 'next/headers';
 import { getLangDir } from 'rtl-detect';
 
@@ -89,17 +90,19 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${cairo.variable} antialiased`}
       >
-        <LocaleProvider initialLocale={locale as 'en' | 'ar'}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-          >
-            <DynamicThemeColor />
-            {children}
-            <PWAInstallPrompt />
-          </ThemeProvider>
-        </LocaleProvider>
+        <AuthProvider>
+          <LocaleProvider initialLocale={locale as 'en' | 'ar'}>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+            >
+              <DynamicThemeColor />
+              {children}
+              <PWAInstallPrompt />
+            </ThemeProvider>
+          </LocaleProvider>
+        </AuthProvider>
       </body>
     </html>
   );

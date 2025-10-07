@@ -1,15 +1,26 @@
 "use client"
 
 import * as React from "react"
-import { usePathname } from "next/navigation"
-import { Home, Users, TrendingUp, Building2, Receipt, Calculator } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { Home, Users, TrendingUp, Building2, Receipt, Calculator, User, LogOut, Shield } from "lucide-react"
 import { useLocale } from "@/i18n/locale-provider"
 import { SimpleLanguageSwitcher } from "@/components/language-switcher"
 import { cssAnimations, createStaggeredClasses } from "@/lib/css-animations"
+import { useAuth, useIsAdmin } from "@/hooks/use-auth"
+import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -24,7 +35,15 @@ import {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname()
+  const router = useRouter()
   const { t } = useLocale()
+  const { user, signOut } = useAuth()
+  const isAdmin = useIsAdmin()
+
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/login')
+  }
 
   const navigationItems = [
     {
@@ -116,6 +135,43 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton className="w-full">
+                  <User className="h-4 w-4" />
+                  <span className="truncate">{user?.email}</span>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium">{user?.email}</p>
+                    {isAdmin && (
+                      <Badge variant="destructive" className="w-fit">
+                        <Shield className="h-3 w-3 mr-1" />
+                        Admin
+                      </Badge>
+                    )}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/profile')}>
+                  <User className="mr-2 h-4 w-4" />
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

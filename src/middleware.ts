@@ -1,51 +1,93 @@
+import { createServerClient } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
-  
+
   // Check for language query parameter first
   const langParam = url.searchParams.get('lang')
-  
+
   // Check for language preference in cookies
   const langCookie = request.cookies.get('preferred-language')?.value
-  
-  // Determine locale: query param > cookie > default (en)
+
+  // Determine locale: query param > cookie > user preference > default (en)
   let locale = 'en'
   if (langParam === 'ar' || langParam === 'en') {
     locale = langParam
   } else if (langCookie === 'ar' || langCookie === 'en') {
     locale = langCookie
   }
-  
+
+  // Create response (headers will be set after determining final locale)
+  let res = NextResponse.next()
+
+  // Create Supabase client with proper cookie handling
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => res.cookies.set(name, value, options))
+        },
+      },
+    }
+  )
+
+  // Get session
+  const { data: { session } } = await supabase.auth.getSession()
+
+  // Fetch user's preferred language if logged in and no manual override
+  if (session && !langParam && !langCookie) {
+    const { data: userPrefs } = await supabase
+      .from('user_branch_permissions')
+      .select('preferred_language')
+      .eq('user_id', session.user.id)
+      .single()
+
+    if (userPrefs?.preferred_language === 'ar' || userPrefs?.preferred_language === 'en') {
+      locale = userPrefs.preferred_language
+    }
+  }
+
+  // Calculate isArabic after all locale logic
   const isArabic = locale === 'ar'
-  
-  // Clone the request headers and add locale information
-  const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('x-locale', locale)
-  requestHeaders.set('x-is-arabic', isArabic.toString())
-  
-  // Create response with modified headers
-  const response = NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
-  })
-  
+
+  // Public routes that don't require authentication
+  const publicRoutes = ['/login']
+  const isPublicRoute = publicRoutes.some(route => url.pathname.startsWith(route))
+
+  // Redirect to login if not authenticated
+  if (!session && !isPublicRoute) {
+    const redirectUrl = url.clone()
+    redirectUrl.pathname = '/login'
+    redirectUrl.searchParams.set('redirectedFrom', url.pathname)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // Redirect to home if authenticated and trying to access login
+  if (session && url.pathname === '/login') {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+
   // Set locale in response headers for client-side access
-  response.headers.set('x-locale', locale)
-  response.headers.set('x-is-arabic', isArabic.toString())
-  
+  res.headers.set('x-locale', locale)
+  res.headers.set('x-is-arabic', isArabic.toString())
+
   // If language was set via query parameter, store it in a cookie
   if (langParam && (langParam === 'ar' || langParam === 'en')) {
-    response.cookies.set('preferred-language', langParam, {
+    res.cookies.set('preferred-language', langParam, {
       maxAge: 365 * 24 * 60 * 60, // 1 year
       path: '/',
       secure: true,
       sameSite: 'lax'
     })
   }
-  
-  return response
+
+  return res
 }
 
 export const config = {

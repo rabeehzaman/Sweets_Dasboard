@@ -72,6 +72,7 @@
     "profit_margin": "هامش الربح",
     "gross_profit": "إجمالي الربح",
     "gp_percentage": "نسبة الربح الإجمالي",
+    "total_expenses": "إجمالي المصروفات",
     "total_stock_value": "إجمالي قيمة المخزون (جميع المستودعات)",
     "daily_avg_sales": "متوسط المبيعات اليومية",
     "database_optimized": "قاعدة البيانات محسّنة",

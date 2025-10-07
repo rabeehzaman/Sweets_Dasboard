@@ -72,6 +72,7 @@
     "profit_margin": "Profit Margin",
     "gross_profit": "Gross Profit",
     "gp_percentage": "GP %",
+    "total_expenses": "Total Expenses",
     "total_stock_value": "Total Stock Value (All Warehouses)",
     "daily_avg_sales": "Daily Avg Sales",
     "database_optimized": "Database optimized",

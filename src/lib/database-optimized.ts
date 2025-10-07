@@ -62,9 +62,9 @@ export interface OptimizedKPIs {
   total_revenue: number
   total_taxable_sales: number
   total_cost: number
-  total_profit: number
-  profit_margin_percent: number
-  gross_profit_percentage: number
+  total_profit: number // This is actually gross_profit
+  profit_margin_percent: number // This is net_profit_margin
+  gross_profit_percentage: number // This is gross_profit_margin
   total_quantity: number
   total_line_items: number
   total_invoices: number
@@ -75,6 +75,10 @@ export interface OptimizedKPIs {
   latest_transaction: string
   total_stock_value: number
   gross_profit: number
+  net_profit: number
+  total_expenses: number
+  gross_profit_margin: number
+  net_profit_margin: number
   daily_avg_sales: number
 }
 
@@ -193,27 +197,31 @@ export async function getOptimizedKPIs(
       return null
     }
 
-    // The function returns JSON with camelCase keys: {totalRevenue, taxableSales, totalProfit, ...}
+    // The function returns JSON with camelCase keys: {totalRevenue, totalTaxableSales, grossProfit, netProfit, ...}
     // We need to convert to snake_case to match OptimizedKPIs interface
     const rawKpis = Array.isArray(data) ? data[0] : data
     console.log('🔍 DEBUG rawKpis:', JSON.stringify(rawKpis, null, 2))
     const kpis = {
       total_revenue: rawKpis.totalRevenue || 0, // Total sales WITH VAT
-      total_taxable_sales: rawKpis.taxableSales || 0, // Total sales WITHOUT VAT
-      total_cost: (rawKpis.totalRevenue || 0) - (rawKpis.totalProfit || 0),
-      total_profit: rawKpis.totalProfit || 0,
-      profit_margin_percent: rawKpis.profitMargin || 0,
-      gross_profit_percentage: rawKpis.profitMargin || 0, // Same as profit_margin
-      total_quantity: 0, // Not returned by function
-      total_line_items: rawKpis.transactionCount || 0,
-      total_invoices: rawKpis.transactionCount || 0,
+      total_taxable_sales: rawKpis.totalTaxableSales || 0, // Total sales WITHOUT VAT
+      total_cost: rawKpis.totalCost || 0,
+      total_profit: rawKpis.grossProfit || 0, // This is actually gross profit (for backwards compatibility)
+      profit_margin_percent: rawKpis.netProfitMargin || 0, // Net profit margin
+      gross_profit_percentage: rawKpis.grossProfitMargin || 0, // Gross profit margin (GP%)
+      total_quantity: rawKpis.totalQuantity || 0,
+      total_line_items: rawKpis.totalInvoices || 0,
+      total_invoices: rawKpis.uniqueInvoices || 0,
       unique_customers: 0, // Not returned by function
       active_branches: 0, // Not returned by function
-      average_order_value: rawKpis.transactionCount > 0 ? (rawKpis.totalRevenue / rawKpis.transactionCount) : 0,
+      average_order_value: rawKpis.averageOrderValue || 0,
       earliest_transaction: '', // Not returned by function
       latest_transaction: '', // Not returned by function
       total_stock_value: 0, // Not returned by function
-      gross_profit: rawKpis.totalProfit || 0,
+      gross_profit: rawKpis.grossProfit || 0,
+      net_profit: rawKpis.netProfit || 0,
+      total_expenses: rawKpis.totalExpenses || 0,
+      gross_profit_margin: rawKpis.grossProfitMargin || 0,
+      net_profit_margin: rawKpis.netProfitMargin || 0,
       daily_avg_sales: 0 // Not returned by function
     }
 
