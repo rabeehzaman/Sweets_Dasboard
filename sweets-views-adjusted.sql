@@ -441,6 +441,22 @@ BEGIN
             THEN total_revenue / COUNT(DISTINCT "Inv No")
             ELSE 0
         END,
+        'dailyAvgSales', CASE
+            WHEN start_date IS NOT NULL THEN
+                -- Use date range: divide by days from start to end (or today if end > today)
+                CASE
+                    WHEN (LEAST(COALESCE(end_date, CURRENT_DATE), CURRENT_DATE) - start_date + 1) > 0
+                    THEN total_revenue / (LEAST(COALESCE(end_date, CURRENT_DATE), CURRENT_DATE) - start_date + 1)
+                    ELSE 0
+                END
+            ELSE
+                -- No date range: divide by day of current month
+                CASE
+                    WHEN EXTRACT(DAY FROM CURRENT_DATE) > 0
+                    THEN total_revenue / EXTRACT(DAY FROM CURRENT_DATE)
+                    ELSE 0
+                END
+        END,
         'dateRange', json_build_object(
             'from', start_date,
             'to', end_date,

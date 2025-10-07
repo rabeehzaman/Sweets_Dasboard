@@ -222,7 +222,7 @@ export async function getOptimizedKPIs(
       total_expenses: rawKpis.totalExpenses || 0,
       gross_profit_margin: rawKpis.grossProfitMargin || 0,
       net_profit_margin: rawKpis.netProfitMargin || 0,
-      daily_avg_sales: 0 // Not returned by function
+      daily_avg_sales: rawKpis.dailyAvgSales || 0
     }
 
     console.log('✅ Optimized KPIs loaded:', {
