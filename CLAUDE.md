@@ -1,4 +1,4 @@
-# SWEETS DASHBOARD - Database Migration Project
+# GHADEER AL SHARQ TRADING EST - Database Migration Project
 
 ## Executive Summary
 Successfully migrated MADA Department dashboard to SWEETS Department database. The project involved database schema analysis, view/function migration, and environment configuration updates while preserving SWEETS table naming conventions.
@@ -21,7 +21,7 @@ This project involves migrating the existing MADA Department dashboard to use th
 - **Total Views**: 8 (migrated from MADA)
 - **RPC Functions**: 2 (migrated from MADA)
 - **Total Rows**: ~2,186 (development data)
-- **Project Name**: sweets-dashboard
+- **Project Name**: ghadeer-al-sharq-dashboard
 - **Purpose**: New production environment for Sweets Department
 - **Architecture Note**: Uses `branch_id` for both branches and warehouses (no separate warehouses table)
 
@@ -121,7 +121,7 @@ SUPABASE_ACCESS_TOKEN=sbp_e218982f851e3553afa3281584365b931eed2edf
 
 #### Tasks Completed:
 - [x] Updated `.env.local` with SWEETS database credentials
-- [x] Updated package.json project name to "sweets-dashboard"
+- [x] Updated package.json project name to "ghadeer-al-sharq-dashboard"
 - [ ] Configure Next.js Supabase client for SWEETS connection
 - [ ] Update API routes to use new database
 - [ ] Test database connectivity in application

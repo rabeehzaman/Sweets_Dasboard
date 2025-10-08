@@ -26,13 +26,13 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "Sweets Dashboard - Profit Analytics",
+  title: "Ghadeer Al Sharq Trading EST - Business Analytics",
   description: "A comprehensive dashboard for profit analysis and business insights",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Sweets Dashboard",
+    title: "Ghadeer Al Sharq Trading EST",
   },
   formatDetection: {
     telephone: false,
@@ -63,7 +63,7 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href="/apple-icon-180x180.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Sweets Dashboard" />
+        <meta name="apple-mobile-web-app-title" content="Ghadeer Al Sharq Trading EST" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#FAF9F5" />
         <meta name="msapplication-tap-highlight" content="no" />

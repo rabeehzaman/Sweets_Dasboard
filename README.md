@@ -1,4 +1,4 @@
-# Mada Dashboard - Profit Analytics
+# Ghadeer Al Sharq Trading EST - Business Analytics Dashboard
 
 A comprehensive dashboard for profit analysis and business insights built with Next.js, Supabase, and shadcn/ui.
 

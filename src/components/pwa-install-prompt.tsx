@@ -70,7 +70,7 @@ export function PWAInstallPrompt() {
             </svg>
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm">Install Sweets Dashboard</h3>
+            <h3 className="font-medium text-sm">Install Ghadeer Al Sharq Trading EST</h3>
             <p className="text-xs text-muted-foreground mt-1">
               Get native app experience with no browser address bar. Works offline!
             </p>

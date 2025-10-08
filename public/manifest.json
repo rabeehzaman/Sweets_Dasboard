@@ -1,7 +1,7 @@
 {
-  "name": "Sweets Department - Business Dashboard",
-  "short_name": "Sweets Dashboard",
-  "description": "Sweets Department Business Dashboard - Comprehensive analytics for profit analysis and business insights",
+  "name": "Ghadeer Al Sharq Trading EST - Business Dashboard",
+  "short_name": "Ghadeer Al Sharq",
+  "description": "Ghadeer Al Sharq Trading EST Business Dashboard - Comprehensive analytics for profit analysis and business insights",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FAF9F5",

@@ -6,7 +6,7 @@ export default function PWAInfoPage() {
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="space-y-6">
         <div className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Sweets Dashboard PWA</h1>
+          <h1 className="text-3xl font-bold">Ghadeer Al Sharq Trading EST PWA</h1>
           <p className="text-muted-foreground">
             Progressive Web App Features & Installation Guide
           </p>
@@ -83,7 +83,7 @@ export default function PWAInfoPage() {
                 <h4 className="font-medium">Chrome/Edge:</h4>
                 <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
                   <li>Look for install icon in address bar</li>
-                  <li>Click &quot;Install Sweets Dashboard&quot;</li>
+                  <li>Click &quot;Install Ghadeer Al Sharq Trading EST&quot;</li>
                   <li>App opens in dedicated window</li>
                 </ol>
               </div>
@@ -117,7 +117,7 @@ export default function PWAInfoPage() {
           <CardHeader>
             <CardTitle>✨ PWA Benefits</CardTitle>
             <CardDescription>
-              Why install Sweets Dashboard as a PWA?
+              Why install Ghadeer Al Sharq Trading EST as a PWA?
             </CardDescription>
           </CardHeader>
           <CardContent>
