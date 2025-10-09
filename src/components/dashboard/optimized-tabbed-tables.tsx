@@ -709,35 +709,37 @@ export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabb
                     </div>
                   </div>
                 </div>
-                <div className="space-y-3 p-3">
+                <div className="space-y-2.5 p-2.5">
                   {displayInvoiceData.map((invoice, index) => (
-                    <div key={`${invoice.invoice_no}-${index}`} className="bg-muted/30 p-3 rounded-lg space-y-2">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <div className="text-sm font-medium">{invoice.invoice_no}</div>
-                          <div className="text-xs text-muted-foreground">
+                    <div key={`${invoice.invoice_no}-${index}`} className="bg-card border border-border p-3 rounded-lg space-y-2.5 shadow-sm">
+                      <div className="flex justify-between items-start gap-2">
+                        <div className="space-y-0.5 flex-1 min-w-0">
+                          <div className="text-sm font-bold text-primary truncate">{invoice.invoice_no}</div>
+                          <div className="text-xs text-muted-foreground truncate">
                             {invoice.customer_name || 'Unknown Customer'}
                           </div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {formatDateSA(invoice.inv_date)}
+                          </div>
                         </div>
-                        <Badge variant={(invoice.profit_margin_percent || 0) >= 0 ? "default" : "destructive"} className="text-xs">
+                        <Badge variant={(invoice.profit_margin_percent || 0) >= 0 ? "default" : "destructive"}
+                               className="text-xs shrink-0">
                           {(invoice.profit_margin_percent || 0).toFixed(1)}%
                         </Badge>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {t("tables.headers.date")}: {formatDateSA(invoice.inv_date)}
-                      </div>
-                      <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div className="grid grid-cols-3 gap-2 text-[11px] pt-2 border-t">
                         <div>
-                          <span className="text-muted-foreground">{t("tables.headers.sale_price")}:</span><br/>
-                          <span className="font-medium">{formatCurrencyTable(invoice.total_sale_price || 0)}</span>
+                          <div className="text-muted-foreground mb-0.5">{t("tables.headers.sale_price")}</div>
+                          <div className="font-semibold text-green-700 dark:text-green-400">{formatCurrencyTable(invoice.total_sale_price || 0)}</div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{t("tables.headers.cost")}:</span><br/>
-                          <span className="font-medium">{formatCurrencyTable(invoice.total_cost || 0)}</span>
+                          <div className="text-muted-foreground mb-0.5">{t("tables.headers.cost")}</div>
+                          <div className="font-semibold text-orange-700 dark:text-orange-400">{formatCurrencyTable(invoice.total_cost || 0)}</div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{t("tables.headers.profit")}:</span><br/>
-                          <Badge variant={(invoice.total_profit || 0) >= 0 ? "default" : "destructive"} className="text-xs">
+                          <div className="text-muted-foreground mb-0.5">{t("tables.headers.profit")}</div>
+                          <Badge variant={(invoice.total_profit || 0) >= 0 ? "default" : "destructive"}
+                                 className="text-[10px] h-5 px-1.5">
                             {formatCurrencyTable(invoice.total_profit || 0)}
                           </Badge>
                         </div>
@@ -869,31 +871,33 @@ export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabb
                     </div>
                   </div>
                 </div>
-                <div className="space-y-3 p-3">
+                <div className="space-y-2.5 p-2.5">
                   {displayStockData.map((stock, index) => (
-                    <div key={`${stock.product_name}-${index}`} className="bg-muted/30 p-3 rounded-lg space-y-2">
-                      <div className="text-sm font-medium truncate">{stock.product_name}</div>
-                      <div className="grid grid-cols-2 gap-3 text-xs">
+                    <div key={`${stock.product_name}-${index}`} className="bg-card border border-border p-3 rounded-lg space-y-2.5 shadow-sm">
+                      <div className="text-sm font-bold text-primary truncate" title={stock.product_name}>{stock.product_name}</div>
+                      <div className="grid grid-cols-2 gap-2 text-[11px] pt-2 border-t">
                         <div>
-                          <span className="text-muted-foreground">{t("tables.headers.stock_qty")}:</span><br/>
-                          <span className="font-medium">{formatNumber(stock.stock_quantity || 0)}</span>
+                          <div className="text-muted-foreground mb-0.5">{t("tables.headers.stock_qty")}</div>
+                          <div className="font-semibold text-blue-700 dark:text-blue-400">{formatNumber(stock.stock_quantity || 0)}</div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{t("tables.headers.stock_in_pcs")}:</span><br/>
-                          <span className="font-medium">{formatNumber(stock.stock_in_pieces || 0)}</span>
+                          <div className="text-muted-foreground mb-0.5">{t("tables.headers.stock_in_pcs")}</div>
+                          <div className="font-semibold text-blue-700 dark:text-blue-400">{formatNumber(stock.stock_in_pieces || 0)}</div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{t("tables.headers.unit_cost_header")}:</span><br/>
-                          <span className="font-medium">{formatCurrencyTable(stock.unit_cost || 0)}</span>
+                          <div className="text-muted-foreground mb-0.5">{t("tables.headers.unit_cost_header")}</div>
+                          <div className="font-semibold">{formatCurrencyTable(stock.unit_cost || 0)}</div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">{t("tables.headers.total_cost")}:</span><br/>
-                          <span className="font-medium">{formatCurrencyTable(stock.current_stock_value || 0)}</span>
+                          <div className="text-muted-foreground mb-0.5">{t("tables.headers.total_cost")}</div>
+                          <div className="font-semibold text-green-700 dark:text-green-400">{formatCurrencyTable(stock.current_stock_value || 0)}</div>
                         </div>
                       </div>
-                      <div className="text-xs">
-                        <span className="text-muted-foreground">{t("tables.headers.total_cost_with_vat")}:</span>
-                        <span className="font-medium ml-1">{formatCurrencyTable(stock.stock_value_with_vat || 0)}</span>
+                      <div className="text-[11px] pt-2 border-t">
+                        <div className="flex justify-between items-center">
+                          <span className="text-muted-foreground">{t("tables.headers.total_cost_with_vat")}</span>
+                          <span className="font-bold text-sm text-emerald-700 dark:text-emerald-400">{formatCurrencyTable(stock.stock_value_with_vat || 0)}</span>
+                        </div>
                       </div>
                     </div>
                   ))}

@@ -4,6 +4,8 @@
     "customers": "العملاء",
     "vendors": "الموردين",
     "expenses": "المصروفات",
+    "vehicle_instalments": "أقساط المركبات",
+    "loans": "القروض",
     "financials": "المالية",
     "whats_new": "الجديد",
     "navigation": "التنقل"
@@ -578,6 +580,123 @@
       "showing": "عرض",
       "of": "من",
       "transactions": "معاملة"
+    }
+  },
+  "vehicleInstalments": {
+    "title": "لوحة تحكم أقساط المركبات",
+    "description": "إدارة وتتبع أقساط المركبات الشهرية ومواعيد الدفع",
+    "kpi": {
+      "total_vehicles": "إجمالي المركبات",
+      "total_installments": "إجمالي الأقساط الشهرية",
+      "departments": "الأقسام",
+      "early_month": "أوائل الشهر (6)",
+      "mid_month": "منتصف الشهر (8-9)",
+      "mid_late": "منتصف-أواخر الشهر (14-15)"
+    },
+    "filters": {
+      "department": "القسم",
+      "owner": "المالك",
+      "payment_status": "حالة الدفع",
+      "deduction_day": "يوم الخصم",
+      "search_placeholder": "البحث بالرقم اللوحة أو الموديل...",
+      "all_departments": "جميع الأقسام",
+      "all_owners": "جميع المالكين",
+      "all_dates": "جميع التواريخ",
+      "all_payment_status": "جميع الحالات",
+      "active_loans": "القروض النشطة",
+      "completed_loans": "القروض المكتملة",
+      "overdue_payments": "الدفعات المتأخرة"
+    },
+    "table": {
+      "plate_number": "رقم اللوحة",
+      "plate_type": "نوع اللوحة",
+      "body_type": "نوع الهيكل",
+      "vehicle_maker": "الصانع",
+      "vehicle_model": "الموديل",
+      "model_year": "سنة الصنع",
+      "major_color": "اللون",
+      "owner_name": "المالك",
+      "department": "القسم",
+      "installment": "القسط الشهري",
+      "deduction_day": "يوم الخصم",
+      "first_installment": "أول قسط",
+      "total_months": "عدد الأشهر",
+      "last_installment": "آخر قسط",
+      "payment_details": "تفاصيل الدفع",
+      "expand_details": "توسيع التفاصيل",
+      "collapse_details": "طي التفاصيل",
+      "paid_months": "الأشهر المدفوعة",
+      "paid_amount": "المبلغ المدفوع",
+      "total_repayment": "إجمالي السداد",
+      "remaining_amount": "المبلغ المتبقي",
+      "remaining_months": "الأشهر المتبقية",
+      "next_payment_date": "موعد الدفع التالي",
+      "days_until_next": "أيام حتى الدفع التالي",
+      "progress": "التقدم",
+      "status": "الحالة",
+      "overdue": "متأخر",
+      "due_today": "مستحق اليوم",
+      "upcoming": "قادم",
+      "loan_completed": "القرض مكتمل",
+      "active": "نشط",
+      "completed": "مكتمل",
+      "no_vehicles": "لم يتم العثور على مركبات",
+      "loading": "جاري تحميل المركبات...",
+      "error": "خطأ في تحميل المركبات"
+    },
+    "countdown": {
+      "days_until": "أيام حتى",
+      "day_until": "يوم حتى",
+      "due_today": "مستحق اليوم",
+      "overdue": "متأخر",
+      "next_deduction": "الخصم التالي"
+    }
+  },
+  "loans": {
+    "title": "لوحة تحكم القروض",
+    "description": "مراقبة القروض البنكية وجداول السداد والأرصدة المعلقة",
+    "loading": "جاري تحميل القروض...",
+    "error": "خطأ في تحميل القروض",
+    "no_loans": "لم يتم العثور على قروض",
+    "export": "تصدير إلى Excel",
+    "search_placeholder": "البحث بالشخص المسؤول...",
+    "completed": "مكتمل",
+    "overdue": "متأخر",
+    "due_today": "مستحق اليوم",
+    "days_remaining": "أيام متبقية",
+    "kpi": {
+      "total_loans": "إجمالي القروض",
+      "total_amount": "إجمالي المبلغ",
+      "remaining_amount": "المبلغ المتبقي",
+      "payment_rate": "معدل السداد",
+      "active": "نشط",
+      "original_borrowed": "المبلغ المقترض الأصلي",
+      "to_be_paid": "المبلغ المطلوب دفعه",
+      "paid_so_far": "المدفوع حتى الآن"
+    },
+    "filters": {
+      "all_banks": "جميع البنوك",
+      "all_status": "جميع الحالات"
+    },
+    "status": {
+      "active": "نشط",
+      "closed": "مغلق",
+      "overdue": "متأخر"
+    },
+    "table": {
+      "title": "نظرة عامة على القروض",
+      "description": "جميع القروض مع تتبع الدفعات",
+      "loans": "قروض",
+      "loan": "قرض",
+      "person_in_charge": "الشخص المسؤول",
+      "bank": "البنك",
+      "initiation_date": "تاريخ البدء",
+      "maturity_date": "تاريخ الاستحقاق",
+      "time_remaining": "الوقت المتبقي",
+      "original_amount": "المبلغ الأصلي",
+      "repayment_amount": "مبلغ السداد",
+      "remaining_amount": "المبلغ المتبقي",
+      "status": "الحالة"
     }
   }
 }

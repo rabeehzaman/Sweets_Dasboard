@@ -102,12 +102,80 @@ export function ExpensesTable({ branchFilter, dateRange }: ExpensesTableProps) {
             placeholder={t("pages.expenses.search_placeholder")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
+            className="max-w-sm sm:max-w-md w-full sm:w-auto min-h-[44px]"
           />
         </div>
 
-        {/* Expenses Table */}
-        <div className="overflow-x-auto">
+        {/* Mobile View */}
+        <div className="md:hidden space-y-3">
+          {/* Total Summary Card */}
+          <div className="bg-muted/50 border-2 border-primary/20 p-3 rounded-lg">
+            <div className="flex justify-between items-center mb-1">
+              <div className="text-sm font-medium text-muted-foreground">{t("pages.expenses.total_row")}</div>
+              <Badge variant="secondary" className="text-xs">
+                {filteredExpenses.length} {filteredExpenses.length !== 1 ? t("pages.expenses.expenses_plural") : t("pages.expenses.expense_singular")}
+              </Badge>
+            </div>
+            <div className="text-2xl font-bold text-green-700 dark:text-green-400">
+              {formatCurrency(totalAmount)}
+            </div>
+            <div className="text-xs text-muted-foreground mt-1">
+              {branchFilter ? branchFilter : t("pages.expenses.all_branches")}
+            </div>
+          </div>
+
+          {/* Expense Cards */}
+          {filteredExpenses.length > 0 ? (
+            <div className="space-y-2.5">
+              {filteredExpenses.map((expense, index) => {
+                const expenseAmount = typeof expense.amount === 'string' ? parseFloat(expense.amount) || 0 : expense.amount
+                const percentage = totalAmount > 0 ? (expenseAmount / totalAmount) * 100 : 0
+
+                return (
+                  <div key={index} className="bg-card border border-border p-3 rounded-lg shadow-sm space-y-2">
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="text-xs text-muted-foreground">
+                        {expense.date
+                          ? format(new Date(expense.date), "MMM dd, yyyy")
+                          : "-"
+                        }
+                      </div>
+                      <Badge variant="outline" className="text-xs shrink-0">
+                        {expense.branch_name}
+                      </Badge>
+                    </div>
+
+                    <div className="text-sm font-medium break-words leading-tight">
+                      {expense.description}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t text-[11px]">
+                      <div>
+                        <div className="text-muted-foreground mb-0.5">Amount</div>
+                        <div className="font-bold text-base text-green-700 dark:text-green-400">
+                          {formatCurrency(expenseAmount)}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-muted-foreground mb-0.5">% of Total</div>
+                        <Badge variant="secondary" className="text-xs mt-1">
+                          {percentage.toFixed(1)}%
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground text-sm">
+              {searchTerm ? t("pages.expenses.no_match_search") : t("pages.expenses.no_expenses_found")}
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -176,6 +244,7 @@ export function ExpensesTable({ branchFilter, dateRange }: ExpensesTableProps) {
             )}
           </Table>
         </div>
+        {/* End Desktop Table View */}
       </CardContent>
     </Card>
   )

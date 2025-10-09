@@ -27,21 +27,24 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     <SidebarProvider defaultOpen={false}>
       <AppSidebar />
       <SidebarInset>
-        <header className={`flex h-16 shrink-0 items-center justify-between gap-2 border-b px-4 ${isArabic ? 'flex-row-reverse' : ''}`}>
+        <header className={`flex h-auto min-h-16 shrink-0 items-center justify-between gap-2 border-b px-3 sm:px-4 py-2 sm:py-0 flex-wrap sm:flex-nowrap ${isArabic ? 'flex-row-reverse' : ''}`}>
           <div className={`flex items-center gap-2 ${isArabic ? 'flex-row-reverse' : ''}`}>
-            <SidebarTrigger className={`${isArabic ? '-mr-1' : '-ml-1'}`}>
+            <SidebarTrigger className={`${isArabic ? '-mr-1' : '-ml-1'} min-h-[44px] min-w-[44px]`}>
               {isArabic ? <PanelRight /> : <PanelLeft />}
             </SidebarTrigger>
-            <Separator orientation="vertical" className={`h-4 ${isArabic ? 'ml-2' : 'mr-2'}`} />
-            <h1 className="font-semibold">{t("dashboard.title")}</h1>
+            <Separator orientation="vertical" className={`h-4 hidden sm:block ${isArabic ? 'ml-2' : 'mr-2'}`} />
+            <h1 className="font-semibold text-sm sm:text-base truncate max-w-[150px] sm:max-w-none">{t("dashboard.title")}</h1>
           </div>
           <div className={`flex items-center gap-2 ${isArabic ? 'flex-row-reverse' : ''}`}>
             {displayName && (
               <>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-xs sm:text-sm text-muted-foreground hidden md:inline">
                   {t("common.welcome")}, {displayName}
                 </span>
-                <Separator orientation="vertical" className="h-4" />
+                <span className="text-xs sm:text-sm text-muted-foreground md:hidden truncate max-w-[100px]">
+                  {displayName}
+                </span>
+                <Separator orientation="vertical" className="h-4 hidden sm:block" />
               </>
             )}
             <ThemeToggle />

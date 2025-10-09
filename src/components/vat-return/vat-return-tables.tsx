@@ -126,36 +126,117 @@ export function VATReturnTables({ dateRange, branchFilter }: VATReturnTablesProp
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <CardTitle>{t("vatReturn.title")}</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg sm:text-xl">{t("vatReturn.title")}</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               {t("vatReturn.tables.showing")} {data.invoices.length + data.credit_notes.length + data.bills.length} {t("vatReturn.tables.transactions")}
             </CardDescription>
           </div>
-          <Button onClick={handleExportToExcel} variant="outline" size="sm">
+          <Button onClick={handleExportToExcel} variant="outline" size="sm" className="w-full sm:w-auto min-h-[44px]">
             <Download className="h-4 w-4 mr-2" />
-            {t("vatReturn.exportExcel")}
+            <span className="truncate">{t("vatReturn.exportExcel")}</span>
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="invoices" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="invoices">
-              {t("vatReturn.salesTab")} ({data.invoices.length})
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="invoices" className="text-xs sm:text-sm min-h-[44px] px-1 sm:px-2">
+              {/* Mobile: Short label */}
+              <span className="truncate md:hidden">Sales ({data.invoices.length})</span>
+              {/* Desktop: Full label */}
+              <span className="truncate hidden md:inline">{t("vatReturn.salesTab")} ({data.invoices.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="creditNotes">
-              {t("vatReturn.returnsTab")} ({data.credit_notes.length})
+            <TabsTrigger value="creditNotes" className="text-xs sm:text-sm min-h-[44px] px-1 sm:px-2">
+              <span className="truncate md:hidden">Returns ({data.credit_notes.length})</span>
+              <span className="truncate hidden md:inline">{t("vatReturn.returnsTab")} ({data.credit_notes.length})</span>
             </TabsTrigger>
-            <TabsTrigger value="bills">
-              {t("vatReturn.purchasesTab")} ({data.bills.length})
+            <TabsTrigger value="bills" className="text-xs sm:text-sm min-h-[44px] px-1 sm:px-2">
+              <span className="truncate md:hidden">Bills ({data.bills.length})</span>
+              <span className="truncate hidden md:inline">{t("vatReturn.purchasesTab")} ({data.bills.length})</span>
             </TabsTrigger>
           </TabsList>
 
           {/* Invoices Tab */}
           <TabsContent value="invoices" className="mt-4">
-            <div className="rounded-md border">
+            {/* Mobile View - Summary Card */}
+            <div className="md:hidden mb-4">
+              <div className="bg-muted/50 border-2 border-primary/20 p-3 rounded-lg">
+                <div className="flex justify-between items-center mb-1">
+                  <div className="text-sm font-medium text-muted-foreground">
+                    {t("vatReturn.salesTab")}
+                  </div>
+                  <span className="text-xs font-semibold">
+                    {data.invoices.length} {data.invoices.length !== 1 ? 'invoices' : 'invoice'}
+                  </span>
+                </div>
+                <div className="text-2xl font-bold text-green-700 dark:text-green-400">
+                  {formatCurrency(data.summary.total_output_vat)}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {t("vatReturn.vatAmount")}
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile View - Invoice Cards */}
+            <div className="md:hidden space-y-2.5">
+              {data.invoices.length > 0 ? (
+                data.invoices.map((invoice, idx) => (
+                  <div key={idx} className="bg-card border border-border p-3 rounded-lg shadow-sm space-y-2">
+                    {/* Header */}
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <div className="text-sm font-bold text-primary truncate">
+                          {invoice.invoice_number}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {format(new Date(invoice.invoice_date), 'yyyy-MM-dd')}
+                        </div>
+                      </div>
+                      <span className="text-xs px-2 py-1 bg-muted rounded shrink-0">
+                        {invoice.branch_name || 'N/A'}
+                      </span>
+                    </div>
+
+                    {/* Customer */}
+                    <div className="text-sm font-medium break-words leading-tight">
+                      {invoice.customer_name}
+                    </div>
+
+                    {/* Amounts */}
+                    <div className="grid grid-cols-3 gap-2 pt-2 border-t text-[11px]">
+                      <div>
+                        <div className="text-muted-foreground mb-0.5">{t("vatReturn.subtotal")}</div>
+                        <div className="font-medium text-sm">
+                          {formatCurrency(invoice.subtotal)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-muted-foreground mb-0.5">{t("vatReturn.vatAmount")}</div>
+                        <div className="font-bold text-sm text-green-700 dark:text-green-400">
+                          {formatCurrency(invoice.vat_amount)}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-muted-foreground mb-0.5">{t("vatReturn.total")}</div>
+                        <div className="font-bold text-sm">
+                          {formatCurrency(invoice.total)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  {t("vatReturn.no_data")}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -211,7 +292,83 @@ export function VATReturnTables({ dateRange, branchFilter }: VATReturnTablesProp
 
           {/* Credit Notes Tab */}
           <TabsContent value="creditNotes" className="mt-4">
-            <div className="rounded-md border">
+            {/* Mobile View - Summary Card */}
+            <div className="md:hidden mb-4">
+              <div className="bg-muted/50 border-2 border-primary/20 p-3 rounded-lg">
+                <div className="flex justify-between items-center mb-1">
+                  <div className="text-sm font-medium text-muted-foreground">
+                    {t("vatReturn.returnsTab")}
+                  </div>
+                  <span className="text-xs font-semibold">
+                    {data.credit_notes.length} {data.credit_notes.length !== 1 ? 'credit notes' : 'credit note'}
+                  </span>
+                </div>
+                <div className="text-2xl font-bold text-orange-700 dark:text-orange-400">
+                  {formatCurrency(data.summary.total_credit_vat)}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {t("vatReturn.vatAmount")}
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile View - Credit Note Cards */}
+            <div className="md:hidden space-y-2.5">
+              {data.credit_notes.length > 0 ? (
+                data.credit_notes.map((cn, idx) => (
+                  <div key={idx} className="bg-card border border-border p-3 rounded-lg shadow-sm space-y-2">
+                    {/* Header */}
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <div className="text-sm font-bold text-primary truncate">
+                          {cn.credit_note_number}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {format(new Date(cn.credit_note_date), 'yyyy-MM-dd')}
+                        </div>
+                      </div>
+                      <span className="text-xs px-2 py-1 bg-muted rounded shrink-0">
+                        {cn.branch_name || 'N/A'}
+                      </span>
+                    </div>
+
+                    {/* Customer */}
+                    <div className="text-sm font-medium break-words leading-tight">
+                      {cn.customer_name}
+                    </div>
+
+                    {/* Amounts */}
+                    <div className="grid grid-cols-3 gap-2 pt-2 border-t text-[11px]">
+                      <div>
+                        <div className="text-muted-foreground mb-0.5">{t("vatReturn.subtotal")}</div>
+                        <div className="font-medium text-sm">
+                          {formatCurrency(cn.subtotal)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-muted-foreground mb-0.5">{t("vatReturn.vatAmount")}</div>
+                        <div className="font-bold text-sm text-orange-700 dark:text-orange-400">
+                          {formatCurrency(cn.vat_amount)}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-muted-foreground mb-0.5">{t("vatReturn.total")}</div>
+                        <div className="font-bold text-sm">
+                          {formatCurrency(cn.total)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  {t("vatReturn.no_data")}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -267,7 +424,83 @@ export function VATReturnTables({ dateRange, branchFilter }: VATReturnTablesProp
 
           {/* Bills Tab */}
           <TabsContent value="bills" className="mt-4">
-            <div className="rounded-md border">
+            {/* Mobile View - Summary Card */}
+            <div className="md:hidden mb-4">
+              <div className="bg-muted/50 border-2 border-primary/20 p-3 rounded-lg">
+                <div className="flex justify-between items-center mb-1">
+                  <div className="text-sm font-medium text-muted-foreground">
+                    {t("vatReturn.purchasesTab")}
+                  </div>
+                  <span className="text-xs font-semibold">
+                    {data.bills.length} {data.bills.length !== 1 ? 'bills' : 'bill'}
+                  </span>
+                </div>
+                <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+                  {formatCurrency(data.summary.total_input_vat)}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {t("vatReturn.vatAmount")}
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile View - Bill Cards */}
+            <div className="md:hidden space-y-2.5">
+              {data.bills.length > 0 ? (
+                data.bills.map((bill, idx) => (
+                  <div key={idx} className="bg-card border border-border p-3 rounded-lg shadow-sm space-y-2">
+                    {/* Header */}
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="space-y-0.5 flex-1 min-w-0">
+                        <div className="text-sm font-bold text-primary truncate">
+                          {bill.bill_number}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {format(new Date(bill.bill_date), 'yyyy-MM-dd')}
+                        </div>
+                      </div>
+                      <span className="text-xs px-2 py-1 bg-muted rounded shrink-0">
+                        {bill.branch_name || 'N/A'}
+                      </span>
+                    </div>
+
+                    {/* Vendor */}
+                    <div className="text-sm font-medium break-words leading-tight">
+                      {bill.vendor_name}
+                    </div>
+
+                    {/* Amounts */}
+                    <div className="grid grid-cols-3 gap-2 pt-2 border-t text-[11px]">
+                      <div>
+                        <div className="text-muted-foreground mb-0.5">{t("vatReturn.subtotal")}</div>
+                        <div className="font-medium text-sm">
+                          {formatCurrency(bill.subtotal)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-muted-foreground mb-0.5">{t("vatReturn.vatAmount")}</div>
+                        <div className="font-bold text-sm text-blue-700 dark:text-blue-400">
+                          {formatCurrency(bill.vat_amount)}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-muted-foreground mb-0.5">{t("vatReturn.total")}</div>
+                        <div className="font-bold text-sm">
+                          {formatCurrency(bill.total)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  {t("vatReturn.no_data")}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>

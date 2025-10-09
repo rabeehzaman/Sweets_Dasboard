@@ -4,6 +4,8 @@
     "customers": "Customers",
     "vendors": "Vendors",
     "expenses": "Expenses",
+    "vehicle_instalments": "Vehicle Instalments",
+    "loans": "Loans",
     "financials": "Financials",
     "whats_new": "What's New",
     "navigation": "Navigation"
@@ -578,6 +580,97 @@
       "showing": "Showing",
       "of": "of",
       "transactions": "transactions"
+    }
+  },
+  "vehicleInstalments": {
+    "title": "Vehicle Instalments Dashboard",
+    "description": "Monitor vehicle loans, payment schedules, and deduction tracking",
+    "kpi": {
+      "total_vehicles": "Total Vehicles",
+      "total_installments": "Total Installments",
+      "departments": "Departments",
+      "early_month": "Early Month (6th)",
+      "mid_month": "Mid Month (8th-9th)",
+      "mid_late": "Mid-Late (14th-15th)"
+    },
+    "filters": {
+      "department": "Department:",
+      "owner": "Owner:",
+      "payment_status": "Payment Status:",
+      "deduction_date": "Deduction Date:",
+      "search_placeholder": "Search by plate number, vehicle, amount, department..."
+    },
+    "table": {
+      "plate_number": "Plate Number",
+      "vehicle_details": "Vehicle Details",
+      "owner": "Owner",
+      "department": "Department",
+      "payment_status": "Payment Status",
+      "deduction_date": "Deduction Date",
+      "installment": "Installment",
+      "payment_timeline": "Payment Timeline",
+      "start_date": "Start Date",
+      "end_date": "End Date",
+      "duration": "Duration",
+      "months": "months",
+      "paid_amount": "Paid Amount",
+      "total_repayment": "Total Repayment",
+      "remaining": "Remaining",
+      "months_left": "Months Left",
+      "next_payment": "Next Payment",
+      "due_date": "Due Date",
+      "amount": "Amount",
+      "overdue": "OVERDUE",
+      "due_today": "DUE TODAY",
+      "due_in_days": "Due in {{days}} days",
+      "loan_completed": "LOAN COMPLETED"
+    }
+  },
+  "loans": {
+    "title": "Loans Dashboard",
+    "description": "Monitor bank loans, repayment schedules, and outstanding balances",
+    "loading": "Loading loans...",
+    "error": "Error loading loans",
+    "no_loans": "No loans found",
+    "export": "Export to Excel",
+    "search_placeholder": "Search by person in charge...",
+    "completed": "Completed",
+    "overdue": "Overdue",
+    "due_today": "Due Today",
+    "days_remaining": "days remaining",
+    "kpi": {
+      "total_loans": "Total Loans",
+      "total_amount": "Total Amount",
+      "remaining_amount": "Remaining Amount",
+      "payment_rate": "Payment Rate",
+      "active": "active",
+      "original_borrowed": "Original borrowed",
+      "to_be_paid": "To be paid",
+      "paid_so_far": "Paid so far"
+    },
+    "filters": {
+      "all_banks": "All Banks",
+      "all_status": "All Status"
+    },
+    "status": {
+      "active": "Active",
+      "closed": "Closed",
+      "overdue": "Overdue"
+    },
+    "table": {
+      "title": "Loans Overview",
+      "description": "All loans with payment tracking",
+      "loans": "loans",
+      "loan": "Loan",
+      "person_in_charge": "Person in Charge",
+      "bank": "Bank",
+      "initiation_date": "Initiation Date",
+      "maturity_date": "Maturity Date",
+      "time_remaining": "Time Remaining",
+      "original_amount": "Original Amount",
+      "repayment_amount": "Repayment Amount",
+      "remaining_amount": "Remaining Amount",
+      "status": "Status"
     }
   }
 }

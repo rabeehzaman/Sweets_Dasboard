@@ -89,7 +89,7 @@ export function KPICards({ dateRange, branchFilter }: KPICardsProps = {}) {
 
   if (error) {
     return (
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 px-1">
         {Array.from({ length: 4 }).map((_, i) => (
           <Card key={i} className="border-red-200 dark:border-red-800">
             <CardHeader>
@@ -106,7 +106,7 @@ export function KPICards({ dateRange, branchFilter }: KPICardsProps = {}) {
 
   if (!kpis && !loading) {
     return (
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 px-1">
         {Array.from({ length: 4 }).map((_, i) => (
           <Card key={i} className="border-yellow-200 dark:border-yellow-800">
             <CardHeader>
@@ -136,7 +136,7 @@ export function KPICards({ dateRange, branchFilter }: KPICardsProps = {}) {
         </div>
       )}
       
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 px-1">
         <KPICard
           title={t("kpi.total_revenue")}
           value={formatCurrency(kpis?.total_revenue || 0)}
@@ -185,7 +185,7 @@ export function ExtendedKPICards({ dateRange, branchFilter }: KPICardsProps = {}
   return (
     <div className="space-y-4">
       {/* First row - Extended KPIs */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 px-1">
         <KPICard
           title={t("kpi.total_expenses")}
           value={formatCurrency(kpis?.total_expenses || 0)}
@@ -213,7 +213,7 @@ export function ExtendedKPICards({ dateRange, branchFilter }: KPICardsProps = {}
       </div>
       
       {/* Second row - Additional metrics */}
-      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+      <div className="grid gap-3 sm:gap-4 md:grid-cols-1 lg:grid-cols-2 px-1">
         <KPICard
           title={`${t("nav.overview")} (${t("kpi.invoices")})`}
           value={formatNumber(kpis?.total_invoices || 0)}

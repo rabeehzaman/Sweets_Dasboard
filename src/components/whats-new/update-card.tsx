@@ -75,29 +75,32 @@ export function UpdateCard({ update, index = 0 }: UpdateCardProps) {
         <div className={`flex items-start gap-3 ${isArabic ? 'flex-row-reverse' : ''}`}>
           {/* Timeline dot */}
           <div className="relative flex-shrink-0">
-            <div className="w-3 h-3 rounded-full bg-primary ring-4 ring-background" />
+            <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-primary ring-4 ring-background" />
           </div>
 
           <div className={`flex-1 ${isArabic ? 'text-right' : ''}`}>
             <div className={`flex flex-wrap items-center gap-2 mb-2 ${isArabic ? 'flex-row-reverse' : ''}`}>
-              <Badge variant="outline" className={`${config.colorClass} ${isArabic ? 'flex-row-reverse' : ''}`}>
-                <Icon className={`w-3 h-3 ${isArabic ? 'ml-1' : 'mr-1'}`} />
+              <Badge variant="outline" className={`text-xs ${config.colorClass} ${isArabic ? 'flex-row-reverse' : ''}`}>
+                <Icon className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isArabic ? 'ml-1' : 'mr-1'}`} />
                 {isArabic ? config.labelAr : config.labelEn}
               </Badge>
 
               {update.version && (
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="text-xs">
                   v{update.version}
                 </Badge>
               )}
 
-              <span className="text-sm text-muted-foreground" suppressHydrationWarning>
-                {formattedDate}
+              <span className="text-xs sm:text-sm text-muted-foreground" suppressHydrationWarning>
+                {/* Mobile: Short date format */}
+                <span className="md:hidden">{format(new Date(update.date), 'MMM d, yyyy')}</span>
+                {/* Desktop: Full date format */}
+                <span className="hidden md:inline">{formattedDate}</span>
               </span>
             </div>
 
-            <CardTitle className="mb-1">{title}</CardTitle>
-            <CardDescription>{description}</CardDescription>
+            <CardTitle className="mb-1 text-base sm:text-lg">{title}</CardTitle>
+            <CardDescription className="text-sm sm:text-base">{description}</CardDescription>
           </div>
         </div>
       </CardHeader>
@@ -105,14 +108,14 @@ export function UpdateCard({ update, index = 0 }: UpdateCardProps) {
       {changes && changes.length > 0 && (
         <>
           <Separator />
-          <CardContent>
-            <ul className={`space-y-2 ${isArabic ? 'text-right' : ''}`}>
+          <CardContent className="px-4 sm:px-6">
+            <ul className={`space-y-2 sm:space-y-2.5 ${isArabic ? 'text-right' : ''}`}>
               {changes.map((change, idx) => (
                 <li
                   key={idx}
-                  className={`text-sm text-muted-foreground flex items-start gap-2 ${isArabic ? 'flex-row-reverse' : ''}`}
+                  className={`text-xs sm:text-sm text-muted-foreground flex items-start gap-2 ${isArabic ? 'flex-row-reverse' : ''}`}
                 >
-                  <span className="flex-shrink-0">{change}</span>
+                  <span className="flex-shrink-0 leading-relaxed">{change}</span>
                 </li>
               ))}
             </ul>

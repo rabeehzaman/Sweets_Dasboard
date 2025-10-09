@@ -145,17 +145,40 @@ export function DateFilter({ onDateRangeChange, className }: DateFilterProps) {
     if (selectedPreset === "custom" && customDateRange) {
       return `${format(customDateRange.from, "MMM d, yyyy")} - ${format(customDateRange.to, "MMM d, yyyy")}`
     }
-    
+
     const preset = datePresets.find(p => p.value === selectedPreset)
     return preset?.label || "Select date range"
+  }
+
+  const getMobileDisplayText = () => {
+    if (selectedPreset === "custom" && customDateRange) {
+      return `${format(customDateRange.from, "MMM d")} - ${format(customDateRange.to, "MMM d")}`
+    }
+
+    // Shorter labels for mobile
+    const mobileLabels: Record<DateFilterPreset, string> = {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "day-before-yesterday": "2 Days Ago",
+      "this-week": "This Week",
+      "last-week": "Last Week",
+      "this-month": "This Month",
+      "previous-month": "Last Month",
+      "this-year": "This Year",
+      "previous-year": "Last Year",
+      "custom": "Custom"
+    }
+
+    return mobileLabels[selectedPreset] || getDisplayText()
   }
 
   return (
     <div className={cn("flex flex-col sm:flex-row sm:items-center gap-2", className)}>
       <Select value={selectedPreset} onValueChange={handlePresetChange}>
         <SelectTrigger className="w-full sm:w-[180px] min-h-[44px] hover:border-primary focus:ring-primary focus:border-primary">
-          <CalendarIcon className="h-4 w-4 mr-2" />
-          <SelectValue placeholder={t("filters.date_range")} />
+          <CalendarIcon className="h-4 w-4 mr-2 shrink-0" />
+          <span className="truncate block sm:hidden">{getMobileDisplayText()}</span>
+          <span className="truncate hidden sm:block">{getDisplayText()}</span>
         </SelectTrigger>
         <SelectContent>
           {datePresets.map((preset) => (
