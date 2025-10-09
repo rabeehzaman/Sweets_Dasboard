@@ -385,6 +385,7 @@ DECLARE
     net_profit NUMERIC;
     gross_profit_margin NUMERIC;
     net_profit_margin NUMERIC;
+    total_stock_value NUMERIC;
 BEGIN
     -- Calculate sales and cost from profit_analysis_view_current
     SELECT
@@ -410,6 +411,13 @@ BEGIN
         AND (end_date IS NULL OR date <= end_date)
         AND (branch_filter IS NULL OR branch_name = branch_filter);
 
+    -- Calculate total stock value from stock_in_flow_table
+    SELECT COALESCE(SUM(CAST(REGEXP_REPLACE(COALESCE(s.total_bcy, '0'), '[^0-9.-]', '', 'g') AS NUMERIC)), 0)
+    INTO total_stock_value
+    FROM stock_in_flow_table s
+    LEFT JOIN branch b ON s.branch_id = b.branch_id
+    WHERE (branch_filter IS NULL OR b.branch_name = branch_filter);
+
     -- Calculate net profit and margins
     net_profit := gross_profit - total_expenses;
 
@@ -433,6 +441,7 @@ BEGIN
         'netProfit', net_profit,
         'grossProfitMargin', gross_profit_margin,
         'netProfitMargin', net_profit_margin,
+        'totalStockValue', total_stock_value,
         'totalInvoices', COUNT(*),
         'uniqueInvoices', COUNT(DISTINCT "Inv No"),
         'totalQuantity', COALESCE(SUM("Qty"), 0),
@@ -530,6 +539,7 @@ DECLARE
     net_profit NUMERIC;
     gross_profit_margin NUMERIC;
     net_profit_margin NUMERIC;
+    total_stock_value NUMERIC;
 BEGIN
     -- Calculate sales and cost from profit_analysis_view_current (2025 data only)
     SELECT
@@ -557,6 +567,13 @@ BEGIN
         AND (end_date IS NULL OR date <= end_date)
         AND (branch_filter IS NULL OR branch_name = branch_filter);
 
+    -- Calculate total stock value from stock_in_flow_table
+    SELECT COALESCE(SUM(CAST(REGEXP_REPLACE(COALESCE(s.total_bcy, '0'), '[^0-9.-]', '', 'g') AS NUMERIC)), 0)
+    INTO total_stock_value
+    FROM stock_in_flow_table s
+    LEFT JOIN branch b ON s.branch_id = b.branch_id
+    WHERE (branch_filter IS NULL OR b.branch_name = branch_filter);
+
     -- Calculate net profit and margins
     net_profit := gross_profit - total_expenses;
 
@@ -580,6 +597,7 @@ BEGIN
         'netProfit', net_profit,
         'grossProfitMargin', gross_profit_margin,
         'netProfitMargin', net_profit_margin,
+        'totalStockValue', total_stock_value,
         'totalInvoices', COUNT(*),
         'uniqueInvoices', COUNT(DISTINCT "Inv No"),
         'totalQuantity', COALESCE(SUM("Qty"), 0),

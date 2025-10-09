@@ -5,6 +5,7 @@
     "vendors": "Vendors",
     "expenses": "Expenses",
     "financials": "Financials",
+    "whats_new": "What's New",
     "navigation": "Navigation"
   },
   "dashboard": {
@@ -28,6 +29,7 @@
     "back": "Back",
     "next": "Next",
     "previous": "Previous",
+    "welcome": "Welcome",
     "total": "Total",
     "date": "Date",
     "amount": "Amount",
@@ -59,6 +61,23 @@
       "this_year": "This Year",
       "previous_year": "Previous Year",
       "custom_range": "Custom Range"
+    },
+    "select_month": "Select Month",
+    "transactions": "transactions",
+    "no_months_available": "No months with transactions",
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
     }
   },
   "kpi": {
@@ -73,8 +92,10 @@
     "gross_profit": "Gross Profit",
     "gp_percentage": "GP %",
     "total_expenses": "Total Expenses",
-    "total_stock_value": "Total Stock Value (All Warehouses)",
+    "total_stock_value": "Total Stock Value",
     "daily_avg_sales": "Daily Avg Sales",
+    "net_vat_payable": "Net VAT Payable",
+    "net_vat_refundable": "Net VAT Refundable",
     "database_optimized": "Database optimized",
     "invoices": "invoices",
     "items": "items"
@@ -239,6 +260,11 @@
       "over_90_days": "Over 90 days",
       "days_avg": "days avg",
       "no_payment_data": "No payment data"
+    },
+    "whats_new": {
+      "title": "What's New",
+      "description": "Latest updates and improvements to your dashboard",
+      "no_updates": "No updates available at this time"
     }
   },
   "customers": {
@@ -508,6 +534,50 @@
       "equation_verification": "Balance Sheet Equation Verification",
       "balanced": "✓ Balanced",
       "imbalanced": "⚠ Imbalanced"
+    }
+  },
+  "vatReturn": {
+    "title": "VAT Return",
+    "description": "Value Added Tax (VAT) calculation and reporting for tax compliance",
+    "nav_title": "VAT Return",
+    "outputVat": "Output VAT (Sales)",
+    "creditNoteVat": "Less: Sales Returns VAT",
+    "netOutputVat": "Net Output VAT",
+    "inputVat": "Input VAT (Purchases)",
+    "netVatPayable": "Net VAT Payable",
+    "netVatRefundable": "Net VAT Refundable",
+    "invoiceNumber": "Invoice Number",
+    "creditNoteNumber": "Credit Note Number",
+    "billNumber": "Bill Number",
+    "date": "Date",
+    "customer": "Customer",
+    "vendor": "Vendor",
+    "subtotal": "Subtotal",
+    "vatAmount": "VAT Amount",
+    "total": "Total",
+    "branch": "Branch",
+    "exportExcel": "Export to Excel",
+    "salesTab": "Sales (Invoices)",
+    "returnsTab": "Sales Returns",
+    "purchasesTab": "Purchases (Bills)",
+    "loading": "Loading VAT return data...",
+    "error": "Error loading VAT return data",
+    "no_data": "No VAT transactions found for the selected period",
+    "summary": {
+      "title": "VAT Summary",
+      "description": "VAT calculation summary for the selected period",
+      "outputVatDescription": "VAT collected from customer sales",
+      "creditVatDescription": "VAT adjustments for sales returns",
+      "inputVatDescription": "VAT paid on purchases",
+      "netVatDescription": "Net VAT amount due to tax authority"
+    },
+    "tables": {
+      "invoices_title": "Sales Invoices (Output VAT)",
+      "credit_notes_title": "Credit Notes (Sales Returns)",
+      "bills_title": "Purchase Bills (Input VAT)",
+      "showing": "Showing",
+      "of": "of",
+      "transactions": "transactions"
     }
   }
 }

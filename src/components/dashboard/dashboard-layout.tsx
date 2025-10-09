@@ -10,6 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { useLocale } from "@/i18n/locale-provider"
+import { useAuth } from "@/hooks/use-auth"
 import { PanelLeft, PanelRight } from "lucide-react"
 
 interface DashboardLayoutProps {
@@ -18,7 +19,10 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { isArabic, t } = useLocale()
-  
+  const { permissions } = useAuth()
+
+  const displayName = isArabic ? permissions?.displayNameAr : permissions?.displayNameEn
+
   return (
     <SidebarProvider defaultOpen={false}>
       <AppSidebar />
@@ -31,7 +35,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <Separator orientation="vertical" className={`h-4 ${isArabic ? 'ml-2' : 'mr-2'}`} />
             <h1 className="font-semibold">{t("dashboard.title")}</h1>
           </div>
-          <ThemeToggle />
+          <div className={`flex items-center gap-2 ${isArabic ? 'flex-row-reverse' : ''}`}>
+            {displayName && (
+              <>
+                <span className="text-sm text-muted-foreground">
+                  {t("common.welcome")}, {displayName}
+                </span>
+                <Separator orientation="vertical" className="h-4" />
+              </>
+            )}
+            <ThemeToggle />
+          </div>
         </header>
         <div className="flex flex-1 flex-col gap-4 p-2 sm:p-4 md:p-6 overflow-x-hidden w-full max-w-full">
           {children}

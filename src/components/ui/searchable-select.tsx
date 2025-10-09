@@ -89,7 +89,7 @@ export function SearchableSelect({
           {!selectedOption && <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={cn("p-0 w-[var(--radix-popover-trigger-width)] min-w-[200px] max-w-[300px]")} align="start">
+      <PopoverContent className={cn("p-0 w-[300px]")} align="start" sideOffset={8}>
         <div className="flex flex-col max-h-64">
           <div className="p-2 border-b">
             <Input

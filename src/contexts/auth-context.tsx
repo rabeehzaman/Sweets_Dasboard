@@ -9,6 +9,8 @@ interface UserPermissions {
   role: string
   isAdmin: boolean
   preferredLanguage: string
+  displayNameEn?: string
+  displayNameAr?: string
 }
 
 interface AuthContextType {
@@ -32,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchPermissions = async (userId: string) => {
     const { data, error } = await supabase
       .from('user_branch_permissions')
-      .select('allowed_branches, role, preferred_language')
+      .select('allowed_branches, role, preferred_language, display_name_en, display_name_ar')
       .eq('user_id', userId)
       .single()
 
@@ -45,7 +47,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       allowedBranches: data.allowed_branches || [],
       role: data.role || 'viewer',
       isAdmin: data.allowed_branches?.includes('*') || false,
-      preferredLanguage: data.preferred_language || 'en'
+      preferredLanguage: data.preferred_language || 'en',
+      displayNameEn: data.display_name_en,
+      displayNameAr: data.display_name_ar
     }
   }
 

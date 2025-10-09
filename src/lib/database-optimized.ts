@@ -80,6 +80,7 @@ export interface OptimizedKPIs {
   gross_profit_margin: number
   net_profit_margin: number
   daily_avg_sales: number
+  net_vat_payable: number
 }
 
 export interface OptimizedTransaction {
@@ -216,13 +217,14 @@ export async function getOptimizedKPIs(
       average_order_value: rawKpis.averageOrderValue || 0,
       earliest_transaction: '', // Not returned by function
       latest_transaction: '', // Not returned by function
-      total_stock_value: 0, // Not returned by function
+      total_stock_value: rawKpis.totalStockValue || 0,
       gross_profit: rawKpis.grossProfit || 0,
       net_profit: rawKpis.netProfit || 0,
       total_expenses: rawKpis.totalExpenses || 0,
       gross_profit_margin: rawKpis.grossProfitMargin || 0,
       net_profit_margin: rawKpis.netProfitMargin || 0,
-      daily_avg_sales: rawKpis.dailyAvgSales || 0
+      daily_avg_sales: rawKpis.dailyAvgSales || 0,
+      net_vat_payable: rawKpis.netVatPayable || 0
     }
 
     console.log('✅ Optimized KPIs loaded:', {
@@ -1305,12 +1307,13 @@ export async function getInvoiceFilterOptions(
 
     if (!data) return []
 
+    // The RPC function returns invoice_no field
     const options = data.map((invoice: { invoice_no: string }) => ({
       value: invoice.invoice_no,
       label: invoice.invoice_no
     }))
 
-    console.log('✅ Invoice filter options loaded:', { count: options.length })
+    console.log('✅ Invoice filter options loaded:', { count: options.length, sample: options.slice(0, 3) })
     return options
   } catch (error) {
     console.error('❌ Exception fetching invoice filter options:', error)
@@ -1424,6 +1427,163 @@ export async function getInvoiceItems(invoiceNumber: string): Promise<InvoiceIte
   } catch (error) {
     console.error('❌ Exception fetching invoice items:', error)
     return null
+  }
+}
+
+// =============================================================================
+// VAT RETURN API
+// =============================================================================
+
+export interface VATInvoice {
+  invoice_number: string
+  invoice_date: string
+  customer_name: string
+  branch_name: string
+  subtotal: number
+  vat_amount: number
+  total: number
+}
+
+export interface VATCreditNote {
+  credit_note_number: string
+  credit_note_date: string
+  customer_name: string
+  branch_name: string
+  subtotal: number
+  vat_amount: number
+  total: number
+}
+
+export interface VATBill {
+  bill_number: string
+  bill_date: string
+  vendor_name: string
+  branch_name: string
+  subtotal: number
+  vat_amount: number
+  total: number
+}
+
+export interface VATReturnSummary {
+  total_output_vat: number
+  total_credit_vat: number
+  total_input_vat: number
+  net_vat_payable: number
+}
+
+export interface VATReturnData {
+  invoices: VATInvoice[]
+  credit_notes: VATCreditNote[]
+  bills: VATBill[]
+  summary: VATReturnSummary
+}
+
+export interface VATAvailableMonth {
+  month: number
+  year: number
+  transaction_count: number
+}
+
+/**
+ * Get VAT return data for a specific date range
+ */
+export async function getVATReturn(
+  startDate: string,
+  endDate: string,
+  branchFilter?: string
+): Promise<VATReturnData | null> {
+  try {
+    console.log('💰 Fetching VAT return data:', { startDate, endDate, branchFilter })
+
+    const { data, error } = await supabase.rpc('get_vat_return', {
+      p_start_date: startDate,
+      p_end_date: endDate,
+      p_branch_id: branchFilter || null
+    })
+
+    if (error) {
+      console.error('❌ Error fetching VAT return:', error)
+      return null
+    }
+
+    if (!data) {
+      console.warn('⚠️ No VAT return data returned')
+      return {
+        invoices: [],
+        credit_notes: [],
+        bills: [],
+        summary: {
+          total_output_vat: 0,
+          total_credit_vat: 0,
+          total_input_vat: 0,
+          net_vat_payable: 0
+        }
+      }
+    }
+
+    // The RPC function returns JSON with snake_case keys
+    const vatData = data as Record<string, unknown>
+
+    // Extract summary first (it's nested in the response)
+    const summaryData = (vatData.summary as Record<string, unknown>) || {}
+
+    const result: VATReturnData = {
+      invoices: (vatData.invoices as VATInvoice[]) || [],
+      credit_notes: (vatData.credit_notes as VATCreditNote[]) || [],
+      bills: (vatData.bills as VATBill[]) || [],
+      summary: {
+        total_output_vat: (summaryData.total_output_vat as number) || 0,
+        total_credit_vat: (summaryData.total_credit_vat as number) || 0,
+        total_input_vat: (summaryData.total_input_vat as number) || 0,
+        net_vat_payable: (summaryData.net_vat_payable as number) || 0
+      }
+    }
+
+    console.log('✅ VAT return loaded:', {
+      invoices: result.invoices.length,
+      creditNotes: result.credit_notes.length,
+      bills: result.bills.length,
+      netVatPayable: result.summary.net_vat_payable
+    })
+
+    return result
+  } catch (error) {
+    console.error('❌ Exception fetching VAT return:', error)
+    return null
+  }
+}
+
+/**
+ * Get available months with VAT transactions (current year only)
+ */
+export async function getVATAvailableMonths(): Promise<VATAvailableMonth[]> {
+  try {
+    console.log('📅 Fetching available VAT months')
+
+    const { data, error } = await supabase.rpc('get_vat_available_months')
+
+    if (error) {
+      console.error('❌ Error fetching available VAT months:', error)
+      return []
+    }
+
+    if (!data || !Array.isArray(data)) {
+      console.warn('⚠️ No available VAT months returned')
+      return []
+    }
+
+    // Map the response to match our interface
+    const months: VATAvailableMonth[] = data.map((item: Record<string, unknown>) => ({
+      month: item.month as number,
+      year: item.year as number,
+      transaction_count: item.transactionCount as number
+    }))
+
+    console.log('✅ Available VAT months loaded:', { count: months.length })
+    return months
+  } catch (error) {
+    console.error('❌ Exception fetching available VAT months:', error)
+    return []
   }
 }
 

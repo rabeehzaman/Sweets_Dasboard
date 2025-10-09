@@ -5,6 +5,7 @@
     "vendors": "الموردين",
     "expenses": "المصروفات",
     "financials": "المالية",
+    "whats_new": "الجديد",
     "navigation": "التنقل"
   },
   "dashboard": {
@@ -28,6 +29,7 @@
     "back": "رجوع",
     "next": "التالي",
     "previous": "السابق",
+    "welcome": "مرحباً",
     "total": "الإجمالي",
     "date": "التاريخ",
     "amount": "المبلغ",
@@ -59,6 +61,23 @@
       "this_year": "هذه السنة",
       "previous_year": "السنة الماضية",
       "custom_range": "نطاق مخصص"
+    },
+    "select_month": "اختر الشهر",
+    "transactions": "معاملة",
+    "no_months_available": "لا توجد شهور بمعاملات",
+    "months": {
+      "january": "يناير",
+      "february": "فبراير",
+      "march": "مارس",
+      "april": "أبريل",
+      "may": "مايو",
+      "june": "يونيو",
+      "july": "يوليو",
+      "august": "أغسطس",
+      "september": "سبتمبر",
+      "october": "أكتوبر",
+      "november": "نوفمبر",
+      "december": "ديسمبر"
     }
   },
   "kpi": {
@@ -73,8 +92,10 @@
     "gross_profit": "إجمالي الربح",
     "gp_percentage": "نسبة الربح الإجمالي",
     "total_expenses": "إجمالي المصروفات",
-    "total_stock_value": "إجمالي قيمة المخزون (جميع المستودعات)",
+    "total_stock_value": "إجمالي قيمة المخزون",
     "daily_avg_sales": "متوسط المبيعات اليومية",
+    "net_vat_payable": "صافي الضريبة المستحقة",
+    "net_vat_refundable": "صافي الضريبة القابلة للاسترداد",
     "database_optimized": "قاعدة البيانات محسّنة",
     "invoices": "فواتير",
     "items": "عناصر"
@@ -239,6 +260,11 @@
       "over_90_days": "أكثر من 90 يوم",
       "days_avg": "متوسط الأيام",
       "no_payment_data": "لا توجد بيانات دفع"
+    },
+    "whats_new": {
+      "title": "الجديد",
+      "description": "آخر التحديثات والتحسينات على لوحة التحكم",
+      "no_updates": "لا توجد تحديثات متاحة في الوقت الحالي"
     }
   },
   "customers": {
@@ -508,6 +534,50 @@
       "equation_verification": "تحقق معادلة الميزانية العمومية",
       "balanced": "✓ متوازنة",
       "imbalanced": "⚠ غير متوازنة"
+    }
+  },
+  "vatReturn": {
+    "title": "الإقرار الضريبي",
+    "description": "حساب وإعداد تقارير ضريبة القيمة المضافة للامتثال الضريبي",
+    "nav_title": "الإقرار الضريبي",
+    "outputVat": "ضريبة المخرجات (المبيعات)",
+    "creditNoteVat": "ناقص: ضريبة المرتجعات",
+    "netOutputVat": "صافي ضريبة المخرجات",
+    "inputVat": "ضريبة المدخلات (المشتريات)",
+    "netVatPayable": "صافي الضريبة المستحقة",
+    "netVatRefundable": "صافي الضريبة القابلة للاسترداد",
+    "invoiceNumber": "رقم الفاتورة",
+    "creditNoteNumber": "رقم الإشعار الدائن",
+    "billNumber": "رقم الفاتورة",
+    "date": "التاريخ",
+    "customer": "العميل",
+    "vendor": "المورد",
+    "subtotal": "المجموع الفرعي",
+    "vatAmount": "قيمة الضريبة",
+    "total": "الإجمالي",
+    "branch": "الفرع",
+    "exportExcel": "تصدير إلى Excel",
+    "salesTab": "المبيعات (الفواتير)",
+    "returnsTab": "مرتجعات المبيعات",
+    "purchasesTab": "المشتريات (الفواتير)",
+    "loading": "جاري تحميل بيانات الإقرار الضريبي...",
+    "error": "خطأ في تحميل بيانات الإقرار الضريبي",
+    "no_data": "لم يتم العثور على معاملات ضريبية للفترة المحددة",
+    "summary": {
+      "title": "ملخص الضريبة",
+      "description": "ملخص حساب الضريبة للفترة المحددة",
+      "outputVatDescription": "الضريبة المحصلة من مبيعات العملاء",
+      "creditVatDescription": "تسويات الضريبة لمرتجعات المبيعات",
+      "inputVatDescription": "الضريبة المدفوعة على المشتريات",
+      "netVatDescription": "صافي مبلغ الضريبة المستحق للهيئة الضريبية"
+    },
+    "tables": {
+      "invoices_title": "فواتير المبيعات (ضريبة المخرجات)",
+      "credit_notes_title": "إشعارات دائنة (مرتجعات المبيعات)",
+      "bills_title": "فواتير المشتريات (ضريبة المدخلات)",
+      "showing": "عرض",
+      "of": "من",
+      "transactions": "معاملة"
     }
   }
 }

@@ -615,7 +615,7 @@ export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabb
             
             <div className="flex flex-col lg:flex-row lg:items-center gap-3 bg-muted/50 p-3 rounded-lg">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">{t("tables.filters_label")}</span>
-              <div className="flex flex-col sm:flex-row gap-2 flex-1 min-w-0 overflow-hidden">
+              <div className="flex flex-col sm:flex-row gap-2 flex-1 min-w-0">
                 <SearchableSelect
                   options={customerFilterOptions}
                   value={invoiceCustomerFilter}
@@ -823,7 +823,7 @@ export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabb
             
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-muted/50 p-3 rounded-lg">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">{t("common.filter")}:</span>
-              <div className="flex flex-col sm:flex-row gap-2 flex-1 min-w-0 overflow-hidden">
+              <div className="flex flex-col sm:flex-row gap-2 flex-1 min-w-0">
                 <SearchableSelect
                   options={warehouseFilterOptions}
                   value={warehouseFilter}

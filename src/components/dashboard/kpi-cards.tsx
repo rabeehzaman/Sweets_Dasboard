@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { TrendingUp, TrendingDown, DollarSign, Percent, ShoppingCart, Receipt, Package, Warehouse, Calendar, Eye, Target } from "lucide-react"
+import { TrendingUp, TrendingDown, DollarSign, Percent, ShoppingCart, Receipt, Package, Warehouse, Calendar, Eye, Target, ReceiptText } from "lucide-react"
 import { useOptimizedKPIs } from "@/hooks/use-optimized-data"
 import { formatCurrency, formatNumber } from "@/lib/formatting"
 import { useLocale } from "@/i18n/locale-provider"
@@ -213,11 +213,17 @@ export function ExtendedKPICards({ dateRange, branchFilter }: KPICardsProps = {}
       </div>
       
       {/* Second row - Additional metrics */}
-      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
+      <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-2">
         <KPICard
           title={`${t("nav.overview")} (${t("kpi.invoices")})`}
           value={formatNumber(kpis?.total_invoices || 0)}
           icon={<Eye className="h-4 w-4" />}
+          loading={loading}
+        />
+        <KPICard
+          title={kpis?.net_vat_payable >= 0 ? t("kpi.net_vat_payable") : t("kpi.net_vat_refundable")}
+          value={formatCurrency(Math.abs(kpis?.net_vat_payable || 0))}
+          icon={<ReceiptText className="h-4 w-4" />}
           loading={loading}
         />
       </div>
