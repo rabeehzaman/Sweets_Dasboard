@@ -46,12 +46,14 @@
     "type": "النوع",
     "owner": "المالك",
     "unassigned": "غير مخصص",
+    "unknown": "غير معروف",
     "invoices": "فواتير",
     "days_ago": "منذ أيام",
     "customers": "عملاء",
     "avg": "متوسط",
     "ago": "منذ",
     "combined": "المجموع",
+    "priority": "الأولوية",
     "excellent": "ممتاز",
     "good": "جيد",
     "poor": "ضعيف",
@@ -78,7 +80,10 @@
     "multiple": "متعدد",
     "n_a": "غ/م",
     "portfolio": "المحفظة",
-    "various": "متنوع"
+    "various": "متنوع",
+    "overdue": "متأخر",
+    "id": "المعرف",
+    "vendors": "موردين"
   },
   "filters": {
     "branch": "الفرع",
@@ -459,7 +464,10 @@
       "of": "من",
       "avg": "متوسط",
       "ago": "منذ",
-      "no_payments": "لا توجد دفعات"
+      "no_payments": "لا توجد دفعات",
+      "vs": "مقابل",
+      "terms": "شروط",
+      "frequency": "التكرار"
     },
     "performance": {
       "title": "بطاقة أداء الموردين",
@@ -488,7 +496,28 @@
       "business": "الأعمال",
       "pay_rate": "معدل الدفع",
       "outstanding": "مستحق",
-      "status": "الحالة"
+      "status": "الحالة",
+      "excellent_vendors": "موردين ممتازين",
+      "avg_payment_rate": "متوسط معدل الدفع",
+      "total_outstanding_label": "إجمالي المستحق",
+      "avg_payment_days_actual": "متوسط أيام الدفع (فعلي)",
+      "payment_intelligence_insights": "رؤى ذكاء الدفع",
+      "vendors_pay_within": "موردين يدفعون خلال",
+      "days": "يوم",
+      "vendors_with_score": "موردين بدرجة موثوقية",
+      "vendors_with_completion": "موردين بمعدل إتمام دفع",
+      "vendors_represent_over": "موردين يمثلون أكثر من",
+      "of_business_each": "من الأعمال لكل منهم",
+      "legend_excellent": "أداء ممتاز",
+      "legend_good": "أداء جيد",
+      "legend_average": "أداء متوسط",
+      "legend_needs_attention": "يحتاج اهتمام",
+      "legend_performance_score": "درجة الأداء:",
+      "legend_based_on": "بناءً على موثوقية الدفع، معدل الإتمام، السرعة، ونسبة التأخير.",
+      "legend_pay_days": "أيام الدفع:",
+      "legend_actual_days": "الأيام الفعلية من الفاتورة للدفع.",
+      "legend_pay_rate_desc": "معدل الدفع:",
+      "legend_percentage_paid": "نسبة المبلغ المفوتر المدفوع فعلياً."
     },
     "table_headers": {
       "vendor_name": "اسم المورد",

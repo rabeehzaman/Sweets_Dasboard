@@ -147,14 +147,14 @@ export function TopOverdueCustomers({ selectedOwner }: TopOverdueCustomersProps)
                   
                   <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                     <span className="truncate">
-                      💼 {customer.sales_person || 'Unassigned'}
+                      💼 {customer.sales_person || t('common.unassigned')}
                     </span>
                     <span className="whitespace-nowrap">
-                      📄 {customer.total_invoices} invoices
+                      📄 {customer.total_invoices} {t('common.invoices')}
                     </span>
                     {customer.days_since_last_invoice !== null && (
                       <span className="whitespace-nowrap">
-                        ⏰ {customer.days_since_last_invoice} days ago
+                        ⏰ {customer.days_since_last_invoice} {t('common.days_ago')}
                       </span>
                     )}
                   </div>
@@ -165,7 +165,7 @@ export function TopOverdueCustomers({ selectedOwner }: TopOverdueCustomersProps)
                     {formatCurrency(customer.outstanding_amount)}
                   </div>
                   <div className="text-xs text-muted-foreground whitespace-nowrap order-1 sm:order-2 sm:mt-1">
-                    Priority {customer.collection_priority}/5
+                    {t('common.priority')} {customer.collection_priority}/5
                   </div>
                 </div>
               </div>
@@ -180,7 +180,7 @@ export function TopOverdueCustomers({ selectedOwner }: TopOverdueCustomersProps)
                 {t("pages.customers.total_shown")} {data.length} {t("customers.table_headers.customers")}
               </span>
               <span className="font-medium">
-                Combined: {formatCurrency(
+                {t('common.combined')}: {formatCurrency(
                   data.reduce((sum, customer) => sum + customer.outstanding_amount, 0)
                 )}
               </span>

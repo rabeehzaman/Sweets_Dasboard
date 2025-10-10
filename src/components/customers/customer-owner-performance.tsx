@@ -24,13 +24,6 @@ const formatCurrency = (amount: number) => {
   }).format(amount).replace('SAR', 'SAR ')
 }
 
-const getPerformanceBadge = (overduePercentage: number) => {
-  if (overduePercentage <= 10) return { variant: 'default' as const, text: 'Excellent', icon: TrendingUp }
-  if (overduePercentage <= 25) return { variant: 'secondary' as const, text: 'Good', icon: TrendingUp }
-  if (overduePercentage <= 40) return { variant: 'outline' as const, text: 'Fair', icon: TrendingDown }
-  return { variant: 'destructive' as const, text: 'Poor', icon: TrendingDown }
-}
-
 interface CustomerOwnerData {
   owner_name: string
   total_customers: number
@@ -51,24 +44,25 @@ interface CustomTooltipProps {
     payload: CustomerOwnerData
   }>
   label?: string
+  t: (key: string) => string
 }
 
-function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+function CustomTooltip({ active, payload, label, t }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     const data = payload[0].payload
     return (
       <div className="bg-background border rounded-lg shadow-lg p-3">
         <p className="font-medium">{label}</p>
         <p className="text-sm">
-          <span className="text-muted-foreground">Receivables: </span>
+          <span className="text-muted-foreground">{t('pages.customers.total_balance')}: </span>
           {formatCurrency(data.total_receivables)}
         </p>
         <p className="text-sm">
-          <span className="text-muted-foreground">Overdue: </span>
+          <span className="text-muted-foreground">{t('common.overdue')}: </span>
           {data.overdue_percentage.toFixed(1)}%
         </p>
         <p className="text-sm">
-          <span className="text-muted-foreground">Customers: </span>
+          <span className="text-muted-foreground">{t('common.customers')}: </span>
           {data.customers_with_balance}
         </p>
       </div>
@@ -103,6 +97,13 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
   const { t } = useLocale()
   const { data: agingData, loading, error } = useCustomerAgingData()
 
+  const getPerformanceBadge = (overduePercentage: number) => {
+    if (overduePercentage <= 10) return { variant: 'default' as const, text: t('common.excellent'), icon: TrendingUp }
+    if (overduePercentage <= 25) return { variant: 'secondary' as const, text: t('common.good'), icon: TrendingUp }
+    if (overduePercentage <= 40) return { variant: 'outline' as const, text: t('customers.status_badges.watch'), icon: TrendingDown }
+    return { variant: 'destructive' as const, text: t('common.poor'), icon: TrendingDown }
+  }
+
   // Process data to get owner performance
   const ownerPerformance = React.useMemo(() => {
     if (!agingData) return []
@@ -118,7 +119,7 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
 
     // Group data by customer owner
     agingData.forEach(customer => {
-      const owner = customer.customer_owner_name_custom || 'Unassigned'
+      const owner = customer.customer_owner_name_custom || t('common.unassigned')
       
       if (!ownerStats.has(owner)) {
         ownerStats.set(owner, {
@@ -178,7 +179,7 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
     }
 
     return result
-  }, [agingData, selectedOwner])
+  }, [agingData, selectedOwner, t])
 
   if (error) {
     return (
@@ -251,7 +252,7 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
         <CardDescription>
           {t("customers.charts.collection_efficiency_detailed")}
           {selectedOwner && selectedOwner !== 'All' && (
-            <span className="ml-2 text-primary font-medium">• Filtered by: {selectedOwner}</span>
+            <span className="ml-2 text-primary font-medium">• {t('pages.expenses.filtered_by')} {selectedOwner}</span>
           )}
         </CardDescription>
       </CardHeader>
@@ -276,7 +277,7 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
                   className="fill-muted-foreground"
                   tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip t={t} />} />
                 <Bar 
                   dataKey="total_receivables" 
                   fill="hsl(var(--primary))"
@@ -312,9 +313,9 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
                   <div className="min-w-0 flex-1">
                     <div className="font-medium truncate">{owner.owner_name}</div>
                     <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
-                      <span className="whitespace-nowrap">👥 {owner.customers_with_balance} customers</span>
-                      <span className="whitespace-nowrap">⚠️ {owner.high_risk_customers} high risk</span>
-                      <span className="whitespace-nowrap">💰 {formatCurrency(owner.avg_balance_per_customer)} avg</span>
+                      <span className="whitespace-nowrap">👥 {owner.customers_with_balance} {t('common.customers')}</span>
+                      <span className="whitespace-nowrap">⚠️ {owner.high_risk_customers} {t('common.high_risk')}</span>
+                      <span className="whitespace-nowrap">💰 {formatCurrency(owner.avg_balance_per_customer)} {t('common.avg')}</span>
                     </div>
                   </div>
                 </div>
@@ -325,7 +326,7 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
                       {formatCurrency(owner.total_receivables)}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {owner.overdue_percentage.toFixed(1)}% overdue
+                      {owner.overdue_percentage.toFixed(1)}% {t('common.overdue')}
                     </div>
                   </div>
                   
@@ -349,7 +350,7 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
             <div>
               <span className="text-muted-foreground">{t("customers.charts.best_performer")}:</span>
               <span className="ml-2 font-medium text-green-600">
-                {ownerPerformance[0]?.owner_name || 'N/A'}
+                {ownerPerformance[0]?.owner_name || t('common.n_a')}
               </span>
             </div>
             <div>

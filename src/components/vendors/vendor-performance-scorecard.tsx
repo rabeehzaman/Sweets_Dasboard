@@ -133,7 +133,7 @@ export function VendorPerformanceScorecard({ className }: VendorPerformanceScore
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-base truncate">{vendor.vendor_name}</div>
-                    <div className="text-xs text-muted-foreground font-mono">ID: {vendor.vendor_id.slice(-8)}</div>
+                    <div className="text-xs text-muted-foreground font-mono">{t('common.id')}: {vendor.vendor_id.slice(-8)}</div>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0">
                     <div className="text-center">
@@ -180,7 +180,7 @@ export function VendorPerformanceScorecard({ className }: VendorPerformanceScore
                   <div>
                     <div className="text-muted-foreground">{t("vendors.performance.outstanding")}:</div>
                     <div className="font-medium text-red-600 break-all">
-                      {vendor.outstanding_amount ? `SAR ${Math.round(vendor.outstanding_amount).toLocaleString()}` : 'N/A'}
+                      {vendor.outstanding_amount ? `SAR ${Math.round(vendor.outstanding_amount).toLocaleString()}` : t('common.n_a')}
                     </div>
                   </div>
                 </div>
@@ -214,7 +214,7 @@ export function VendorPerformanceScorecard({ className }: VendorPerformanceScore
                         {vendor.vendor_name}
                       </div>
                       <div className="text-xs text-muted-foreground font-mono">
-                        ID: {vendor.vendor_id.slice(-8)}
+                        {t('common.id')}: {vendor.vendor_id.slice(-8)}
                       </div>
                     </div>
                   </TableCell>
@@ -231,7 +231,7 @@ export function VendorPerformanceScorecard({ className }: VendorPerformanceScore
                       {vendor.avg_payment_days}d
                     </span>
                     <div className="text-xs text-muted-foreground">
-                      {vendor.payment_reliability_score ? `${vendor.payment_reliability_score}/100` : 'N/A'}
+                      {vendor.payment_reliability_score ? `${vendor.payment_reliability_score}/100` : t('common.n_a')}
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
@@ -251,7 +251,7 @@ export function VendorPerformanceScorecard({ className }: VendorPerformanceScore
                   </TableCell>
                   <TableCell className="text-right">
                     <span className="text-sm font-medium text-red-600">
-                      {vendor.outstanding_amount ? `SAR ${Math.round(vendor.outstanding_amount).toLocaleString()}` : 'N/A'}
+                      {vendor.outstanding_amount ? `SAR ${Math.round(vendor.outstanding_amount).toLocaleString()}` : t('common.n_a')}
                     </span>
                   </TableCell>
                   <TableCell className="text-center">

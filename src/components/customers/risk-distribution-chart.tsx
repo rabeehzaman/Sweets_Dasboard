@@ -30,16 +30,17 @@ interface CustomTooltipProps {
       chart_color: string
     }
   }>
+  t: (key: string) => string
 }
 
-function CustomTooltip({ active, payload }: CustomTooltipProps) {
+function CustomTooltip({ active, payload, t }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     const data = payload[0].payload
     return (
       <div className="bg-background border rounded-lg shadow-lg p-3">
         <p className="font-medium">{data.risk_category}</p>
         <p className="text-sm text-muted-foreground">
-          {data.customer_count} customers
+          {data.customer_count} {t('customers.table_headers.customers')}
         </p>
         <p className="text-sm font-medium">
           {formatCurrency(data.total_amount)}
@@ -194,7 +195,7 @@ export function RiskDistributionChart({ selectedOwner }: RiskDistributionChartPr
                     />
                   ))}
                 </Pie>
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<CustomTooltip t={t} />} />
               </PieChart>
             </ResponsiveContainer>
           </div>

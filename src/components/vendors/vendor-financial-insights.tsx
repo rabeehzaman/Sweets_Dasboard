@@ -160,7 +160,7 @@ export function VendorFinancialInsights({ className }: VendorFinancialInsightsPr
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-base truncate">{vendor.vendor_name}</div>
                     <div className="text-xs text-muted-foreground">
-                      {t("vendors.aging.last_bill")}: {vendor.last_bill_date ? new Date(vendor.last_bill_date).toLocaleDateString() : 'N/A'}
+                      {t("vendors.aging.last_bill")}: {vendor.last_bill_date ? new Date(vendor.last_bill_date).toLocaleDateString() : t('common.n_a')}
                     </div>
                     {vendor.last_payment_date && (
                       <div className="text-xs text-green-600">
@@ -202,7 +202,7 @@ export function VendorFinancialInsights({ className }: VendorFinancialInsightsPr
                   <div>
                     <div className="text-muted-foreground">{t("vendors.financial_insights.cash_days")}:</div>
                     <div className={`font-medium ${(vendor.cash_conversion_days || 999) > 60 ? 'text-red-600' : (vendor.cash_conversion_days || 999) > 30 ? 'text-yellow-600' : 'text-green-600'}`}>
-                      {vendor.cash_conversion_days ? `${vendor.cash_conversion_days}d` : 'N/A'}
+                      {vendor.cash_conversion_days ? `${vendor.cash_conversion_days}d` : t('common.n_a')}
                     </div>
                   </div>
                   <div>
@@ -251,7 +251,7 @@ export function VendorFinancialInsights({ className }: VendorFinancialInsightsPr
                         {vendor.vendor_name}
                       </div>
                       <div className="text-xs text-muted-foreground flex items-center gap-2">
-                        <span>{t("vendors.aging.last_bill")}: {vendor.last_bill_date ? new Date(vendor.last_bill_date).toLocaleDateString() : 'N/A'}</span>
+                        <span>{t("vendors.aging.last_bill")}: {vendor.last_bill_date ? new Date(vendor.last_bill_date).toLocaleDateString() : t('common.n_a')}</span>
                         {vendor.last_payment_date && (
                           <span className="text-green-600">• {t("vendors.aging.last_pay")}: {new Date(vendor.last_payment_date).toLocaleDateString()}</span>
                         )}
@@ -292,10 +292,10 @@ export function VendorFinancialInsights({ className }: VendorFinancialInsightsPr
                   </TableCell>
                   <TableCell className="text-center">
                     <div className={`text-sm font-bold ${(vendor.cash_conversion_days || 999) > 60 ? 'text-red-600' : (vendor.cash_conversion_days || 999) > 30 ? 'text-yellow-600' : 'text-green-600'}`}>
-                      {vendor.cash_conversion_days ? `${vendor.cash_conversion_days}d` : 'N/A'}
+                      {vendor.cash_conversion_days ? `${vendor.cash_conversion_days}d` : t('common.n_a')}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      vs {vendor.credit_terms_days}d terms
+                      {t('vendors.financial_insights.vs')} {vendor.credit_terms_days}d {t('vendors.financial_insights.terms')}
                     </div>
                   </TableCell>
                   <TableCell className="text-center">
@@ -303,7 +303,7 @@ export function VendorFinancialInsights({ className }: VendorFinancialInsightsPr
                       {vendor.payment_velocity ? `${vendor.payment_velocity.toFixed(1)}/mo` : '0/mo'}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      frequency
+                      {t('vendors.financial_insights.frequency')}
                     </div>
                   </TableCell>
                   <TableCell className="text-center">

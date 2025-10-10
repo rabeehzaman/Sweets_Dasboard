@@ -200,39 +200,39 @@ export function CustomerAgingBalance({ selectedOwner = "All" }: CustomerAgingBal
                   
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 w-full">
                     <div className="text-xs text-muted-foreground space-y-0.5 min-w-0 flex-1">
-                      <div className="truncate">Owner: <span className="font-medium">{customer.customer_owner_name_custom || 'Unknown'}</span></div>
-                      <div className="truncate">Status: <span className="font-medium">{customer.customer_status}</span> • <span className="font-medium">{customer.total_invoices}</span> invoices</div>
+                      <div className="truncate">{t('common.owner')}: <span className="font-medium">{customer.customer_owner_name_custom || t('common.unknown')}</span></div>
+                      <div className="truncate">{t('common.status')}: <span className="font-medium">{customer.customer_status}</span> • <span className="font-medium">{customer.total_invoices}</span> {t('common.invoices')}</div>
                     </div>
                     <div className="text-right flex-shrink-0">
                       <div className="font-bold text-lg break-all">{formatCurrency(customer.total_balance)}</div>
-                      <div className="text-xs text-muted-foreground">Total Balance</div>
+                      <div className="text-xs text-muted-foreground">{t('pages.customers.total_balance')}</div>
                     </div>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3 text-xs w-full">
                   <div className="min-w-0">
-                    <div className="text-muted-foreground">Current (0-30):</div>
+                    <div className="text-muted-foreground">{t('customers.table_headers.current_0_30')}:</div>
                     <div className="font-medium break-all">{formatCurrency(customer.current_0_30)}</div>
                   </div>
                   <div className="min-w-0">
-                    <div className="text-muted-foreground">31-60 Days:</div>
+                    <div className="text-muted-foreground">{t('customers.table_headers.past_due_31_60')}:</div>
                     <div className="font-medium break-all">{formatCurrency(customer.past_due_31_60)}</div>
                   </div>
                   <div className="min-w-0">
-                    <div className="text-muted-foreground">61-90 Days:</div>
+                    <div className="text-muted-foreground">{t('customers.table_headers.past_due_61_90')}:</div>
                     <div className="font-medium break-all">{formatCurrency(customer.past_due_61_90)}</div>
                   </div>
                   <div className="min-w-0">
-                    <div className="text-muted-foreground">91-180 Days:</div>
+                    <div className="text-muted-foreground">{t('customers.table_headers.past_due_91_180')}:</div>
                     <div className="font-medium text-orange-600 dark:text-orange-400 break-all">{formatCurrency(customer.past_due_91_180)}</div>
                   </div>
                 </div>
-                
+
                 {customer.past_due_over_180 > 0 && (
                   <div className="pt-2 border-t border-red-200 dark:border-red-800 w-full">
                     <div className="flex justify-between items-center gap-2 w-full">
-                      <span className="text-xs text-red-600 dark:text-red-400 font-medium min-w-0 flex-1">High Risk (180+ Days):</span>
+                      <span className="text-xs text-red-600 dark:text-red-400 font-medium min-w-0 flex-1">{t('customers.table_headers.high_risk_180')}:</span>
                       <span className="font-bold text-red-600 dark:text-red-400 break-all flex-shrink-0">{formatCurrency(customer.past_due_over_180)}</span>
                     </div>
                   </div>
@@ -268,10 +268,10 @@ export function CustomerAgingBalance({ selectedOwner = "All" }: CustomerAgingBal
                     <div>
                       <div className="truncate max-w-48 text-foreground font-semibold">{customer.customer_name}</div>
                       <div className="text-xs text-muted-foreground truncate">
-                        Owner: {customer.customer_owner_name_custom || 'Unknown'}
+                        {t('common.owner')}: {customer.customer_owner_name_custom || t('common.unknown')}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        Status: {customer.customer_status} • Invoices: {customer.total_invoices}
+                        {t('common.status')}: {customer.customer_status} • {t('common.invoices')}: {customer.total_invoices}
                       </div>
                     </div>
                   </TableCell>
