@@ -359,7 +359,7 @@ export function VehicleLoanManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active (Exclude Completed)</SelectItem>
+                    <SelectItem value="active">{t('vehicleInstalments.filters.active_loans')}</SelectItem>
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="0-6">Less than 6 months</SelectItem>
                     <SelectItem value="6-12">6 months - 1 year</SelectItem>
@@ -368,7 +368,7 @@ export function VehicleLoanManager() {
                     <SelectItem value="24-30">2 years - 2.5 years</SelectItem>
                     <SelectItem value="30-36">2.5 years - 3 years</SelectItem>
                     <SelectItem value="36+">More than 3 years</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="completed">{t('vehicleInstalments.filters.completed_loans')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -376,7 +376,7 @@ export function VehicleLoanManager() {
               {/* Deduction Day Filter */}
               <div className="space-y-1.5">
                 <label className="text-xs sm:text-sm font-medium text-muted-foreground">
-                  {t('vehicleInstalments.filters.deduction_date')}
+                  {t('vehicleInstalments.filters.deduction_day')}
                 </label>
                 <Select value={selectedDeductionDay} onValueChange={setSelectedDeductionDay}>
                   <SelectTrigger className="w-full min-h-[44px]">
@@ -400,7 +400,7 @@ export function VehicleLoanManager() {
                   {t('vehicleInstalments.kpi.total_vehicles')}
                 </div>
                 <Badge variant="secondary" className="text-xs">
-                  {vehicles.length} {vehicles.length !== 1 ? 'vehicles' : 'vehicle'}
+                  {vehicles.length} {vehicles.length !== 1 ? t('common.vehicles') : t('common.vehicle')}
                 </Badge>
               </div>
               <div className="text-2xl font-bold text-green-700 dark:text-green-400">
@@ -465,9 +465,9 @@ export function VehicleLoanManager() {
                       {/* Progress Bar */}
                       <div className="space-y-1 pt-2 border-t">
                         <div className="flex justify-between items-center text-[11px]">
-                          <span className="text-muted-foreground">Progress</span>
+                          <span className="text-muted-foreground">{t('common.progress')}</span>
                           <span className="font-medium">
-                            {payment.paidMonths}/{vehicle.total_months} months ({payment.progressPercentage.toFixed(0)}%)
+                            {payment.paidMonths}/{vehicle.total_months} {t('common.months')} ({payment.progressPercentage.toFixed(0)}%)
                           </span>
                         </div>
                         <Progress value={payment.progressPercentage} className="h-2" />
@@ -476,13 +476,13 @@ export function VehicleLoanManager() {
                       {/* Installment & Deduction Day */}
                       <div className="grid grid-cols-2 gap-2 pt-2 border-t text-[11px]">
                         <div>
-                          <div className="text-muted-foreground mb-0.5">Monthly Payment</div>
+                          <div className="text-muted-foreground mb-0.5">{t('common.monthly_payment')}</div>
                           <div className="font-bold text-base text-blue-700 dark:text-blue-400">
                             {formatCurrencyTable(vehicle.installment)}
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="text-muted-foreground mb-0.5">Deduction Day</div>
+                          <div className="text-muted-foreground mb-0.5">{t('common.deduction_day')}</div>
                           <Badge variant="outline" className={`font-mono text-sm ${getDeductionDateColor(vehicle.deduction_day)}`}>
                             {vehicle.deduction_day}th
                           </Badge>
@@ -535,7 +535,7 @@ export function VehicleLoanManager() {
       </Card>
 
       {/* Countdown KPI Cards */}
-      <CountdownCards kpiData={kpiData} countdownTick={countdownTick} />
+      <CountdownCards kpiData={kpiData} countdownTick={countdownTick} t={t} />
     </div>
   )
 }
@@ -547,9 +547,9 @@ function VehicleTable({ vehicles, expandedRows, toggleRowExpansion, t }: any) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-16">Expand</TableHead>
+            <TableHead className="w-16">{t('vehicleInstalments.table.expand_details')}</TableHead>
             <TableHead className="w-32">{t('vehicleInstalments.table.plate_number')}</TableHead>
-            <TableHead className="w-20">Type</TableHead>
+            <TableHead className="w-20">{t('common.type')}</TableHead>
             <TableHead>{t('vehicleInstalments.table.vehicle_details')}</TableHead>
             <TableHead>{t('vehicleInstalments.table.owner')}</TableHead>
             <TableHead>{t('vehicleInstalments.table.department')}</TableHead>
@@ -572,19 +572,19 @@ function VehicleTable({ vehicles, expandedRows, toggleRowExpansion, t }: any) {
             <TableCell colSpan={4} className="text-lg">
               <div className="flex items-center gap-2">
                 <Car className="h-5 w-5" />
-                <span>Total ({vehicles.length} vehicles)</span>
+                <span>{t('common.total')} ({vehicles.length} {vehicles.length > 1 ? t('common.vehicles') : t('common.vehicle')})</span>
               </div>
             </TableCell>
             <TableCell className="text-lg">
               <Badge variant="secondary" className="text-sm px-3 py-1">
-                {vehicles.length > 1 ? 'Multiple' : vehicles[0]?.department || 'N/A'}
+                {vehicles.length > 1 ? t('common.multiple') : vehicles[0]?.department || t('common.n_a')}
               </Badge>
             </TableCell>
             <TableCell className="text-lg">
-              <Badge variant="outline" className="text-sm px-3 py-1">Portfolio</Badge>
+              <Badge variant="outline" className="text-sm px-3 py-1">{t('common.portfolio')}</Badge>
             </TableCell>
             <TableCell className="text-lg">
-              <Badge variant="outline" className="text-sm px-3 py-1">Various</Badge>
+              <Badge variant="outline" className="text-sm px-3 py-1">{t('common.various')}</Badge>
             </TableCell>
             <TableCell className="text-right text-lg font-mono">
               <Badge variant="default" className="text-base px-4 py-2 bg-green-600 hover:bg-green-700">
@@ -659,7 +659,7 @@ function VehicleRow({ vehicle, index, isExpanded, toggleRowExpansion, t }: any) 
           <div className="flex items-center gap-2">
             <div className="flex flex-col gap-1">
               <div className="text-sm font-medium">
-                {payment.paidMonths}/{vehicle.total_months} months
+                {payment.paidMonths}/{vehicle.total_months} {t('common.months')}
               </div>
               <Progress value={payment.progressPercentage} className="h-2 w-20" />
             </div>
@@ -723,7 +723,7 @@ function PaymentTimelineCard({ payment, vehicle, t }: any) {
           <div className="border-t pt-2 mt-2">
             <Progress value={payment.progressPercentage} className="h-3 mb-2" />
             <div className="text-center text-xs text-blue-600 dark:text-blue-400 font-medium">
-              {payment.progressPercentage.toFixed(1)}% Complete
+              {payment.progressPercentage.toFixed(1)}% {t('common.complete')}
             </div>
           </div>
         </div>
@@ -835,7 +835,7 @@ function NextPaymentCard({ payment, vehicle, t }: any) {
 }
 
 // Countdown Cards
-function CountdownCards({ kpiData, countdownTick }: any) {
+function CountdownCards({ kpiData, countdownTick, t }: any) {
   return (
     <div className="grid gap-6 md:grid-cols-3">
       {kpiData.map((kpi: any, index: number) => {
@@ -867,7 +867,7 @@ function CountdownCards({ kpiData, countdownTick }: any) {
                   </div>
                   <div>
                     <h3 className="text-lg font-bold">{kpi.title}</h3>
-                    <p className="text-white/80 text-sm">{kpi.vehicles.length} vehicles</p>
+                    <p className="text-white/80 text-sm">{kpi.vehicles.length} {t('common.vehicles')}</p>
                   </div>
                 </div>
               </div>
@@ -876,31 +876,31 @@ function CountdownCards({ kpiData, countdownTick }: any) {
                 <div className="flex items-center gap-4 text-2xl font-bold mb-2">
                   <div className="text-center">
                     <div className="text-3xl">{countdown.days}</div>
-                    <div className="text-xs text-white/80">DAYS</div>
+                    <div className="text-xs text-white/80 uppercase">{t('common.days')}</div>
                   </div>
                   <div className="text-white/60">:</div>
                   <div className="text-center">
                     <div className="text-3xl">{countdown.hours}</div>
-                    <div className="text-xs text-white/80">HRS</div>
+                    <div className="text-xs text-white/80 uppercase">{t('common.hours')}</div>
                   </div>
                   <div className="text-white/60">:</div>
                   <div className="text-center">
                     <div className="text-3xl">{countdown.minutes}</div>
-                    <div className="text-xs text-white/80">MIN</div>
+                    <div className="text-xs text-white/80 uppercase">{t('common.minutes')}</div>
                   </div>
                 </div>
 
                 {isUrgent && (
                   <div className="flex items-center gap-1 text-yellow-200 animate-pulse">
                     <AlertCircle className="h-4 w-4" />
-                    <span className="text-sm font-medium">URGENT - Due Soon!</span>
+                    <span className="text-sm font-medium uppercase">{t('common.urgent_due_soon')}</span>
                   </div>
                 )}
               </div>
 
               <div className="flex justify-between items-center">
                 <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                  <div className="text-sm text-white/80">Total Amount</div>
+                  <div className="text-sm text-white/80">{t('common.total_amount')}</div>
                   <div className="text-xl font-bold">{formatCurrencyTable(kpi.totalAmount)}</div>
                 </div>
               </div>

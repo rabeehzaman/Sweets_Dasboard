@@ -46,7 +46,7 @@ export function BranchFilter({ value, onValueChange, className, dateRange }: Bra
     <div className="flex items-center gap-2">
       {isAdmin && (
         <Badge variant="destructive" className="text-xs">
-          Admin View
+          {t('common.admin_view')}
         </Badge>
       )}
       <Select
@@ -64,7 +64,7 @@ export function BranchFilter({ value, onValueChange, className, dateRange }: Bra
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">
-            {isAdmin ? "All Branches (Admin)" : t("filters.all_branches")}
+            {isAdmin ? t("common.all_branches_admin") : t("filters.all_branches")}
           </SelectItem>
           {error ? (
             <SelectItem value="error" disabled>{t("filters.error_loading_branches")}</SelectItem>

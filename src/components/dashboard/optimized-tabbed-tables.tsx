@@ -259,7 +259,7 @@ export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabb
               <div>
                 <div className="font-medium text-sm text-foreground">{formatDateSA(invoice.inv_date)}</div>
                 <div className="text-xs text-muted-foreground dark:text-muted-foreground/80">
-                  {items && items.length > 0 ? `${items.length} items` : 'Click to view items'}
+                  {items && items.length > 0 ? `${items.length} ${t('kpi.items')}` : t('common.click_to_view_items')}
                 </div>
               </div>
             </div>
