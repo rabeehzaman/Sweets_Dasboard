@@ -668,6 +668,7 @@
       "department": "القسم",
       "owner": "المالك",
       "payment_status": "حالة الدفع",
+      "deduction_date": "تاريخ الخصم:",
       "deduction_day": "يوم الخصم",
       "search_placeholder": "البحث بالرقم اللوحة أو الموديل...",
       "all_departments": "جميع الأقسام",
