@@ -26,13 +26,12 @@ export function useLast7DaysSummary(locationIds?: string[]) {
         setLoading(true)
         setError(null)
 
-        // If multiple locations are selected, we need to fetch data for each and aggregate
-        // For simplicity, if multiple locations selected, pass null (show all)
-        // If single location, pass that location name
-        const branchFilter = locationIds && locationIds.length === 1 ? locationIds[0] : null
+        // Pass the array of location IDs to the database function
+        // The function now supports filtering by multiple branches
+        const branchNames = locationIds && locationIds.length > 0 ? locationIds : null
 
         const { data: summary, error: fetchError } = await supabase.rpc('get_last_7_days_summary', {
-          p_branch_filter: branchFilter
+          p_branch_names: branchNames
         })
 
         if (fetchError) {

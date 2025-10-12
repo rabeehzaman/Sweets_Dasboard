@@ -17,6 +17,104 @@ export interface Update {
 
 export const updates: Update[] = [
   {
+    id: '13',
+    date: '2025-10-12',
+    version: '1.5.4',
+    category: 'bugfix',
+    titleEn: 'Fixed Last 7 Days Performance Multi-Location Filter',
+    titleAr: 'إصلاح تصفية المواقع المتعددة لأداء آخر 7 أيام',
+    descriptionEn: 'Resolved issue where selecting 2+ locations would show ALL data instead of only the selected locations in the Last 7 Days Performance summary.',
+    descriptionAr: 'تم حل مشكلة حيث كان اختيار موقعين أو أكثر يعرض جميع البيانات بدلاً من المواقع المحددة فقط في ملخص أداء آخر 7 أيام.',
+    changes: {
+      en: [
+        '🐛 Fixed multi-location filtering for Last 7 Days Performance',
+        '🔧 Updated database function to accept array of branch names',
+        '✅ Now correctly filters when 2+ locations selected',
+        '📊 Shows combined data from selected locations only',
+        '⚡ Single location, multiple locations, and all locations now work correctly',
+        '🗄️ Database function parameter changed from text to text[]'
+      ],
+      ar: [
+        '🐛 إصلاح تصفية المواقع المتعددة لأداء آخر 7 أيام',
+        '🔧 تحديث دالة قاعدة البيانات لقبول مصفوفة من أسماء الفروع',
+        '✅ الآن يصفي بشكل صحيح عند اختيار موقعين أو أكثر',
+        '📊 يعرض البيانات المجمعة من المواقع المحددة فقط',
+        '⚡ موقع واحد، مواقع متعددة، وجميع المواقع تعمل الآن بشكل صحيح',
+        '🗄️ معامل دالة قاعدة البيانات تغير من text إلى text[]'
+      ]
+    }
+  },
+  {
+    id: '12',
+    date: '2025-10-12',
+    version: '1.5.3',
+    category: 'bugfix',
+    titleEn: 'Fixed Overview Page KPI Access Control',
+    titleAr: 'إصلاح التحكم في الوصول لمؤشرات أداء صفحة النظرة العامة',
+    descriptionEn: 'Resolved critical security issue where Overview page KPIs (Total Sales, Gross Profit, Net Profit, etc.) were showing all location data for restricted users. RLS enforcement now applied to all profit and expense views.',
+    descriptionAr: 'تم حل مشكلة أمنية حرجة حيث كانت مؤشرات الأداء في صفحة النظرة العامة (إجمالي المبيعات، إجمالي الربح، صافي الربح، إلخ) تعرض جميع بيانات المواقع للمستخدمين المقيدين. يتم الآن تطبيق تنفيذ RLS على جميع عروض الربح والمصروفات.',
+    changes: {
+      en: [
+        '🔐 Implemented RLS on profit_analysis_view_current',
+        '🔐 Implemented RLS on expense_details_view',
+        '🔐 Implemented RLS on profit_totals_view',
+        '🔐 Implemented RLS on profit_by_branch_view',
+        '✅ Overview page Total Sales now filtered by user permissions',
+        '✅ Gross Profit and Net Profit KPIs now respect branch access',
+        '✅ Expense totals now filtered to allowed branches only',
+        '🛡️ All 4 views now execute with user context (security_invoker = true)',
+        '📊 Restricted users see only their assigned branch data in Overview',
+        '⚡ No performance impact - views remain optimized'
+      ],
+      ar: [
+        '🔐 تنفيذ RLS على profit_analysis_view_current',
+        '🔐 تنفيذ RLS على expense_details_view',
+        '🔐 تنفيذ RLS على profit_totals_view',
+        '🔐 تنفيذ RLS على profit_by_branch_view',
+        '✅ إجمالي المبيعات في صفحة النظرة العامة الآن مصفى حسب أذونات المستخدم',
+        '✅ مؤشرات إجمالي الربح وصافي الربح الآن تحترم وصول الفروع',
+        '✅ إجماليات المصروفات الآن مصفاة للفروع المسموح بها فقط',
+        '🛡️ جميع العروض الأربعة الآن تنفذ مع سياق المستخدم (security_invoker = true)',
+        '📊 المستخدمون المقيدون يرون فقط بيانات فروعهم المعينة في النظرة العامة',
+        '⚡ لا يوجد تأثير على الأداء - العروض تظل محسّنة'
+      ]
+    }
+  },
+  {
+    id: '11',
+    date: '2025-10-12',
+    version: '1.5.2',
+    category: 'bugfix',
+    titleEn: 'Fixed KPI Data Access Control',
+    titleAr: 'إصلاح التحكم في الوصول لبيانات مؤشرات الأداء',
+    descriptionEn: 'Resolved critical security issue where restricted users could see all location transactions in KPI views instead of only their allowed branches. RLS policies now properly enforced at database level.',
+    descriptionAr: 'تم حل مشكلة أمنية حرجة حيث كان المستخدمون المقيدون يرون جميع معاملات المواقع في عروض مؤشرات الأداء بدلاً من فروعهم المسموح بها فقط. يتم الآن تطبيق سياسات RLS بشكل صحيح على مستوى قاعدة البيانات.',
+    changes: {
+      en: [
+        '🔐 Implemented RLS (security_invoker = true) for all KPI views',
+        '✅ vendor_bills_filtered now respects user branch permissions',
+        '✅ customer_balance_aging_filtered now respects user permissions',
+        '✅ top_overdue_customers now respects user permissions',
+        '✅ branch_performance_comparison now respects user permissions',
+        '🛡️ Security enforcement moved from application to database layer',
+        '⚡ No performance impact - views remain optimized',
+        '📊 Restricted users now see only their assigned branches in KPIs',
+        '🔒 All dashboard KPIs (vendor, customer, financial) now properly filtered'
+      ],
+      ar: [
+        '🔐 تنفيذ RLS (security_invoker = true) لجميع عروض مؤشرات الأداء',
+        '✅ vendor_bills_filtered الآن يحترم أذونات فروع المستخدم',
+        '✅ customer_balance_aging_filtered الآن يحترم أذونات المستخدم',
+        '✅ top_overdue_customers الآن يحترم أذونات المستخدم',
+        '✅ branch_performance_comparison الآن يحترم أذونات المستخدم',
+        '🛡️ تم نقل تطبيق الأمان من طبقة التطبيق إلى طبقة قاعدة البيانات',
+        '⚡ لا يوجد تأثير على الأداء - العروض تظل محسّنة',
+        '📊 المستخدمون المقيدون يرون الآن فروعهم المعينة فقط في مؤشرات الأداء',
+        '🔒 جميع مؤشرات الأداء في لوحة التحكم (البائع، العميل، المالي) يتم تصفيتها بشكل صحيح الآن'
+      ]
+    }
+  },
+  {
     id: '10',
     date: '2025-10-12',
     version: '1.5.1',
