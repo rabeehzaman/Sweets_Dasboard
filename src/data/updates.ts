@@ -17,6 +17,32 @@ export interface Update {
 
 export const updates: Update[] = [
   {
+    id: '10',
+    date: '2025-10-12',
+    version: '1.5.1',
+    category: 'bugfix',
+    titleEn: 'Fixed VAT Return Multi-Branch Filtering',
+    titleAr: 'إصلاح تصفية الفروع المتعددة في إقرار ضريبة القيمة المضافة',
+    descriptionEn: 'Resolved issue where selecting multiple branches on VAT Return page would only show data from the first selected branch instead of all selected branches.',
+    descriptionAr: 'تم حل مشكلة حيث كان اختيار عدة فروع في صفحة إقرار ضريبة القيمة المضافة يعرض البيانات من الفرع الأول المحدد فقط بدلاً من جميع الفروع المحددة.',
+    changes: {
+      en: [
+        '🐛 Fixed multi-branch selection on VAT Return page',
+        '✅ All selected branches now included in calculations',
+        '📊 VAT summary and tables now show combined data from all selected branches',
+        '🔧 Updated database function call to support branch array parameter',
+        '⚡ No performance impact - database already optimized for multiple branches'
+      ],
+      ar: [
+        '🐛 إصلاح اختيار الفروع المتعددة في صفحة إقرار ضريبة القيمة المضافة',
+        '✅ جميع الفروع المحددة الآن مدرجة في الحسابات',
+        '📊 ملخص ضريبة القيمة المضافة والجداول تعرض الآن البيانات المجمعة من جميع الفروع المحددة',
+        '🔧 تحديث استدعاء دالة قاعدة البيانات لدعم معامل مصفوفة الفروع',
+        '⚡ لا يوجد تأثير على الأداء - قاعدة البيانات محسّنة بالفعل للفروع المتعددة'
+      ]
+    }
+  },
+  {
     id: '9',
     date: '2025-10-12',
     version: '1.5.0',
