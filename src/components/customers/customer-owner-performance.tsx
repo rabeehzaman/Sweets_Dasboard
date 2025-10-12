@@ -90,10 +90,10 @@ function OwnerSkeleton() {
 }
 
 interface CustomerOwnerPerformanceProps {
-  selectedOwner?: string
+  selectedOwners?: string[]
 }
 
-export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerformanceProps) {
+export function CustomerOwnerPerformance({ selectedOwners }: CustomerOwnerPerformanceProps) {
   const { t } = useLocale()
   const { data: agingData, loading, error } = useCustomerAgingData()
 
@@ -173,13 +173,13 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
       owner.performance_rank = index + 1
     })
 
-    // Filter by selected owner if specified
-    if (selectedOwner && selectedOwner !== 'All') {
-      return result.filter(owner => owner.owner_name === selectedOwner)
+    // Filter by selected owners if specified
+    if (selectedOwners && selectedOwners.length > 0) {
+      return result.filter(owner => selectedOwners.includes(owner.owner_name))
     }
 
     return result
-  }, [agingData, selectedOwner, t])
+  }, [agingData, selectedOwners, t])
 
   if (error) {
     return (
@@ -251,8 +251,8 @@ export function CustomerOwnerPerformance({ selectedOwner }: CustomerOwnerPerform
         </CardTitle>
         <CardDescription>
           {t("customers.charts.collection_efficiency_detailed")}
-          {selectedOwner && selectedOwner !== 'All' && (
-            <span className="ml-2 text-primary font-medium">• {t('pages.expenses.filtered_by')} {selectedOwner}</span>
+          {selectedOwners && selectedOwners.length > 0 && (
+            <span className="ml-2 text-primary font-medium">• {t('pages.expenses.filtered_by')} {selectedOwners.length} owner(s)</span>
           )}
         </CardDescription>
       </CardHeader>

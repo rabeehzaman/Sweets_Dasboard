@@ -12,7 +12,7 @@ import {
 } from '@/types/customer-aging'
 
 // Hook for fetching aging summary KPIs with owner filtering
-export function useCustomerAgingSummaryKPIs(selectedOwner?: string) {
+export function useCustomerAgingSummaryKPIs(selectedOwners?: string[]) {
   const [data, setData] = useState<CustomerAgingSummaryKPIs | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -28,11 +28,11 @@ export function useCustomerAgingSummaryKPIs(selectedOwner?: string) {
 
       try {
         setLoading(true)
-        
-        // Filter data by selected owner
-        const filteredData = !selectedOwner || selectedOwner === 'All' 
-          ? rawData 
-          : rawData.filter(customer => customer.customer_owner_name_custom === selectedOwner)
+
+        // Filter data by selected owners
+        const filteredData = !selectedOwners || selectedOwners.length === 0
+          ? rawData
+          : rawData.filter(customer => selectedOwners.includes(customer.customer_owner_name_custom))
 
         if (filteredData.length === 0) {
           setData({
@@ -129,7 +129,7 @@ export function useCustomerAgingSummaryKPIs(selectedOwner?: string) {
     }
 
     calculateFilteredKPIs()
-  }, [rawData, selectedOwner])
+  }, [rawData, selectedOwners])
 
   return { data, loading, error }
 }
@@ -178,7 +178,7 @@ export function useTopOverdueCustomers(limit: number = 10) {
 }
 
 // Hook for fetching risk category distribution with filtering
-export function useRiskCategoryDistribution(selectedOwner?: string) {
+export function useRiskCategoryDistribution(selectedOwners?: string[]) {
   const [data, setData] = useState<RiskCategoryDistribution[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -194,11 +194,11 @@ export function useRiskCategoryDistribution(selectedOwner?: string) {
 
       try {
         setLoading(true)
-        
-        // Filter data by selected owner
-        const filteredData = !selectedOwner || selectedOwner === 'All' 
-          ? rawData 
-          : rawData.filter(customer => customer.customer_owner_name_custom === selectedOwner)
+
+        // Filter data by selected owners
+        const filteredData = !selectedOwners || selectedOwners.length === 0
+          ? rawData
+          : rawData.filter(customer => selectedOwners.includes(customer.customer_owner_name_custom))
 
         if (filteredData.length === 0) {
           setData([])
@@ -284,7 +284,7 @@ export function useRiskCategoryDistribution(selectedOwner?: string) {
     }
 
     calculateRiskDistribution()
-  }, [rawData, selectedOwner])
+  }, [rawData, selectedOwners])
 
   return { data, loading, error }
 }
@@ -420,27 +420,27 @@ export function useCustomerOwners() {
 }
 
 // Updated combined hook for all customer aging KPIs with filtering
-export function useCustomerAgingDashboard(selectedOwner?: string) {
+export function useCustomerAgingDashboard(selectedOwners?: string[]) {
   const summaryKPIs = useCustomerAgingSummaryKPIs()
   const topOverdueCustomers = useTopOverdueCustomers(10)
   const riskDistribution = useRiskCategoryDistribution()
   const branchPerformance = useBranchPerformance()
 
-  const loading = summaryKPIs.loading || topOverdueCustomers.loading || 
+  const loading = summaryKPIs.loading || topOverdueCustomers.loading ||
                  riskDistribution.loading || branchPerformance.loading
 
-  const error = summaryKPIs.error || topOverdueCustomers.error || 
+  const error = summaryKPIs.error || topOverdueCustomers.error ||
                riskDistribution.error || branchPerformance.error
 
-  // Filter data by selected owner
+  // Filter data by selected owners
   const filteredTopOverdueCustomers = React.useMemo(() => {
-    if (!topOverdueCustomers.data || !selectedOwner || selectedOwner === 'All') {
+    if (!topOverdueCustomers.data || !selectedOwners || selectedOwners.length === 0) {
       return topOverdueCustomers.data
     }
-    return topOverdueCustomers.data.filter(customer => 
-      customer.sales_person === selectedOwner
+    return topOverdueCustomers.data.filter(customer =>
+      selectedOwners.includes(customer.sales_person)
     )
-  }, [topOverdueCustomers.data, selectedOwner])
+  }, [topOverdueCustomers.data, selectedOwners])
 
   return {
     summaryKPIs: summaryKPIs.data,

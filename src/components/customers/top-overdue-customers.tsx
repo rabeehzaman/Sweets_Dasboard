@@ -63,20 +63,20 @@ function CustomerSkeleton() {
 }
 
 interface TopOverdueCustomersProps {
-  selectedOwner?: string
+  selectedOwners?: string[]
 }
 
-export function TopOverdueCustomers({ selectedOwner }: TopOverdueCustomersProps) {
+export function TopOverdueCustomers({ selectedOwners }: TopOverdueCustomersProps) {
   const { t } = useLocale()
   const { data: allData, loading, error } = useTopOverdueCustomers(50)
-  
-  // Filter data by selected owner
+
+  // Filter data by selected owners
   const data = React.useMemo(() => {
-    if (!allData || !selectedOwner || selectedOwner === 'All') {
+    if (!allData || !selectedOwners || selectedOwners.length === 0) {
       return allData?.slice(0, 10) || []
     }
-    return allData.filter(customer => customer.sales_person === selectedOwner).slice(0, 10)
-  }, [allData, selectedOwner])
+    return allData.filter(customer => selectedOwners.includes(customer.sales_person)).slice(0, 10)
+  }, [allData, selectedOwners])
 
   if (error) {
     return (

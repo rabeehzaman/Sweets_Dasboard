@@ -76,12 +76,12 @@ function RiskLegend({ data }: { data: Array<{ risk_category: string; customer_co
 }
 
 interface RiskDistributionChartProps {
-  selectedOwner?: string
+  selectedOwners?: string[]
 }
 
-export function RiskDistributionChart({ selectedOwner }: RiskDistributionChartProps) {
+export function RiskDistributionChart({ selectedOwners }: RiskDistributionChartProps) {
   const { t } = useLocale()
-  const { data, loading, error } = useRiskCategoryDistribution(selectedOwner)
+  const { data, loading, error } = useRiskCategoryDistribution(selectedOwners)
 
   if (error) {
     return (

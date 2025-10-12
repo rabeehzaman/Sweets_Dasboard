@@ -83,12 +83,12 @@ function KPICard({ title, value, subtitle, icon: Icon, badge, loading }: KPICard
 }
 
 interface CustomerAgingKPICardsProps {
-  selectedOwner?: string
+  selectedOwners?: string[]
 }
 
-export function CustomerAgingKPICards({ selectedOwner }: CustomerAgingKPICardsProps) {
+export function CustomerAgingKPICards({ selectedOwners }: CustomerAgingKPICardsProps) {
   const { t } = useLocale()
-  const { data, loading, error } = useCustomerAgingSummaryKPIs(selectedOwner)
+  const { data, loading, error } = useCustomerAgingSummaryKPIs(selectedOwners)
 
   if (error) {
     return (

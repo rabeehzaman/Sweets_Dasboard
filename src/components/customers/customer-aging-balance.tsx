@@ -26,10 +26,10 @@ const formatCurrency = (amount: number) => {
 }
 
 interface CustomerAgingBalanceProps {
-  selectedOwner?: string
+  selectedOwners?: string[]
 }
 
-export function CustomerAgingBalance({ selectedOwner = "All" }: CustomerAgingBalanceProps) {
+export function CustomerAgingBalance({ selectedOwners = [] }: CustomerAgingBalanceProps) {
   const { t } = useLocale()
   const [customerData, setCustomerData] = React.useState<CustomerBalanceAging[]>([])
   const [loading, setLoading] = React.useState(true)
@@ -61,28 +61,28 @@ export function CustomerAgingBalance({ selectedOwner = "All" }: CustomerAgingBal
 
   const filteredData = React.useMemo(() => {
     // Filter out any records that might be totals or summaries
-    let filtered = customerData.filter(customer => 
-      customer.customer_name && 
+    let filtered = customerData.filter(customer =>
+      customer.customer_name &&
       !customer.customer_name.toLowerCase().includes('total') &&
       !customer.customer_name.toLowerCase().includes('outstanding') &&
-      customer.customer_id && 
+      customer.customer_id &&
       customer.customer_id.trim() !== ''
     )
-    
-    // Filter by selected owner
-    if (selectedOwner !== "All") {
-      filtered = filtered.filter(customer => customer.customer_owner_name_custom === selectedOwner)
+
+    // Filter by selected owners
+    if (selectedOwners && selectedOwners.length > 0) {
+      filtered = filtered.filter(customer => selectedOwners.includes(customer.customer_owner_name_custom))
     }
-    
+
     // Filter by search query
     if (searchQuery.trim()) {
-      filtered = filtered.filter(customer => 
+      filtered = filtered.filter(customer =>
         customer.customer_name.toLowerCase().includes(searchQuery.toLowerCase().trim())
       )
     }
-    
+
     return filtered
-  }, [customerData, selectedOwner, searchQuery])
+  }, [customerData, selectedOwners, searchQuery])
 
   const totals = React.useMemo(() => {
     return filteredData.reduce(
@@ -325,9 +325,9 @@ export function CustomerAgingBalance({ selectedOwner = "All" }: CustomerAgingBal
         </div>
         {filteredData.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
-            {searchQuery.trim() 
-              ? `${t("pages.customers.no_customers_search")} "${searchQuery.trim()}"${selectedOwner !== "All" ? ` ${t("pages.customers.for_owner")} "${selectedOwner}"` : ""}.`
-              : `${t("pages.customers.no_customers_found")}${selectedOwner !== "All" ? ` ${t("pages.customers.for_owner")} "${selectedOwner}"` : ""}.`
+            {searchQuery.trim()
+              ? `${t("pages.customers.no_customers_search")} "${searchQuery.trim()}"${selectedOwners && selectedOwners.length > 0 ? ` for selected owner(s)` : ""}.`
+              : `${t("pages.customers.no_customers_found")}${selectedOwners && selectedOwners.length > 0 ? ` for selected owner(s)` : ""}.`
             }
           </div>
         )}

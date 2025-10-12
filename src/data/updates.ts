@@ -17,6 +17,40 @@ export interface Update {
 
 export const updates: Update[] = [
   {
+    id: '9',
+    date: '2025-10-12',
+    version: '1.5.0',
+    category: 'feature',
+    titleEn: 'Customer Owner Filtering System',
+    titleAr: 'نظام تصفية مالك العميل',
+    descriptionEn: 'Added comprehensive customer owner filtering capability to the Customers page. Users can now filter all customer aging data, KPIs, and reports by specific customer owners with persistent selections.',
+    descriptionAr: 'تمت إضافة إمكانية تصفية شاملة لمالك العميل إلى صفحة العملاء. يمكن للمستخدمين الآن تصفية جميع بيانات تقادم العملاء ومؤشرات الأداء والتقارير حسب مالكي عملاء محددين مع اختيارات ثابتة.',
+    changes: {
+      en: [
+        '👥 New Customer Owner filter with multi-select dropdown',
+        '🔍 Search functionality to quickly find specific owners',
+        '💾 Persistent filter selections stored in localStorage',
+        '📊 All components respond to filter: KPI cards, aging tables, charts',
+        '🔐 RLS-aware: Restricted users see only their assigned owners',
+        '⚡ Optimized queries for better performance',
+        '🌐 Full bilingual support (English/Arabic)',
+        '✨ Visual feedback showing active filter count',
+        '📱 Responsive design for mobile and desktop'
+      ],
+      ar: [
+        '👥 مرشح مالك العميل الجديد مع قائمة منسدلة متعددة الاختيار',
+        '🔍 وظيفة البحث للعثور بسرعة على المالكين المحددين',
+        '💾 اختيارات التصفية الثابتة المخزنة في localStorage',
+        '📊 جميع المكونات تستجيب للمرشح: بطاقات KPI، جداول التقادم، الرسوم البيانية',
+        '🔐 مدرك لـ RLS: المستخدمون المقيدون يرون فقط المالكين المعينين لهم',
+        '⚡ استعلامات محسّنة لأداء أفضل',
+        '🌐 دعم كامل ثنائي اللغة (الإنجليزية/العربية)',
+        '✨ ردود فعل بصرية تعرض عدد المرشحات النشطة',
+        '📱 تصميم متجاوب للهاتف المحمول وسطح المكتب'
+      ]
+    }
+  },
+  {
     id: '8',
     date: '2025-10-12',
     version: '1.4.2',
