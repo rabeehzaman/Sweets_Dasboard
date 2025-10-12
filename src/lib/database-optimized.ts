@@ -1495,15 +1495,12 @@ export async function getVATReturn(
   try {
     console.log('💰 Fetching VAT return data:', { startDate, endDate, branchFilters })
 
-    // Database function expects single location ID (p_branch_id text)
-    // If multiple locations selected, pass the first one
-    // If no locations selected, pass null to get all locations
-    const singleBranchId = branchFilters && branchFilters.length > 0 ? branchFilters[0] : null
-
+    // Database function supports multiple branches via p_branch_names parameter (text[])
+    // Pass the entire array to support multiple branch selection
     const { data, error } = await supabase.rpc('get_vat_return', {
       p_start_date: startDate,
       p_end_date: endDate,
-      p_branch_id: singleBranchId  // ✅ Correct parameter name (was p_branch_names)
+      p_branch_names: branchFilters && branchFilters.length > 0 ? branchFilters : null
     })
 
     if (error) {
