@@ -6,6 +6,7 @@ import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { DynamicThemeColor } from "@/components/dynamic-theme-color";
 import { LocaleProvider } from "@/i18n/locale-provider";
 import { AuthProvider } from "@/contexts/auth-context";
+import { LocationFilterProvider } from "@/contexts/location-filter-context";
 import { headers } from 'next/headers';
 import { getLangDir } from 'rtl-detect';
 
@@ -92,15 +93,17 @@ export default async function RootLayout({
       >
         <AuthProvider>
           <LocaleProvider initialLocale={locale as 'en' | 'ar'}>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-            >
-              <DynamicThemeColor />
-              {children}
-              <PWAInstallPrompt />
-            </ThemeProvider>
+            <LocationFilterProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+              >
+                <DynamicThemeColor />
+                {children}
+                <PWAInstallPrompt />
+              </ThemeProvider>
+            </LocationFilterProvider>
           </LocaleProvider>
         </AuthProvider>
       </body>

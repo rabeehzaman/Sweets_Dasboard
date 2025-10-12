@@ -80,11 +80,13 @@ function KPICard({ title, value, change, description, icon, loading, delay = 0 }
 
 interface KPICardsProps {
   dateRange?: DateRange
-  branchFilter?: string
+  locationIds?: string[]
+  kpis: any // Required: must be provided by parent
+  loading: boolean // Required: must be provided by parent
+  error: string | null // Required: must be provided by parent
 }
 
-export function KPICards({ dateRange, branchFilter }: KPICardsProps = {}) {
-  const { kpis, loading, error } = useOptimizedKPIs(dateRange, branchFilter)
+export function KPICards({ dateRange, locationIds, kpis, loading, error }: KPICardsProps) {
   const { t } = useLocale()
 
   if (error) {
@@ -130,7 +132,7 @@ export function KPICards({ dateRange, branchFilter }: KPICardsProps = {}) {
             <div className="w-2 h-2 rounded-full bg-green-500" />
             <span>{t("kpi.database_optimized")}</span>
             <span className="ml-2">
-              ({kpis.total_invoices} {t("kpi.invoices")}, {kpis.total_line_items} {t("kpi.items")})
+              ({kpis.uniqueInvoices || kpis.totalInvoices || 0} {t("kpi.invoices")}, {kpis.totalQuantity || 0} {t("kpi.items")})
             </span>
           </div>
         </div>
@@ -139,28 +141,28 @@ export function KPICards({ dateRange, branchFilter }: KPICardsProps = {}) {
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 px-1">
         <KPICard
           title={t("kpi.total_revenue")}
-          value={formatCurrency(kpis?.total_revenue || 0)}
+          value={formatCurrency(kpis?.totalRevenue || 0)}
           icon={<DollarSign className="h-4 w-4" />}
           loading={loading}
           delay={0}
         />
         <KPICard
           title={t("kpi.taxable_sales")}
-          value={formatCurrency(kpis?.total_taxable_sales || 0)}
+          value={formatCurrency(kpis?.totalTaxableSales || 0)}
           icon={<Receipt className="h-4 w-4" />}
           loading={loading}
           delay={100}
         />
         <KPICard
           title={t("kpi.gross_profit")}
-          value={formatCurrency(kpis?.gross_profit || 0)}
+          value={formatCurrency(kpis?.grossProfit || 0)}
           icon={<TrendingUp className="h-4 w-4" />}
           loading={loading}
           delay={200}
         />
         <KPICard
           title={t("kpi.gp_percentage")}
-          value={`${(kpis?.gross_profit_percentage || 0).toFixed(1)}%`}
+          value={`${(kpis?.grossProfitMargin || 0).toFixed(1)}%`}
           icon={<Percent className="h-4 w-4" />}
           loading={loading}
           delay={300}
@@ -170,8 +172,7 @@ export function KPICards({ dateRange, branchFilter }: KPICardsProps = {}) {
   )
 }
 
-export function ExtendedKPICards({ dateRange, branchFilter }: KPICardsProps = {}) {
-  const { kpis, loading, error } = useOptimizedKPIs(dateRange, branchFilter)
+export function ExtendedKPICards({ dateRange, locationIds, kpis, loading, error }: KPICardsProps) {
   const { t } = useLocale()
 
   if (error) {
@@ -188,41 +189,41 @@ export function ExtendedKPICards({ dateRange, branchFilter }: KPICardsProps = {}
       <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 px-1">
         <KPICard
           title={t("kpi.total_expenses")}
-          value={formatCurrency(kpis?.total_expenses || 0)}
+          value={formatCurrency(kpis?.totalExpenses || 0)}
           icon={<Receipt className="h-4 w-4" />}
           loading={loading}
         />
         <KPICard
           title={t("kpi.net_profit")}
-          value={formatCurrency(kpis?.net_profit || 0)}
+          value={formatCurrency(kpis?.netProfit || 0)}
           icon={<Target className="h-4 w-4" />}
           loading={loading}
         />
         <KPICard
           title={t("kpi.total_stock_value")}
-          value={formatCurrency(kpis?.total_stock_value || 0)}
+          value={formatCurrency(kpis?.totalStockValue || 0)}
           icon={<Warehouse className="h-4 w-4" />}
           loading={loading}
         />
         <KPICard
           title={t("kpi.daily_avg_sales")}
-          value={formatCurrency(kpis?.daily_avg_sales || 0)}
+          value={formatCurrency(kpis?.dailyAvgSales || 0)}
           icon={<Calendar className="h-4 w-4" />}
           loading={loading}
         />
       </div>
-      
+
       {/* Second row - Additional metrics */}
       <div className="grid gap-3 sm:gap-4 md:grid-cols-1 lg:grid-cols-2 px-1">
         <KPICard
           title={`${t("nav.overview")} (${t("kpi.invoices")})`}
-          value={formatNumber(kpis?.total_invoices || 0)}
+          value={formatNumber(kpis?.uniqueInvoices || kpis?.totalInvoices || 0)}
           icon={<Eye className="h-4 w-4" />}
           loading={loading}
         />
         <KPICard
-          title={kpis?.net_vat_payable >= 0 ? t("kpi.net_vat_payable") : t("kpi.net_vat_refundable")}
-          value={formatCurrency(Math.abs(kpis?.net_vat_payable || 0))}
+          title={kpis?.netVatPayable >= 0 ? t("kpi.net_vat_payable") : t("kpi.net_vat_refundable")}
+          value={formatCurrency(Math.abs(kpis?.netVatPayable || 0))}
           icon={<ReceiptText className="h-4 w-4" />}
           loading={loading}
         />

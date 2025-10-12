@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { collection, query, orderBy, onSnapshot, getDocs, where } from 'firebase/firestore';
 import { loansDb } from '@/lib/firebase-loans';
+import { useAuth } from '@/contexts/auth-context';
 import { Loan, Payment, LoanWithCalculations, BankType, LoanStatus } from '@/types/loans';
 
 interface UseLoansResult {
@@ -12,6 +13,7 @@ interface UseLoansResult {
 }
 
 export function useLoans(): UseLoansResult {
+  const { permissions } = useAuth();
   const [loans, setLoans] = useState<LoanWithCalculations[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,7 +98,28 @@ export function useLoans(): UseLoansResult {
             })
           );
 
-          setLoans(loansWithCalculations);
+          // Apply permission-based filtering if user has loan filter rules
+          let filteredLoans = loansWithCalculations;
+          if (permissions?.loanFilterRules && !permissions.isAdmin) {
+            const { show_overdue, remaining_days_threshold } = permissions.loanFilterRules;
+
+            filteredLoans = loansWithCalculations.filter(loan => {
+              // Show overdue loans
+              if (show_overdue && loan.status === 'overdue') {
+                return true;
+              }
+
+              // Show loans with remaining days below threshold
+              if (remaining_days_threshold && loan.remainingDays < remaining_days_threshold && loan.status !== 'closed') {
+                return true;
+              }
+
+              // If neither condition met, filter it out
+              return false;
+            });
+          }
+
+          setLoans(filteredLoans);
           setLoading(false);
         } catch (err) {
           console.error('Error processing loans:', err);
@@ -112,7 +135,7 @@ export function useLoans(): UseLoansResult {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [permissions]);
 
   return { loans, loading, error };
 }

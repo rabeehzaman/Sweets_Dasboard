@@ -5,15 +5,16 @@ import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { VATReturnSummary } from "@/components/vat-return/vat-return-summary"
 import { VATReturnTables } from "@/components/vat-return/vat-return-tables"
 import { MonthFilter, type DateRange } from "@/components/dashboard/month-filter"
-import { BranchFilter, type BranchFilterValue } from "@/components/dashboard/branch-filter"
+import { LocationFilter } from "@/components/filters/location-filter"
+import { useLocationFilter } from "@/contexts/location-filter-context"
 import { useLocale } from "@/i18n/locale-provider"
 
 export default function VATReturnPage() {
   const { t, isArabic } = useLocale()
+  const { selectedLocations } = useLocationFilter()
 
   // MonthFilter will set the initial date range automatically
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>(undefined)
-  const [branchFilter, setBranchFilter] = React.useState<BranchFilterValue>(undefined)
 
   return (
     <DashboardLayout>
@@ -28,11 +29,10 @@ export default function VATReturnPage() {
           </p>
         </div>
         <div className={`flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4 w-full sm:w-auto max-w-full overflow-x-hidden ${isArabic ? 'sm:flex-row-reverse' : ''}`}>
-          <BranchFilter
-            value={branchFilter}
-            onValueChange={setBranchFilter}
-            className="w-full sm:w-auto min-h-[44px]"
-            dateRange={dateRange}
+          <LocationFilter
+            className="w-full sm:w-auto"
+            showLabel={false}
+            showDescription={false}
           />
           <MonthFilter
             onDateRangeChange={setDateRange}
@@ -42,10 +42,10 @@ export default function VATReturnPage() {
       </div>
 
       {/* VAT Summary Cards */}
-      <VATReturnSummary dateRange={dateRange} branchFilter={branchFilter} />
+      <VATReturnSummary dateRange={dateRange} locationIds={selectedLocations} />
 
       {/* VAT Return Tables (Tabbed) */}
-      <VATReturnTables dateRange={dateRange} branchFilter={branchFilter} />
+      <VATReturnTables dateRange={dateRange} locationIds={selectedLocations} />
     </DashboardLayout>
   )
 }

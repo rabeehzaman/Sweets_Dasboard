@@ -24,10 +24,10 @@ import type { DateRange } from "./date-filter"
 
 interface OptimizedTabbedTablesProps {
   dateRange?: DateRange
-  branchFilter?: string
+  locationIds?: string[]
 }
 
-export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabbedTablesProps) {
+export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbedTablesProps) {
   const { t } = useLocale()
   
   // Dual state management for immediate UI vs deferred content rendering
@@ -66,7 +66,7 @@ export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabb
     showingAll: invoiceShowingAll,
     hasMore: invoiceHasMore,
     loadAllData: loadAllInvoiceData
-  } = useOptimizedProfitByInvoice(dateRange, branchFilter, 10000, invoiceCustomerFilter, invoiceNumberFilter)
+  } = useOptimizedProfitByInvoice(dateRange, locationIds, 10000, invoiceCustomerFilter, invoiceNumberFilter)
 
   // Debug logging
   React.useEffect(() => {
@@ -88,12 +88,12 @@ export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabb
   const {
     options: customerFilterOptions,
     loading: customerFilterOptionsLoading
-  } = useCustomerFilterOptions(dateRange, branchFilter)
+  } = useCustomerFilterOptions(dateRange, locationIds)
 
   const {
     options: invoiceFilterOptions,
     loading: invoiceFilterOptionsLoading
-  } = useInvoiceFilterOptions(dateRange, branchFilter)
+  } = useInvoiceFilterOptions(dateRange, locationIds)
 
   const {
     options: warehouseFilterOptions,
@@ -156,7 +156,7 @@ export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabb
       await exportInvoicesDirectFromDB(
         dateRange?.from,
         dateRange?.to,
-        branchFilter,
+        locationIds && locationIds.length === 1 ? locationIds[0] : undefined,
         invoiceCustomerFilter,
         invoiceNumberFilter
       )
@@ -174,7 +174,7 @@ export function OptimizedTabbedTables({ dateRange, branchFilter }: OptimizedTabb
       await exportInvoicesWithItemsDirectFromDB(
         dateRange?.from,
         dateRange?.to,
-        branchFilter,
+        locationIds && locationIds.length === 1 ? locationIds[0] : undefined,
         invoiceCustomerFilter,
         invoiceNumberFilter
       )

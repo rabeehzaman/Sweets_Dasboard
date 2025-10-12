@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/contexts/auth-context'
 
 interface FilterOption {
   value: string
@@ -9,12 +10,13 @@ interface FilterOption {
 }
 
 export function useDepartmentOptions() {
+  const { permissions } = useAuth()
   const [options, setOptions] = useState<FilterOption[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchDepartments()
-  }, [])
+  }, [permissions])
 
   const fetchDepartments = async () => {
     try {
@@ -26,7 +28,15 @@ export function useDepartmentOptions() {
       if (error) throw error
 
       if (data) {
-        const uniqueDepartments = Array.from(new Set(data.map(row => row.department)))
+        let uniqueDepartments = Array.from(new Set(data.map(row => row.department)))
+
+        // Apply permission-based filtering if user has restricted access
+        if (permissions?.vehicleInstalmentDepartments && permissions.vehicleInstalmentDepartments.length > 0 && !permissions.isAdmin) {
+          uniqueDepartments = uniqueDepartments.filter(dept =>
+            permissions.vehicleInstalmentDepartments.includes(dept)
+          )
+        }
+
         setOptions([
           { value: 'all', label: 'All Departments' },
           ...uniqueDepartments.map(dept => ({ value: dept, label: dept }))

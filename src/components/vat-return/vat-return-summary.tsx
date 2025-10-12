@@ -10,11 +10,11 @@ import type { DateRange } from "@/components/dashboard/date-filter"
 
 interface VATReturnSummaryProps {
   dateRange?: DateRange
-  branchFilter?: string
+  locationIds?: string[]
 }
 
-export function VATReturnSummary({ dateRange, branchFilter }: VATReturnSummaryProps) {
-  const { data, loading, error } = useVATReturn(dateRange, branchFilter)
+export function VATReturnSummary({ dateRange, locationIds }: VATReturnSummaryProps) {
+  const { data, loading, error } = useVATReturn(dateRange, locationIds)
   const { t, isArabic } = useLocale()
 
   if (error) {

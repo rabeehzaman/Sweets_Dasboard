@@ -6,6 +6,12 @@ import { supabase } from '@/lib/supabase'
 
 interface UserPermissions {
   allowedBranches: string[]
+  allowedCustomerOwners: string[]
+  vehicleInstalmentDepartments: string[]
+  loanFilterRules: {
+    show_overdue: boolean
+    remaining_days_threshold: number
+  } | null
   role: string
   isAdmin: boolean
   preferredLanguage: string
@@ -34,7 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchPermissions = async (userId: string) => {
     const { data, error } = await supabase
       .from('user_branch_permissions')
-      .select('allowed_branches, role, preferred_language, display_name_en, display_name_ar')
+      .select('allowed_branches, allowed_customer_owners, vehicle_instalment_departments, loan_filter_rules, role, preferred_language, display_name_en, display_name_ar')
       .eq('user_id', userId)
       .single()
 
@@ -45,6 +51,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     return {
       allowedBranches: data.allowed_branches || [],
+      allowedCustomerOwners: data.allowed_customer_owners || [],
+      vehicleInstalmentDepartments: data.vehicle_instalment_departments || [],
+      loanFilterRules: data.loan_filter_rules || null,
       role: data.role || 'viewer',
       isAdmin: data.allowed_branches?.includes('*') || false,
       preferredLanguage: data.preferred_language || 'en',

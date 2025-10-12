@@ -13,7 +13,7 @@ import type { DateRange } from "@/components/dashboard/date-filter"
 
 interface StatementOfProfitAndLossProps {
   dateRange?: DateRange
-  branchFilter?: string
+  locationIds?: string[]
 }
 
 interface ProfitAndLossData {
@@ -26,22 +26,22 @@ interface ProfitAndLossData {
   netProfitMargin: number
 }
 
-export function StatementOfProfitAndLoss({ dateRange, branchFilter }: StatementOfProfitAndLossProps) {
+export function StatementOfProfitAndLoss({ dateRange, locationIds }: StatementOfProfitAndLossProps) {
   const { t } = useLocale()
-  
+
   // Load all invoice data to calculate totals
   const {
     data: invoiceData,
     loading: invoiceLoading,
     error: invoiceError
-  } = useOptimizedProfitByInvoice(dateRange, branchFilter, 10000) // Load all data
+  } = useOptimizedProfitByInvoice(dateRange, locationIds, 10000) // Load all data
 
   // Load expenses data with same filters
   const {
     data: expensesData,
     loading: expensesLoading,
     error: expensesError
-  } = useExpenses(branchFilter, dateRange)
+  } = useExpenses(locationIds, dateRange)
 
 
   // Calculate P&L data from invoice and expenses data

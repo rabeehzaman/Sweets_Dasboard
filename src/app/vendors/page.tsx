@@ -4,10 +4,13 @@ import * as React from "react"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { VendorAgingBalance } from "@/components/vendors/vendor-aging-balance"
 import { VendorKPICards } from "@/components/vendors/vendor-kpi-cards"
+import { LocationFilter } from "@/components/filters/location-filter"
+import { useLocationFilter } from "@/contexts/location-filter-context"
 import { useLocale } from "@/i18n/locale-provider"
 
 export default function VendorsPage() {
   const { t } = useLocale()
+  const { selectedLocations } = useLocationFilter()
 
   return (
     <DashboardLayout>
@@ -18,15 +21,20 @@ export default function VendorsPage() {
             {t("pages.vendors.description")}
           </p>
         </div>
+
+        {/* Master Location Filter */}
+        <div className="bg-muted/30 p-4 rounded-lg border">
+          <LocationFilter excludeChildLocations={true} />
+        </div>
       </div>
 
       {/* Vendor Dashboard Components */}
       <div className="space-y-4 sm:space-y-6 w-full max-w-full overflow-x-hidden">
         {/* KPI Cards Row */}
-        <VendorKPICards />
+        <VendorKPICards locationIds={selectedLocations} />
 
         {/* Vendor Aging Balance */}
-        <VendorAgingBalance />
+        <VendorAgingBalance locationIds={selectedLocations} />
       </div>
     </DashboardLayout>
   )

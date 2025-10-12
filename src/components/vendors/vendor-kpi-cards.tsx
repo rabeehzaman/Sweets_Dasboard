@@ -85,11 +85,12 @@ function KPICard({ title, value, subtitle, icon: Icon, badge, loading, color = '
 
 interface VendorKPICardsProps {
   className?: string
+  locationIds?: string[]
 }
 
-export function VendorKPICards({ className }: VendorKPICardsProps) {
+export function VendorKPICards({ className, locationIds }: VendorKPICardsProps) {
   const { t } = useLocale()
-  const { data, loading, error } = useVendorKPIs()
+  const { data, loading, error } = useVendorKPIs(locationIds)
 
   if (error) {
     return (

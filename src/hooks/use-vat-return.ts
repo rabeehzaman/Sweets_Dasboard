@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { getVATReturn, formatDateForRPC, type VATReturnData } from "@/lib/database-optimized"
 import type { DateRange } from "@/components/dashboard/date-filter"
 
-export function useVATReturn(dateRange?: DateRange, branchFilter?: string) {
+export function useVATReturn(dateRange?: DateRange, locationIds?: string[]) {
   const [data, setData] = useState<VATReturnData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -15,6 +15,9 @@ export function useVATReturn(dateRange?: DateRange, branchFilter?: string) {
         setLoading(true)
         setError(null)
 
+        // Pass all selected location names to RPC function (supports multiple locations)
+        const branchFilters = locationIds && locationIds.length > 0 ? locationIds : undefined
+
         // Format dates for RPC call - use current month if no dates provided
         const now = new Date()
         const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
@@ -23,9 +26,9 @@ export function useVATReturn(dateRange?: DateRange, branchFilter?: string) {
         const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : formatDateForRPC(firstDayOfMonth)
         const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : formatDateForRPC(lastDayOfMonth)
 
-        console.log('📊 Loading VAT return:', { startDate, endDate, branchFilter })
+        console.log('📊 Loading VAT return:', { startDate, endDate, locationIds, branchFilters })
 
-        const result = await getVATReturn(startDate, endDate, branchFilter)
+        const result = await getVATReturn(startDate, endDate, branchFilters)
 
         if (result) {
           setData(result)
@@ -44,7 +47,7 @@ export function useVATReturn(dateRange?: DateRange, branchFilter?: string) {
     }
 
     fetchVATReturn()
-  }, [dateRange?.from?.getTime(), dateRange?.to?.getTime(), branchFilter])
+  }, [dateRange?.from?.getTime(), dateRange?.to?.getTime(), locationIds])
 
   return { data, loading, error }
 }

@@ -75,7 +75,11 @@ interface VendorAgingData {
   risk_category: 'Low' | 'Medium' | 'High' | 'Critical'
 }
 
-export function VendorAgingBalance() {
+interface VendorAgingBalanceProps {
+  locationIds?: string[]
+}
+
+export function VendorAgingBalance({ locationIds }: VendorAgingBalanceProps = {}) {
   const { t } = useLocale()
   const [selectedRisk, setSelectedRisk] = React.useState<string>("All")
   const [searchQuery, setSearchQuery] = React.useState<string>("")
@@ -90,10 +94,31 @@ export function VendorAgingBalance() {
       try {
         setLoading(true)
 
+        // Convert location names to location IDs if needed
+        let locationIdsToFilter: string[] = []
+        if (locationIds && locationIds.length > 0) {
+          const { data: branchData, error: branchError } = await supabase
+            .from('branch')
+            .select('location_id, location_name')
+            .in('location_name', locationIds)
+
+          if (branchError) {
+            console.error('Error fetching branch IDs:', branchError)
+          } else {
+            locationIdsToFilter = branchData?.map(b => b.location_id) || []
+          }
+        }
+
         // Get bills with vendor data using the view
-        const { data: billsData, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('*')
+
+        if (locationIdsToFilter.length > 0) {
+          query = query.in('location_id', locationIdsToFilter)
+        }
+
+        const { data: billsData, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -215,7 +240,7 @@ export function VendorAgingBalance() {
     }
 
     fetchVendorData()
-  }, [])
+  }, [locationIds])
 
   const filteredData = React.useMemo(() => {
     let filtered = vendorData

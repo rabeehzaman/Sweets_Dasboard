@@ -27,26 +27,43 @@ const parseCurrencyValue = (value: string | null | undefined): number => {
 // Helper function to parse date strings in different formats
 const parseDate = (dateStr: string | null | undefined): Date | null => {
   if (!dateStr) return null
-  
+
   // Handle "28 Jul 2025" format (bills.bill_date)
   if (dateStr.match(/^\d{1,2}\s\w{3}\s\d{4}$/)) {
     return new Date(dateStr)
   }
-  
+
   // Handle "2024-08-05 10:40:49" format (payments_made.created_time)
   if (dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
     return new Date(dateStr)
   }
-  
+
   // Fallback to standard Date parsing
   return new Date(dateStr)
+}
+
+// Helper function to convert location names to location IDs
+const convertLocationNamesToIds = async (locationNames: string[]): Promise<string[]> => {
+  if (!locationNames || locationNames.length === 0) return []
+
+  const { data: branchData, error: branchError } = await supabase
+    .from('branch')
+    .select('location_id, location_name')
+    .in('location_name', locationNames)
+
+  if (branchError) {
+    console.error('Error fetching branch IDs:', branchError)
+    return []
+  }
+
+  return branchData?.map(b => b.location_id) || []
 }
 
 
 /**
  * Hook for vendor KPI cards data - Simplified for SWEETS (no payments_made table)
  */
-export function useVendorKPIs(): VendorAPIResponse<VendorKPIs> {
+export function useVendorKPIs(locationIds?: string[]): VendorAPIResponse<VendorKPIs> {
   const [data, setData] = useState<VendorKPIs | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -57,10 +74,19 @@ export function useVendorKPIs(): VendorAPIResponse<VendorKPIs> {
         setLoading(true)
         setError(null)
 
+        // Convert location names to location IDs if needed
+        const locationIdsToFilter = await convertLocationNamesToIds(locationIds || [])
+
         // Get all bills with vendor info
-        const { data: billsWithVendors, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('*')
+
+        if (locationIdsToFilter.length > 0) {
+          query = query.in('location_id', locationIdsToFilter)
+        }
+
+        const { data: billsWithVendors, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -135,7 +161,7 @@ export function useVendorKPIs(): VendorAPIResponse<VendorKPIs> {
     }
 
     fetchKPIs()
-  }, [])
+  }, [locationIds])
 
   return { data, loading, error }
 }
@@ -143,7 +169,7 @@ export function useVendorKPIs(): VendorAPIResponse<VendorKPIs> {
 /**
  * Hook for vendor performance scorecard - Enhanced with payment data
  */
-export function useVendorPerformanceScorecard(): VendorAPIResponse<VendorPerformance[]> {
+export function useVendorPerformanceScorecard(locationIds?: string[]): VendorAPIResponse<VendorPerformance[]> {
   const [data, setData] = useState<VendorPerformance[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -154,10 +180,19 @@ export function useVendorPerformanceScorecard(): VendorAPIResponse<VendorPerform
         setLoading(true)
         setError(null)
 
+        // Convert location names to location IDs if needed
+        const locationIdsToFilter = await convertLocationNamesToIds(locationIds || [])
+
         // Get bills with vendor data (excluding opening balance via view)
-        const { data: billsData, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('*')
+
+        if (locationIdsToFilter.length > 0) {
+          query = query.in('location_id', locationIdsToFilter)
+        }
+
+        const { data: billsData, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -315,7 +350,7 @@ export function useVendorPerformanceScorecard(): VendorAPIResponse<VendorPerform
     }
 
     fetchPerformanceData()
-  }, [])
+  }, [locationIds])
 
   return { data, loading, error }
 }
@@ -323,7 +358,7 @@ export function useVendorPerformanceScorecard(): VendorAPIResponse<VendorPerform
 /**
  * Hook for vendor alerts and problem vendors - Enhanced with payment data
  */
-export function useVendorAlerts(): VendorAPIResponse<{ alerts: VendorAlert[], problemVendors: ProblemVendor[] }> {
+export function useVendorAlerts(locationIds?: string[]): VendorAPIResponse<{ alerts: VendorAlert[], problemVendors: ProblemVendor[] }> {
   const [data, setData] = useState<{ alerts: VendorAlert[], problemVendors: ProblemVendor[] } | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -334,10 +369,19 @@ export function useVendorAlerts(): VendorAPIResponse<{ alerts: VendorAlert[], pr
         setLoading(true)
         setError(null)
 
+        // Convert location names to location IDs if needed
+        const locationIdsToFilter = await convertLocationNamesToIds(locationIds || [])
+
         // Get bills with vendor data (excluding opening balance via view)
-        const { data: billsData, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('*')
+
+        if (locationIdsToFilter.length > 0) {
+          query = query.in('location_id', locationIdsToFilter)
+        }
+
+        const { data: billsData, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -595,7 +639,7 @@ export function useVendorAlerts(): VendorAPIResponse<{ alerts: VendorAlert[], pr
     }
 
     fetchAlerts()
-  }, [])
+  }, [locationIds])
 
   return { data, loading, error }
 }
@@ -603,7 +647,7 @@ export function useVendorAlerts(): VendorAPIResponse<{ alerts: VendorAlert[], pr
 /**
  * Hook for vendor financial insights - Enhanced with actual cash flow data
  */
-export function useVendorFinancialInsights(): VendorAPIResponse<VendorFinancialInsight[]> {
+export function useVendorFinancialInsights(locationIds?: string[]): VendorAPIResponse<VendorFinancialInsight[]> {
   const [data, setData] = useState<VendorFinancialInsight[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -615,9 +659,15 @@ export function useVendorFinancialInsights(): VendorAPIResponse<VendorFinancialI
         setError(null)
 
         // Get bills with vendor data, filtering out opening balance
-        const { data: billsData, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('*')
+
+        if (locationIds && locationIds.length > 0) {
+          query = query.in('location_name', locationIds)
+        }
+
+        const { data: billsData, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -836,7 +886,7 @@ export function useVendorFinancialInsights(): VendorAPIResponse<VendorFinancialI
     }
 
     fetchFinancialInsights()
-  }, [])
+  }, [locationIds])
 
   return { data, loading, error }
 }
@@ -844,7 +894,7 @@ export function useVendorFinancialInsights(): VendorAPIResponse<VendorFinancialI
 /**
  * Hook for vendor payment trends - Enhanced with ACTUAL payment data
  */
-export function useVendorPaymentTrends(): VendorAPIResponse<{ 
+export function useVendorPaymentTrends(locationIds?: string[]): VendorAPIResponse<{ 
   overallTrends: OverallPaymentTrend[], 
   topVendorTrends: VendorPaymentTrend[],
   cashFlowTrends: Array<{
@@ -873,11 +923,20 @@ export function useVendorPaymentTrends(): VendorAPIResponse<{
         setLoading(true)
         setError(null)
 
+        // Convert location names to location IDs if needed
+        const locationIdsToFilter = await convertLocationNamesToIds(locationIds || [])
+
         // Get bills with vendor data, filtering out opening balance
-        const { data: billsData, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('*')
           .not('bill_date', 'is', null)
+
+        if (locationIdsToFilter.length > 0) {
+          query = query.in('location_id', locationIdsToFilter)
+        }
+
+        const { data: billsData, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -1131,7 +1190,7 @@ export function useVendorPaymentTrends(): VendorAPIResponse<{
     }
 
     fetchPaymentTrends()
-  }, [])
+  }, [locationIds])
 
   return { data, loading, error }
 }
@@ -1139,7 +1198,7 @@ export function useVendorPaymentTrends(): VendorAPIResponse<{
 /**
  * Hook for vendor concentration analysis
  */
-export function useVendorConcentration(): VendorAPIResponse<{ 
+export function useVendorConcentration(locationIds?: string[]): VendorAPIResponse<{ 
   concentrationData: VendorConcentration[], 
   concentrationMetrics: ConcentrationMetric[] 
 }> {
@@ -1156,10 +1215,19 @@ export function useVendorConcentration(): VendorAPIResponse<{
         setLoading(true)
         setError(null)
 
+        // Convert location names to location IDs if needed
+        const locationIdsToFilter = await convertLocationNamesToIds(locationIds || [])
+
         // Get bills with amounts for concentration analysis
-        const { data: billsData, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('*')
+
+        if (locationIdsToFilter.length > 0) {
+          query = query.in('location_id', locationIdsToFilter)
+        }
+
+        const { data: billsData, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -1318,7 +1386,7 @@ export function useVendorConcentration(): VendorAPIResponse<{
     }
 
     fetchConcentrationData()
-  }, [])
+  }, [locationIds])
 
   return { data, loading, error }
 }
@@ -1326,7 +1394,7 @@ export function useVendorConcentration(): VendorAPIResponse<{
 /**
  * Hook for vendor relationship matrix
  */
-export function useVendorRelationshipMatrix(): VendorAPIResponse<{ 
+export function useVendorRelationshipMatrix(locationIds?: string[]): VendorAPIResponse<{ 
   matrixData: Array<{
     vendor_id: string
     vendor_name: string
@@ -1359,10 +1427,19 @@ export function useVendorRelationshipMatrix(): VendorAPIResponse<{
         setLoading(true)
         setError(null)
 
+        // Convert location names to location IDs if needed
+        const locationIdsToFilter = await convertLocationNamesToIds(locationIds || [])
+
         // Get bills with vendor and timing data
-        const { data: billsData, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('*')
+
+        if (locationIdsToFilter.length > 0) {
+          query = query.in('location_id', locationIdsToFilter)
+        }
+
+        const { data: billsData, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -1506,7 +1583,7 @@ export function useVendorRelationshipMatrix(): VendorAPIResponse<{
     }
 
     fetchRelationshipMatrix()
-  }, [])
+  }, [locationIds])
 
   return { data, loading, error }
 }
@@ -1514,7 +1591,7 @@ export function useVendorRelationshipMatrix(): VendorAPIResponse<{
 /**
  * Hook for vendor operational metrics
  */
-export function useVendorOperationalMetrics(): VendorAPIResponse<{ 
+export function useVendorOperationalMetrics(locationIds?: string[]): VendorAPIResponse<{ 
   vendorMetrics: Array<{
     vendor_id: string
     vendor_name: string
@@ -1559,12 +1636,21 @@ export function useVendorOperationalMetrics(): VendorAPIResponse<{
         setLoading(true)
         setError(null)
 
+        // Convert location names to location IDs if needed
+        const locationIdsToFilter = await convertLocationNamesToIds(locationIds || [])
+
         // Get bills with timing and status data
-        const { data: billsData, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('vendor_id, bill_date, bill_status, age_in_days, total_bcy')
           .not('vendor_id', 'is', null)
           .not('bill_date', 'is', null)
+
+        if (locationIdsToFilter.length > 0) {
+          query = query.in('location_id', locationIdsToFilter)
+        }
+
+        const { data: billsData, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -1717,7 +1803,7 @@ export function useVendorOperationalMetrics(): VendorAPIResponse<{
     }
 
     fetchOperationalMetrics()
-  }, [])
+  }, [locationIds])
 
   return { data, loading, error }
 }
@@ -1725,7 +1811,7 @@ export function useVendorOperationalMetrics(): VendorAPIResponse<{
 /**
  * Hook for vendor action recommendations
  */
-export function useVendorActionRecommendations(): VendorAPIResponse<{ 
+export function useVendorActionRecommendations(locationIds?: string[]): VendorAPIResponse<{ 
   recommendations: Array<{
     title: string
     description: string
@@ -1768,11 +1854,20 @@ export function useVendorActionRecommendations(): VendorAPIResponse<{
         setLoading(true)
         setError(null)
 
+        // Convert location names to location IDs if needed
+        const locationIdsToFilter = await convertLocationNamesToIds(locationIds || [])
+
         // Get comprehensive vendor data for analysis
-        const { data: billsData, error: billsError } = await supabase
+        let query = supabase
           .from('vendor_bills_filtered')
           .select('vendor_id, bill_date, bill_status, age_in_days, total_bcy')
           .not('vendor_id', 'is', null)
+
+        if (locationIdsToFilter.length > 0) {
+          query = query.in('location_id', locationIdsToFilter)
+        }
+
+        const { data: billsData, error: billsError } = await query
 
         if (billsError) throw billsError
 
@@ -2029,7 +2124,7 @@ export function useVendorActionRecommendations(): VendorAPIResponse<{
     }
 
     fetchActionRecommendations()
-  }, [])
+  }, [locationIds])
 
   return { data, loading, error }
 }

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import type { DateRange } from "@/components/dashboard/date-filter"
-import type { BranchFilterValue } from "@/components/dashboard/branch-filter"
 import { format } from "date-fns"
 
 export interface ExpenseRecord {
@@ -13,7 +12,7 @@ export interface ExpenseRecord {
   branch_name: string
 }
 
-export function useExpenses(branchFilter: BranchFilterValue = undefined, dateRange?: DateRange) {
+export function useExpenses(locationIds?: string[], dateRange?: DateRange) {
   const [data, setData] = useState<ExpenseRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -23,15 +22,15 @@ export function useExpenses(branchFilter: BranchFilterValue = undefined, dateRan
       try {
         setLoading(true)
         setError(null)
-        
+
         let query = supabase
           .from('expense_details_view')
           .select('*')
           .order('date', { ascending: false })
 
-        // Apply branch filter if provided (skip if "All" or undefined)
-        if (branchFilter && branchFilter !== "All") {
-          query = query.eq('branch_name', branchFilter)
+        // Apply location filter if provided - filter by multiple branch names
+        if (locationIds && locationIds.length > 0) {
+          query = query.in('branch_name', locationIds)
         }
 
         // Apply date range filter if provided
@@ -57,7 +56,7 @@ export function useExpenses(branchFilter: BranchFilterValue = undefined, dateRan
 
         if (fetchError) {
           console.error('Error fetching expenses from expense_details_view:', fetchError)
-          console.error('Query parameters:', { branchFilter, dateRange })
+          console.error('Query parameters:', { locationIds, dateRange })
           console.error('Full error details:', JSON.stringify(fetchError, null, 2))
           setError(fetchError.message)
           return
@@ -90,7 +89,7 @@ export function useExpenses(branchFilter: BranchFilterValue = undefined, dateRan
     }
 
     fetchExpenses()
-  }, [branchFilter, dateRange?.from?.getTime(), dateRange?.to?.getTime()])
+  }, [locationIds, dateRange?.from?.getTime(), dateRange?.to?.getTime()])
 
   return { data, loading, error }
 }

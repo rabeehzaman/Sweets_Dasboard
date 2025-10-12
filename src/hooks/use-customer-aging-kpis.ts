@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/contexts/auth-context'
 import {
   CustomerAgingSummaryKPIs,
   TopOverdueCustomer,
@@ -135,6 +136,7 @@ export function useCustomerAgingSummaryKPIs(selectedOwner?: string) {
 
 // Hook for fetching top overdue customers
 export function useTopOverdueCustomers(limit: number = 10) {
+  const { permissions } = useAuth()
   const [data, setData] = useState<TopOverdueCustomer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -149,7 +151,19 @@ export function useTopOverdueCustomers(limit: number = 10) {
           .limit(limit)
 
         if (error) throw error
-        setData(result || [])
+
+        let filteredData = result || []
+
+        // Filter by allowed customer owners if user has restricted permissions
+        if (permissions?.allowedCustomerOwners &&
+            permissions.allowedCustomerOwners.length > 0 &&
+            !permissions.isAdmin) {
+          filteredData = filteredData.filter(customer =>
+            permissions.allowedCustomerOwners.includes(customer.sales_person)
+          )
+        }
+
+        setData(filteredData)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch top overdue customers')
       } finally {
@@ -158,7 +172,7 @@ export function useTopOverdueCustomers(limit: number = 10) {
     }
 
     fetchData()
-  }, [limit])
+  }, [limit, permissions?.allowedCustomerOwners, permissions?.isAdmin])
 
   return { data, loading, error }
 }
@@ -319,6 +333,7 @@ interface CustomerAgingDataRecord {
 }
 
 export function useCustomerAgingData() {
+  const { permissions } = useAuth()
   const [data, setData] = useState<CustomerAgingDataRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -333,7 +348,19 @@ export function useCustomerAgingData() {
           .order('total_balance', { ascending: false })
 
         if (error) throw error
-        setData(result || [])
+
+        let filteredData = result || []
+
+        // Filter by allowed customer owners if user has restricted permissions
+        if (permissions?.allowedCustomerOwners &&
+            permissions.allowedCustomerOwners.length > 0 &&
+            !permissions.isAdmin) {
+          filteredData = filteredData.filter(customer =>
+            permissions.allowedCustomerOwners.includes(customer.customer_owner_name_custom)
+          )
+        }
+
+        setData(filteredData)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch customer aging data')
       } finally {
@@ -342,13 +369,14 @@ export function useCustomerAgingData() {
     }
 
     fetchData()
-  }, [])
+  }, [permissions?.allowedCustomerOwners, permissions?.isAdmin])
 
   return { data, loading, error }
 }
 
 // Hook for getting available customer owners
 export function useCustomerOwners() {
+  const { permissions } = useAuth()
   const [owners, setOwners] = useState<string[]>(['All'])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -357,16 +385,26 @@ export function useCustomerOwners() {
     const fetchOwners = async () => {
       try {
         setLoading(true)
+
+        // If user has restricted permissions, use their allowed list
+        if (permissions?.allowedCustomerOwners && permissions.allowedCustomerOwners.length > 0 && !permissions.isAdmin) {
+          setOwners(['All', ...permissions.allowedCustomerOwners])
+          setLoading(false)
+          return
+        }
+
+        // For admin users, fetch all owners from database
         const { data: result, error } = await supabase
           .from('customer_balance_aging_filtered')
           .select('customer_owner_name_custom')
           .not('customer_owner_name_custom', 'is', null)
 
         if (error) throw error
-        
+
         const uniqueOwners = ['All', ...new Set(
           result?.map(item => item.customer_owner_name_custom).filter(Boolean) || []
         )]
+
         setOwners(uniqueOwners)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch customer owners')
@@ -376,7 +414,7 @@ export function useCustomerOwners() {
     }
 
     fetchOwners()
-  }, [])
+  }, [permissions])
 
   return { owners, loading, error }
 }

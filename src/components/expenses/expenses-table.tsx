@@ -18,16 +18,15 @@ import { formatCurrency } from "@/lib/formatting"
 import { useLocale } from "@/i18n/locale-provider"
 import { format } from "date-fns"
 import type { DateRange } from "@/components/dashboard/date-filter"
-import type { BranchFilterValue } from "@/components/dashboard/branch-filter"
 
 interface ExpensesTableProps {
-  branchFilter: BranchFilterValue
+  locationIds?: string[]
   dateRange: DateRange
 }
 
-export function ExpensesTable({ branchFilter, dateRange }: ExpensesTableProps) {
+export function ExpensesTable({ locationIds, dateRange }: ExpensesTableProps) {
   const { t } = useLocale()
-  const { data: expenses, loading, error } = useExpenses(branchFilter, dateRange)
+  const { data: expenses, loading, error } = useExpenses(locationIds, dateRange)
   const [searchTerm, setSearchTerm] = React.useState("")
 
   // Filter and sort expenses based on search term (biggest first)
@@ -92,7 +91,7 @@ export function ExpensesTable({ branchFilter, dateRange }: ExpensesTableProps) {
         <CardTitle>{t("pages.expenses.expenses_table_title")}</CardTitle>
         <CardDescription>
           {filteredExpenses.length} {t("pages.expenses.expenses_count")} {expenses?.length || 0} {t("pages.expenses.expenses_plural")}
-          {branchFilter && ` • ${t("pages.expenses.filtered_by")}${branchFilter}`}
+          {locationIds && locationIds.length > 0 && ` • ${locationIds.length} ${locationIds.length === 1 ? t("pages.expenses.location_selected") : t("pages.expenses.locations_selected")}`}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -120,7 +119,7 @@ export function ExpensesTable({ branchFilter, dateRange }: ExpensesTableProps) {
               {formatCurrency(totalAmount)}
             </div>
             <div className="text-xs text-muted-foreground mt-1">
-              {branchFilter ? branchFilter : t("pages.expenses.all_branches")}
+              {locationIds && locationIds.length > 0 ? `${locationIds.length} ${locationIds.length === 1 ? t("pages.expenses.location_selected") : t("pages.expenses.locations_selected")}` : t("pages.expenses.all_branches")}
             </div>
           </div>
 
@@ -200,7 +199,7 @@ export function ExpensesTable({ branchFilter, dateRange }: ExpensesTableProps) {
                   100.0%
                 </TableCell>
                 <TableCell className="font-bold">
-                  {branchFilter ? branchFilter : t("pages.expenses.all_branches")}
+                  {locationIds && locationIds.length > 0 ? `${locationIds.length} ${locationIds.length === 1 ? t("pages.expenses.location_selected") : t("pages.expenses.locations_selected")}` : t("pages.expenses.all_branches")}
                 </TableCell>
               </TableRow>
               

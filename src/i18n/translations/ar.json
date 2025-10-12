@@ -274,7 +274,9 @@
       "total_row": "الإجمالي",
       "all_branches": "جميع الفروع",
       "no_match_search": "لا توجد مصروفات تطابق بحثك.",
-      "no_expenses_found": "لم يتم العثور على مصروفات."
+      "no_expenses_found": "لم يتم العثور على مصروفات.",
+      "location_selected": "موقع محدد",
+      "locations_selected": "مواقع محددة"
     },
     "customers": {
       "title": "لوحة قيادة تقادم العملاء",
@@ -409,6 +411,11 @@
       "medium": "متوسط",
       "low": "منخفض",
       "all": "الكل"
+    },
+    "location_filter": {
+      "label": "الموقع:",
+      "all_locations": "جميع المواقع",
+      "filter_description": "تصفية جميع بيانات الموردين حسب الموقع"
     },
     "aging": {
       "title": "رصيد تقادم الموردين",

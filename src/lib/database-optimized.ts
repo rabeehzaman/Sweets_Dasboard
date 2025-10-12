@@ -1490,15 +1490,15 @@ export interface VATAvailableMonth {
 export async function getVATReturn(
   startDate: string,
   endDate: string,
-  branchFilter?: string
+  branchFilters?: string[]  // Changed to accept array of branch names
 ): Promise<VATReturnData | null> {
   try {
-    console.log('💰 Fetching VAT return data:', { startDate, endDate, branchFilter })
+    console.log('💰 Fetching VAT return data:', { startDate, endDate, branchFilters })
 
     const { data, error } = await supabase.rpc('get_vat_return', {
       p_start_date: startDate,
       p_end_date: endDate,
-      p_branch_id: branchFilter || null
+      p_branch_names: branchFilters || null  // Pass array to RPC function
     })
 
     if (error) {

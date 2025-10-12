@@ -274,7 +274,9 @@
       "total_row": "Total",
       "all_branches": "All Branches",
       "no_match_search": "No expenses match your search.",
-      "no_expenses_found": "No expenses found."
+      "no_expenses_found": "No expenses found.",
+      "location_selected": "location selected",
+      "locations_selected": "locations selected"
     },
     "customers": {
       "title": "Customer Aging Dashboard",
@@ -409,6 +411,11 @@
       "medium": "Medium",
       "low": "Low",
       "all": "All"
+    },
+    "location_filter": {
+      "label": "Location:",
+      "all_locations": "All Locations",
+      "filter_description": "Filter all vendor data by location"
     },
     "aging": {
       "title": "Vendor Aging Balance",

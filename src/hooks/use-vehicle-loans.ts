@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/contexts/auth-context'
 import type { Vehicle, VehicleFilters, PaymentCalculation, VehicleWithPayment } from '@/types/vehicle-loans'
 
 // Helper function to parse date from database
@@ -53,6 +54,7 @@ export const calculatePaymentDetails = (vehicle: Vehicle): PaymentCalculation =>
 }
 
 export function useVehicleLoans(filters?: VehicleFilters) {
+  const { permissions } = useAuth()
   const [vehicles, setVehicles] = useState<VehicleWithPayment[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -64,7 +66,9 @@ export function useVehicleLoans(filters?: VehicleFilters) {
     filters?.owner,
     filters?.deductionDay,
     filters?.searchQuery,
-    filters?.paymentStatus
+    filters?.paymentStatus,
+    permissions?.vehicleInstalmentDepartments,
+    permissions?.isAdmin
   ])
 
   const fetchVehicles = async () => {
@@ -140,6 +144,15 @@ export function useVehicleLoans(filters?: VehicleFilters) {
             }
             return true
           })
+        }
+
+        // Permission-based filtering for vehicle departments
+        if (permissions?.vehicleInstalmentDepartments &&
+            permissions.vehicleInstalmentDepartments.length > 0 &&
+            !permissions.isAdmin) {
+          filtered = filtered.filter(vehicle =>
+            permissions.vehicleInstalmentDepartments.includes(vehicle.department)
+          )
         }
 
         setVehicles(filtered)

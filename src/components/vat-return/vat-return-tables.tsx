@@ -22,11 +22,11 @@ import { format } from "date-fns"
 
 interface VATReturnTablesProps {
   dateRange?: DateRange
-  branchFilter?: string
+  locationIds?: string[]
 }
 
-export function VATReturnTables({ dateRange, branchFilter }: VATReturnTablesProps) {
-  const { data, loading, error } = useVATReturn(dateRange, branchFilter)
+export function VATReturnTables({ dateRange, locationIds }: VATReturnTablesProps) {
+  const { data, loading, error } = useVATReturn(dateRange, locationIds)
   const { t, isArabic } = useLocale()
 
   const handleExportToExcel = () => {

@@ -484,7 +484,354 @@ CAST(REGEXP_REPLACE(COALESCE(field, '0'), '[^0-9.]', '', 'g') AS NUMERIC)
 - ✅ Branch: Osaimi Van
 - ✅ Expense tab now fully functional
 
+### October 12, 2025 - RLS Implementation for Vendor Access Control
+**Issue**: Ahmed (restricted user) was seeing all vendor data instead of only his allowed branches
+**Root Cause**: Views bypass RLS policies by default (run as SECURITY DEFINER, not SECURITY INVOKER)
+**Discovery**: User correctly identified that RLS is superior to application-level filtering
+**Investigation Results**:
+- RLS helper functions already exist: `is_admin_user()`, `is_branch_allowed()`, `get_user_branches()`
+- Base tables (bills, invoices) have proper RLS policies
+- Views were not respecting these policies because they run with definer's permissions
+**Fix Applied**:
+- Recreated `vendor_bills_filtered` view with `WITH (security_invoker = true)`
+- Recreated `vendor_balance_aging_view` view with `WITH (security_invoker = true)`
+- Reverted application-level auto-selection logic from `location-filter-context.tsx`
+- Location filter now optional UI control, not security enforcement
+**Result**:
+- ✅ Views now respect RLS policies on underlying tables
+- ✅ Ahmed sees only his allowed branches: Frozen, Nashad-Frozen, Nisam-Frozen, JTB 5936
+- ✅ Expected filtering: 179 bills (SAR 4,577,528) instead of all 185 bills (SAR 5,074,681)
+- ✅ Security enforcement moved from application to database layer
+
+### October 12, 2025 - Branch ID vs Location ID Clarification
+**Confusion**: Database has both `branch_id` and `location_id` columns causing naming ambiguity
+**Investigation Results**:
+```
+Branch Table Structure:
+- branch_id (text) - LEGACY column, always NULL, unused
+- location_id (text) - ACTUAL identifier (e.g., "6817763000000946016")
+- location_name (text) - Human-readable name (e.g., "Frozen / ثلاجة")
+
+Transaction Tables (bills, invoices, etc.):
+- Both columns exist but only location_id is populated
+- Bills: 185 total records
+  • 0 records use branch_id (all NULL)
+  • 185 records use location_id (100% populated)
+
+RLS Implementation:
+- Correctly uses: bills.location_id → branch.location_id → branch.location_name
+- User permissions stored as location_name values in user_branch_permissions.allowed_branches
+```
+
+**Documentation**:
+- ✅ `branch_id` is legacy/unused (always NULL throughout the system)
+- ✅ `location_id` is the actual identifier used everywhere
+- ✅ `location_name` is used for user permissions and display
+- ✅ All RLS policies correctly use location_id-based filtering
+- ✅ No code changes needed - naming is just historical
+
+**Example - Ahmed's Data Breakdown**:
+```
+Ahmed CAN see (his allowed branches):
+- "Frozen / ثلاجة": 178 bills, SAR 4,573,183
+- "Nisam - Frozen / ثلاجة": 1 bill, SAR 4,345
+Total: 179 bills, SAR 4,577,528
+
+Ahmed CANNOT see (restricted):
+- "Khaleel / الخليل": 2 bills, SAR 319,015
+- "Osaimi / العصيمي": 4 bills, SAR 178,137
+Total: 6 bills, SAR 497,153
+```
+
 ---
 
-*Last Updated: September 30, 2025*
-*Version: 1.2.0*
+## 📚 Column Naming Reference Guide
+
+### Overview: Branch vs Location Naming Confusion
+
+**TL;DR**: Your filters work correctly! The confusion comes from inconsistent column naming across views.
+
+The SWEETS database has **three different ways** to reference branch/location data:
+
+| Source | Column Name | Contains Data? | When to Use |
+|--------|-------------|----------------|-------------|
+| `branch` table | `branch_name` | ❌ NO (always NULL) | **NEVER** - Legacy column |
+| `branch` table | `location_name` | ✅ YES | Direct table queries, most views |
+| Views (some) | `branch_name` (alias) | ✅ YES | Aliased from `location_name` in view output |
+
+### Why Your Filters Work
+
+**Key Discovery**: Some views alias `location_name` AS `branch_name` in their output, which is why queries using `branch_name` work despite the base table column being empty.
+
+```sql
+-- Example from expense_details_view:
+COALESCE(b.location_name, 'Unknown Branch') AS branch_name
+LEFT JOIN branch b ON at.location_id = b.location_id
+```
+
+### View-by-View Column Reference
+
+#### Views That Return `branch_name` (Aliased)
+These views join with `branch` table and alias `location_name` → `branch_name`:
+
+| View Name | Output Column | Source | Frontend Usage |
+|-----------|---------------|--------|----------------|
+| `expense_details_view` | `branch_name` | Aliased from `location_name` | `use-expenses.ts`, `use-dynamic-branches.ts` |
+
+**When querying these views:**
+```typescript
+// ✅ CORRECT - Query the aliased column
+.from('expense_details_view')
+.select('branch_name')
+.in('branch_name', locationNames)  // Use location names directly
+```
+
+#### Views That Return `location_name` or `location_id` (Direct)
+These views return location data with original column names:
+
+| View Name | Output Columns | Frontend Usage | Notes |
+|-----------|----------------|----------------|-------|
+| `vendor_bills_filtered` | `location_id`, `location_name` | `use-vendor-kpis.ts` | Standard naming |
+| `customer_balance_aging` | Uses RLS with `location_name` | Customer reports | RLS-protected |
+
+**When querying these views:**
+```typescript
+// ✅ CORRECT - Convert location names to IDs first
+const locationIds = await convertLocationNamesToIds(locationNames)
+.from('vendor_bills_filtered')
+.in('location_id', locationIds)
+
+// OR query by location_name directly if view supports it
+.from('vendor_bills_filtered')
+.in('location_name', locationNames)
+```
+
+#### Views With Display-Friendly Column Names (Quoted Identifiers)
+These views use **capitalized, spaced column names** for display purposes. Requires quoted identifiers:
+
+| View Name | Output Column | Access Pattern | Notes |
+|-----------|---------------|----------------|-------|
+| `profit_analysis_view_current` | `"Branch Name"` | Requires quoted identifier | Use for reporting/display only |
+| `profit_by_branch_view` | `"Branch Name"` | Requires quoted identifier | Aggregated by branch |
+
+**⚠️ IMPORTANT**: These columns require quoted identifiers in SQL or specific field selection in code:
+
+```typescript
+// ✅ CORRECT - Select with quotes in Supabase
+const { data } = await supabase
+  .from('profit_analysis_view_current')
+  .select('"Branch Name", "Profit", "Sale Price"')  // Quoted for spaced names
+
+// ✅ CORRECT - Access in JavaScript
+data.forEach(row => {
+  console.log(row["Branch Name"])  // Use bracket notation
+})
+
+// ❌ WRONG - Cannot use dot notation
+console.log(row.Branch Name)  // Syntax error!
+```
+
+**SQL Example:**
+```sql
+-- ✅ CORRECT
+SELECT "Branch Name", "Profit"
+FROM profit_analysis_view_current
+WHERE "Branch Name" = 'Frozen / ثلاجة'
+
+-- ❌ WRONG - Unquoted identifiers with spaces fail
+SELECT Branch Name FROM profit_analysis_view_current
+```
+
+### Base Table Reference (For Direct Queries)
+
+**⚠️ WARNING**: Only query base `branch` table using `location_*` columns:
+
+```sql
+-- ✅ CORRECT - Use location columns
+SELECT location_id, location_name
+FROM branch
+WHERE location_name IN ('Frozen / ثلاجة', 'Khaleel / الخليل')
+
+-- ❌ WRONG - branch_name is always NULL
+SELECT branch_id, branch_name  -- Returns all NULLs!
+FROM branch
+WHERE branch_name IN (...)  -- Will never match anything
+```
+
+### Frontend Code Patterns
+
+#### Pattern 1: Querying Views with `branch_name` Output
+```typescript
+// Used by: use-expenses.ts, use-dynamic-branches.ts
+const { data } = await supabase
+  .from('expense_details_view')  // View aliases location_name → branch_name
+  .select('branch_name')          // ✅ Works because view creates this column
+  .in('branch_name', locationNames)  // ✅ Filter by location names
+```
+
+#### Pattern 2: Querying Views with `location_id`/`location_name`
+```typescript
+// Used by: use-vendor-kpis.ts
+// Step 1: Convert names to IDs
+const locationIds = await convertLocationNamesToIds(locationNames)
+
+// Step 2: Query with location_id
+const { data } = await supabase
+  .from('vendor_bills_filtered')
+  .select('*')
+  .in('location_id', locationIds)  // ✅ Filter by location IDs
+```
+
+#### Pattern 3: RLS-Protected Views (Automatic Filtering)
+```typescript
+// Views with RLS (security_invoker = true) auto-filter by user permissions
+const { data } = await supabase
+  .from('vendor_bills_filtered')  // RLS applies location_name filtering
+  .select('*')
+  // No manual location filter needed - RLS handles it
+```
+
+### RLS Helper Functions
+
+**All RLS functions use `location_name` for permissions:**
+
+```sql
+-- Helper: Get user's allowed locations (returns location_name array)
+get_user_branches() → RETURNS TEXT[]
+  -- Returns: ['Frozen / ثلاجة', 'Khaleel / الخليل', ...]
+
+-- Helper: Check if specific location is allowed
+is_branch_allowed(p_branch_name TEXT) → RETURNS BOOLEAN
+  -- Takes location_name, returns true/false
+
+-- Helper: Check if user is admin
+is_admin_user() → RETURNS BOOLEAN
+  -- Admin users bypass all location restrictions
+```
+
+**Usage in views:**
+```sql
+-- View with RLS enforcement
+CREATE VIEW expense_details_view
+WITH (security_invoker = true)  -- Respects RLS policies
+AS
+SELECT
+  ...
+  COALESCE(b.location_name, 'Unknown Branch') AS branch_name
+FROM accrual_transactions at
+LEFT JOIN branch b ON at.location_id = b.location_id
+WHERE (is_admin_user() OR is_branch_allowed(b.location_name))
+```
+
+### Common Pitfalls & Solutions
+
+#### ❌ Pitfall 1: Querying Base Table with `branch_name`
+```typescript
+// WRONG - Returns all NULLs
+const { data } = await supabase
+  .from('branch')
+  .select('branch_name')  // ❌ Always NULL
+```
+**Solution**: Use `location_name` instead:
+```typescript
+// CORRECT
+const { data } = await supabase
+  .from('branch')
+  .select('location_name')  // ✅ Contains actual data
+```
+
+#### ❌ Pitfall 2: Mixing Column Names
+```typescript
+// WRONG - Inconsistent column usage
+const { data: branches } = await supabase
+  .from('branch')
+  .select('location_name')  // Get location_name
+
+const { data: bills } = await supabase
+  .from('bills')
+  .in('branch_id', branches.map(b => b.location_name))  // ❌ Trying to filter NULL column
+```
+**Solution**: Use consistent location columns:
+```typescript
+// CORRECT
+const { data: branches } = await supabase
+  .from('branch')
+  .select('location_id, location_name')
+
+const { data: bills } = await supabase
+  .from('bills')
+  .in('location_id', branches.map(b => b.location_id))  // ✅ Both use location_id
+```
+
+#### ❌ Pitfall 3: Assuming View Column Names Match Table
+```typescript
+// Check view definition first!
+// Some views alias location_name → branch_name
+// Others keep location_name as-is
+```
+**Solution**: Check `information_schema.columns` or view definition before querying:
+```sql
+-- Check what columns a view actually returns
+SELECT column_name FROM information_schema.columns
+WHERE table_name = 'your_view_name';
+```
+
+### Quick Decision Tree
+
+**"Which column should I use?"**
+
+```
+Are you querying a VIEW?
+├─ YES → Check view output columns
+│  ├─ Returns 'branch_name'? → Use branch_name
+│  └─ Returns 'location_name' or 'location_id'? → Use those
+│
+└─ NO → Querying base table directly?
+   └─ ALWAYS use location_id and location_name
+      (branch_id and branch_name are empty!)
+```
+
+### Testing Your Queries
+
+```sql
+-- Test 1: Verify view output columns
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'expense_details_view'
+ORDER BY ordinal_position;
+
+-- Test 2: Sample data from view
+SELECT * FROM expense_details_view LIMIT 5;
+
+-- Test 3: Check for NULL values
+SELECT
+  COUNT(*) as total_rows,
+  COUNT(branch_name) as branch_name_count,
+  COUNT(location_name) as location_name_count
+FROM branch;
+-- Result: total_rows: 34, branch_name_count: 0, location_name_count: 34
+```
+
+### Summary: The Golden Rules
+
+1. **✅ NEVER use `branch_id` or `branch_name` from base `branch` table** - They're always NULL
+2. **✅ ALWAYS use `location_id` and `location_name` for base table queries**
+3. **✅ Check view definitions** - Some alias `location_name` → `branch_name` in output
+4. **✅ RLS policies work with `location_name`** for permission checks
+5. **✅ Frontend can use either** depending on which view you're querying
+
+### Why the System Works Despite Confusion
+
+**The views hide the complexity!**
+
+- Base tables use `location_id`/`location_name` (source of truth)
+- Some views alias output as `branch_name` (for semantic clarity)
+- RLS policies enforce permissions using `location_name`
+- Frontend queries work because they match view output columns
+
+**No code changes needed** - the system works correctly. This documentation clarifies the naming conventions to prevent future confusion.
+
+---
+
+*Last Updated: October 12, 2025*
+*Version: 1.4.0*
