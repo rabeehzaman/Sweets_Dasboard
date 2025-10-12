@@ -6,7 +6,7 @@ import { Home, Users, TrendingUp, Building2, Receipt, Calculator, User, LogOut, 
 import { useLocale } from "@/i18n/locale-provider"
 import { SimpleLanguageSwitcher } from "@/components/language-switcher"
 import { cssAnimations, createStaggeredClasses } from "@/lib/css-animations"
-import { useAuth, useIsAdmin } from "@/hooks/use-auth"
+import { useAuth, useIsAdmin, useHiddenPages } from "@/hooks/use-auth"
 import { Badge } from "@/components/ui/badge"
 import {
   DropdownMenu,
@@ -39,13 +39,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { t } = useLocale()
   const { user, signOut } = useAuth()
   const isAdmin = useIsAdmin()
+  const hiddenPages = useHiddenPages()
 
   const handleSignOut = async () => {
     await signOut()
     router.push('/login')
   }
 
-  const navigationItems = [
+  const allNavigationItems = [
     {
       title: t("nav.navigation"),
       items: [
@@ -97,6 +98,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       ],
     },
   ]
+
+  // Filter navigation items based on user permissions
+  // Admin users bypass filtering and see all pages
+  const navigationItems = allNavigationItems.map(section => ({
+    ...section,
+    items: isAdmin
+      ? section.items
+      : section.items.filter(item => !hiddenPages.includes(item.url))
+  }))
 
   const { isArabic } = useLocale()
 

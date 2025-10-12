@@ -17,6 +17,34 @@ export interface Update {
 
 export const updates: Update[] = [
   {
+    id: '3',
+    date: '2025-10-12',
+    version: '1.2.0',
+    category: 'improvement',
+    titleEn: 'Automated What\'s New Updates',
+    titleAr: 'تحديثات تلقائية لصفحة ما الجديد',
+    descriptionEn: 'Implemented comprehensive documentation protocol to ensure all features, bug fixes, and improvements are automatically tracked and communicated to users.',
+    descriptionAr: 'تم تنفيذ بروتوكول توثيق شامل لضمان تتبع وإبلاغ جميع الميزات والإصلاحات والتحسينات للمستخدمين تلقائياً.',
+    changes: {
+      en: [
+        '📋 Added comprehensive What\'s New update protocol to CLAUDE.md',
+        '✅ Defined clear triggers for when to create updates',
+        '🌐 Included bilingual (English/Arabic) guidelines',
+        '📝 Created structured templates for consistency',
+        '🎯 Established priority levels for different update types',
+        '✨ Provided emoji guidelines for visual clarity'
+      ],
+      ar: [
+        '📋 إضافة بروتوكول شامل لتحديثات ما الجديد إلى CLAUDE.md',
+        '✅ تحديد المحفزات الواضحة لإنشاء التحديثات',
+        '🌐 تضمين إرشادات ثنائية اللغة (الإنجليزية/العربية)',
+        '📝 إنشاء قوالب منظمة للاتساق',
+        '🎯 إنشاء مستويات أولوية لأنواع التحديثات المختلفة',
+        '✨ توفير إرشادات الرموز التعبيرية للوضوح البصري'
+      ]
+    }
+  },
+  {
     id: '2',
     date: '2025-10-09',
     version: '1.1.0',

@@ -73,6 +73,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
+  // Check if user is trying to access a hidden page
+  if (session && !isPublicRoute) {
+    const { data: userPerms } = await supabase
+      .from('user_branch_permissions')
+      .select('hidden_pages, allowed_branches')
+      .eq('user_id', session.user.id)
+      .single()
+
+    // Only enforce hidden pages for non-admin users
+    const isAdmin = userPerms?.allowed_branches?.includes('*') || false
+    const hiddenPages = userPerms?.hidden_pages || []
+
+    // If user is not admin and trying to access a hidden page, redirect to home
+    if (!isAdmin && hiddenPages.length > 0 && hiddenPages.includes(url.pathname)) {
+      return NextResponse.redirect(new URL('/', request.url))
+    }
+  }
+
   // Set locale in response headers for client-side access
   res.headers.set('x-locale', locale)
   res.headers.set('x-is-arabic', isArabic.toString())

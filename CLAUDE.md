@@ -5,6 +5,186 @@ Successfully migrated MADA Department dashboard to SWEETS Department database. T
 
 **Migration Status**: ✅ Phase 1-3 Complete | 🟠 Phase 4-7 Pending
 
+## 📢 What's New Update Protocol
+
+**CRITICAL**: This section contains mandatory instructions for maintaining the What's New page.
+
+### When to Update What's New
+
+**ALWAYS update the What's New page (`src/data/updates.ts`) when:**
+1. ✅ **New Features**: Any new functionality added to the application
+2. 🐛 **Bug Fixes**: Critical or user-facing bugs that are resolved
+3. ⚡ **Improvements**: Performance enhancements, UX improvements, or optimizations
+4. 🔄 **Breaking Changes**: Any changes that affect existing workflows or data structures
+5. 🔐 **Security Updates**: RLS policies, authentication, or access control changes
+6. 📊 **Database Changes**: New views, tables, functions, or schema modifications
+7. 🎨 **UI/UX Updates**: Design changes, new components, or layout improvements
+
+### Update Structure
+
+Each update entry in `src/data/updates.ts` must follow this structure:
+
+```typescript
+{
+  id: 'unique-number',           // Sequential number (check last entry + 1)
+  date: 'YYYY-MM-DD',           // ISO format: today's date
+  version: 'X.Y.Z',             // Optional: semantic versioning
+  category: 'feature|bugfix|improvement|breaking',
+  titleEn: 'Brief English title',
+  titleAr: 'عنوان مختصر بالعربية',
+  descriptionEn: 'Detailed English description (1-2 sentences)',
+  descriptionAr: 'وصف مفصل بالعربية (1-2 جملة)',
+  changes: {
+    en: [
+      '✨ Feature 1 description',
+      '🔧 Feature 2 description',
+      '📊 Feature 3 description'
+    ],
+    ar: [
+      '✨ وصف الميزة 1',
+      '🔧 وصف الميزة 2',
+      '📊 وصف الميزة 3'
+    ]
+  }
+}
+```
+
+### Category Guidelines
+
+- **`feature`**: New functionality or capabilities
+- **`bugfix`**: Fixes to existing functionality
+- **`improvement`**: Enhancements to existing features (performance, UX, etc.)
+- **`breaking`**: Changes that may affect existing user workflows
+
+### Emoji Guidelines
+
+Use appropriate emojis to make updates scannable:
+- 🎉 Major feature launch
+- ✨ New feature
+- 🐛 Bug fix
+- ⚡ Performance improvement
+- 🔐 Security update
+- 📊 Data/Analytics feature
+- 🎨 UI/Design change
+- 🔧 Configuration/Settings
+- 📱 Mobile/Responsive update
+- 🌐 Internationalization
+- 🔍 Search/Filter enhancement
+- 📈 Dashboard/Reporting
+- 💰 Financial/Accounting feature
+- 🏢 Business logic update
+- 📑 Documentation
+- 🔄 Process improvement
+
+### Workflow: Making Updates
+
+**Every time you complete work, follow these steps:**
+
+1. **Identify Impact**: Determine if the change warrants a What's New entry
+2. **Draft Update**: Create both English and Arabic descriptions
+3. **Choose Category**: Select the most appropriate category
+4. **Add to File**: Insert at the TOP of the `updates` array in `src/data/updates.ts`
+5. **Increment ID**: Use the next sequential ID number
+6. **Use Today's Date**: Format as ISO (YYYY-MM-DD)
+7. **Review**: Ensure both languages are accurate and clear
+
+### Example: Complete Update Flow
+
+```typescript
+// Before changes - last entry was ID '2'
+export const updates: Update[] = [
+  { id: '2', date: '2025-10-09', ... },
+  { id: '1', date: '2025-10-09', ... }
+]
+
+// After fixing a critical RLS bug
+export const updates: Update[] = [
+  {
+    id: '3',  // New entry at top
+    date: '2025-10-12',
+    category: 'bugfix',
+    titleEn: 'Fixed Vendor Access Control',
+    titleAr: 'إصلاح التحكم في وصول الموردين',
+    descriptionEn: 'Resolved issue where restricted users could see all vendor data instead of only their allowed branches.',
+    descriptionAr: 'تم حل مشكلة حيث كان المستخدمون المقيدون يرون جميع بيانات الموردين بدلاً من فروعهم المسموح بها فقط.',
+    changes: {
+      en: [
+        '🔐 Implemented RLS (Row Level Security) for vendor views',
+        '✅ Restricted users now see only their assigned branches',
+        '⚡ Improved security by moving filtering to database layer'
+      ],
+      ar: [
+        '🔐 تنفيذ أمان مستوى الصف (RLS) لعروض الموردين',
+        '✅ المستخدمون المقيدون يرون الآن فروعهم المعينة فقط',
+        '⚡ تحسين الأمان بنقل التصفية إلى طبقة قاعدة البيانات'
+      ]
+    }
+  },
+  { id: '2', date: '2025-10-09', ... },
+  { id: '1', date: '2025-10-09', ... }
+]
+```
+
+### Translation Guidelines
+
+**For Arabic translations:**
+- Keep technical terms in English if commonly used (e.g., "RLS", "API")
+- Ensure right-to-left (RTL) compatibility
+- Use formal/professional tone matching English version
+- If uncertain about translation, consult with user or use clear technical Arabic
+
+### What NOT to Include
+
+**Do NOT add What's New entries for:**
+- ❌ Internal refactoring (unless it improves performance)
+- ❌ Code cleanup without user impact
+- ❌ Minor typo fixes
+- ❌ Development/debugging changes
+- ❌ Changes to CLAUDE.md or internal documentation
+- ❌ Dependency updates (unless they add features)
+
+### Verification Checklist
+
+Before committing changes, verify:
+- [ ] Entry added to top of `updates` array
+- [ ] Unique sequential ID assigned
+- [ ] Today's date in ISO format
+- [ ] Appropriate category selected
+- [ ] Both English and Arabic titles provided
+- [ ] Both English and Arabic descriptions provided
+- [ ] Changes array includes 3-6 bullet points per language
+- [ ] Emojis used appropriately
+- [ ] No typos or grammatical errors
+- [ ] File syntax is valid TypeScript
+
+### Priority Levels
+
+**IMMEDIATE (Same day update required):**
+- 🔴 Critical bug fixes
+- 🔴 Security vulnerabilities resolved
+- 🔴 Breaking changes
+- 🔴 Major feature launches
+
+**SOON (Within 1-2 days):**
+- 🟡 New features
+- 🟡 Significant improvements
+- 🟡 Database schema changes
+
+**LATER (Can be batched):**
+- 🟢 Minor improvements
+- 🟢 Small bug fixes
+- 🟢 UI tweaks
+
+### Automation Reminder
+
+**⚠️ IMPORTANT**: This update process is NOT automated. You MUST manually:
+1. Remember to check if changes warrant an update
+2. Create the update entry yourself
+3. Add it to `src/data/updates.ts`
+4. Commit the changes with the rest of your work
+
+---
+
 ## Project Overview
 This project involves migrating the existing MADA Department dashboard to use the SWEETS Department database. The dashboard is a Next.js application using Supabase as the backend database.
 
@@ -454,6 +634,24 @@ CAST(REGEXP_REPLACE(COALESCE(field, '0'), '[^0-9.]', '', 'g') AS NUMERIC)
 ---
 
 ## Recent Updates
+
+### October 12, 2025 - What's New Update Protocol
+**Enhancement**: Added comprehensive documentation protocol for maintaining the What's New page
+**Implementation**:
+- Created detailed "What's New Update Protocol" section in CLAUDE.md
+- Defined clear triggers for when to create updates (features, bugs, improvements, etc.)
+- Provided structured templates with bilingual support (English/Arabic)
+- Established category guidelines: feature, bugfix, improvement, breaking
+- Added emoji guidelines for visual clarity and scannability
+- Created priority levels: IMMEDIATE, SOON, LATER
+- Included verification checklist and translation guidelines
+**Location**: CLAUDE.md lines 8-186
+**What's New Entry**: Added entry ID '3' to `src/data/updates.ts`
+**Impact**:
+- ✅ Ensures all changes are properly communicated to users
+- ✅ Maintains consistent documentation standards
+- ✅ Provides clear workflow for future updates
+- ✅ Improves transparency and user communication
 
 ### September 30, 2025 - Branch Name Fix
 **Issue**: `profit_analysis_view_current` was showing "No Branch" for all 292 records

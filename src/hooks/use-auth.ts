@@ -23,3 +23,8 @@ export function useUserRole() {
   const { permissions } = useAuthContext()
   return permissions?.role || 'viewer'
 }
+
+export function useHiddenPages() {
+  const { permissions } = useAuthContext()
+  return permissions?.hiddenPages || []
+}
