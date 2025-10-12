@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { FileText, Warehouse, ChevronDown, ChevronRight, TrendingUp, TrendingDown, Download, Building2, Package } from "lucide-react"
+import { FileText, Warehouse, ChevronDown, ChevronRight, TrendingUp, TrendingDown, Download, Building2, Package, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 import { 
   useOptimizedProfitByInvoice, 
   useOptimizedStockReport,
@@ -41,6 +41,11 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
   
   // Stock report filter
   const [warehouseFilter, setWarehouseFilter] = React.useState<string | undefined>(undefined)
+
+  // Stock table sorting state
+  type StockSortColumn = 'name' | 'stock_qty' | 'stock_pcs' | 'unit_cost' | 'total_cost' | 'total_cost_vat'
+  const [stockSortColumn, setStockSortColumn] = React.useState<StockSortColumn>('name')
+  const [stockSortDirection, setStockSortDirection] = React.useState<'asc' | 'desc'>('asc')
 
   // Pagination is now handled server-side
   const itemsPerPage = 25
@@ -107,20 +112,69 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
   const [isExporting, setIsExporting] = React.useState(false)
 
   const displayInvoiceData = showAllInvoices ? invoiceData : invoiceData.slice(0, itemsPerPage)
-  const displayStockData = stockData
+
+  // Apply sorting to stock data
+  const displayStockData = React.useMemo(() => {
+    if (!stockData || stockData.length === 0) return stockData
+
+    const sorted = [...stockData].sort((a, b) => {
+      let aValue: number | string = 0
+      let bValue: number | string = 0
+
+      switch (stockSortColumn) {
+        case 'name':
+          aValue = a.product_name || ''
+          bValue = b.product_name || ''
+          break
+        case 'stock_qty':
+          aValue = a.stock_quantity || 0
+          bValue = b.stock_quantity || 0
+          break
+        case 'stock_pcs':
+          aValue = a.stock_in_pieces || 0
+          bValue = b.stock_in_pieces || 0
+          break
+        case 'unit_cost':
+          aValue = a.unit_cost || 0
+          bValue = b.unit_cost || 0
+          break
+        case 'total_cost':
+          aValue = a.current_stock_value || 0
+          bValue = b.current_stock_value || 0
+          break
+        case 'total_cost_vat':
+          aValue = a.stock_value_with_vat || 0
+          bValue = b.stock_value_with_vat || 0
+          break
+      }
+
+      // Handle string vs number comparison
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return stockSortDirection === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      } else {
+        return stockSortDirection === 'asc'
+          ? (aValue as number) - (bValue as number)
+          : (bValue as number) - (aValue as number)
+      }
+    })
+
+    return sorted
+  }, [stockData, stockSortColumn, stockSortDirection])
 
   // Helper function to toggle invoice expansion
   const toggleInvoiceExpansion = React.useCallback((invoiceNo: string, event?: React.MouseEvent | React.KeyboardEvent) => {
     if (event) {
       event.preventDefault()
       event.stopPropagation()
-      
+
       // Prevent automatic scroll to focus for mouse clicks
       if (event.type === 'click') {
         event.currentTarget.blur()
       }
     }
-    
+
     setExpandedInvoices(prev => {
       const newSet = new Set(prev)
       if (newSet.has(invoiceNo)) {
@@ -131,6 +185,18 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
       return newSet
     })
   }, [])
+
+  // Helper function to handle stock table sorting
+  const handleStockSort = React.useCallback((column: StockSortColumn) => {
+    if (stockSortColumn === column) {
+      // Toggle direction if same column
+      setStockSortDirection(prev => prev === 'asc' ? 'desc' : 'asc')
+    } else {
+      // New column, default to ascending
+      setStockSortColumn(column)
+      setStockSortDirection('asc')
+    }
+  }, [stockSortColumn])
 
   // Helper function to get branch badge color
   const getBranchBadgeColor = (branchName: string) => {
@@ -146,6 +212,42 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
       default:
         return 'bg-gray-100 dark:bg-gray-900/50 text-gray-800 dark:text-gray-200 border-gray-300 dark:border-gray-700'
     }
+  }
+
+  // Sortable Table Header Component
+  const SortableHeader = ({
+    column,
+    children,
+    className = ''
+  }: {
+    column: StockSortColumn
+    children: React.ReactNode
+    className?: string
+  }) => {
+    const isActive = stockSortColumn === column
+    const isAsc = stockSortDirection === 'asc'
+
+    return (
+      <TableHead
+        className={`cursor-pointer select-none hover:bg-muted/50 transition-colors ${className}`}
+        onClick={() => handleStockSort(column)}
+      >
+        <div className={`flex items-center gap-1 ${className.includes('text-right') ? 'justify-end' : ''}`}>
+          <span>{children}</span>
+          <span className="inline-flex">
+            {isActive ? (
+              isAsc ? (
+                <ArrowUp className="h-4 w-4 text-primary" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-primary" />
+              )
+            ) : (
+              <ArrowUpDown className="h-4 w-4 text-muted-foreground/40" />
+            )}
+          </span>
+        </div>
+      </TableHead>
+    )
   }
 
   // Export handler functions
@@ -909,12 +1011,12 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
                 <Table className="min-w-[600px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t("tables.headers.name")}</TableHead>
-                    <TableHead className="text-right">{t("tables.headers.stock_qty")}</TableHead>
-                    <TableHead className="text-right">{t("tables.headers.stock_in_pcs")}</TableHead>
-                    <TableHead className="text-right">{t("tables.headers.unit_cost_header")}</TableHead>
-                    <TableHead className="text-right">{t("tables.headers.total_cost")}</TableHead>
-                    <TableHead className="text-right">{t("tables.headers.total_cost_with_vat")}</TableHead>
+                    <SortableHeader column="name">{t("tables.headers.name")}</SortableHeader>
+                    <SortableHeader column="stock_qty" className="text-right">{t("tables.headers.stock_qty")}</SortableHeader>
+                    <SortableHeader column="stock_pcs" className="text-right">{t("tables.headers.stock_in_pcs")}</SortableHeader>
+                    <SortableHeader column="unit_cost" className="text-right">{t("tables.headers.unit_cost_header")}</SortableHeader>
+                    <SortableHeader column="total_cost" className="text-right">{t("tables.headers.total_cost")}</SortableHeader>
+                    <SortableHeader column="total_cost_vat" className="text-right">{t("tables.headers.total_cost_with_vat")}</SortableHeader>
                   </TableRow>
                   <TableRow>
                     <TableHead className="bg-muted font-semibold">{t("tables.headers.total")}</TableHead>

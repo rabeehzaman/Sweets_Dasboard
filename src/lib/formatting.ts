@@ -52,7 +52,10 @@ export function formatCurrency(value: number): string {
  * Format currency for tables - NO SYMBOL, just numbers
  * Uses English numbers and Western formatting
  */
-export function formatCurrencyTable(value: number): string {
+export function formatCurrencyTable(value: number | undefined | null): string {
+  if (value === undefined || value === null || isNaN(value)) {
+    return '0'
+  }
   return value.toLocaleString('en-US', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,

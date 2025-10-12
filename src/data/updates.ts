@@ -17,6 +17,154 @@ export interface Update {
 
 export const updates: Update[] = [
   {
+    id: '8',
+    date: '2025-10-12',
+    version: '1.4.2',
+    category: 'bugfix',
+    titleEn: 'Fixed Last 7 Days Performance Table Alignment',
+    titleAr: 'إصلاح محاذاة جدول أداء آخر 7 أيام',
+    descriptionEn: 'Resolved alignment issues in the Last 7 Days Performance table where all columns were appearing left-aligned instead of centered. All 7 columns now display with proper center alignment for improved readability.',
+    descriptionAr: 'تم حل مشاكل المحاذاة في جدول أداء آخر 7 أيام حيث كانت جميع الأعمدة تظهر محاذية لليسار بدلاً من المنتصف. جميع الأعمدة السبعة تعرض الآن بمحاذاة مركزية مناسبة لتحسين القراءة.',
+    changes: {
+      en: [
+        '🎨 Fixed column alignment - all 7 columns now properly centered',
+        '🔧 Applied inline CSS styles to override conflicting alignment rules',
+        '✅ Equal column widths maintained (14.28% each for 7 columns)',
+        '📱 Consistent alignment across both header and data rows',
+        '🌐 Alignment fix works correctly in both English and Arabic'
+      ],
+      ar: [
+        '🎨 إصلاح محاذاة الأعمدة - جميع الأعمدة السبعة الآن في المنتصف بشكل صحيح',
+        '🔧 تطبيق أنماط CSS مباشرة لتجاوز قواعد المحاذاة المتعارضة',
+        '✅ الحفاظ على عرض متساوٍ للأعمدة (14.28% لكل عمود من 7 أعمدة)',
+        '📱 محاذاة متسقة عبر صفوف الرأس والبيانات',
+        '🌐 إصلاح المحاذاة يعمل بشكل صحيح في كل من الإنجليزية والعربية'
+      ]
+    }
+  },
+  {
+    id: '7',
+    date: '2025-10-12',
+    version: '1.4.1',
+    category: 'improvement',
+    titleEn: 'Enhanced Last 7 Days Performance Table',
+    titleAr: 'تحسين جدول أداء آخر 7 أيام',
+    descriptionEn: 'Updated the Last 7 Days Performance table to show 7 detailed columns including Cost of Goods Sold and Net Profit, providing complete financial visibility.',
+    descriptionAr: 'تم تحديث جدول أداء آخر 7 أيام لإظهار 7 أعمدة تفصيلية بما في ذلك تكلفة البضاعة المباعة وصافي الربح، مما يوفر رؤية مالية كاملة.',
+    changes: {
+      en: [
+        '📊 Added Cost of Goods Sold column showing actual product costs',
+        '💰 Added Net Profit column (Gross Profit - Expenses)',
+        '📈 Reordered columns for better financial flow: Total Sales → Taxable Sales → COGS → Gross Profit → GP% → Expenses → Net Profit',
+        '✨ Enhanced data accuracy with proper expense tracking',
+        '🔧 Fixed database function to use correct expense view columns',
+        '🌐 Full bilingual support maintained (English/Arabic)',
+        '✅ All 7 columns respond to location filter as expected'
+      ],
+      ar: [
+        '📊 إضافة عمود تكلفة البضاعة المباعة يعرض التكاليف الفعلية للمنتجات',
+        '💰 إضافة عمود صافي الربح (إجمالي الربح - المصروفات)',
+        '📈 إعادة ترتيب الأعمدة لتدفق مالي أفضل: إجمالي المبيعات → المبيعات الخاضعة للضريبة → تكلفة البضاعة → إجمالي الربح → نسبة الربح → المصروفات → صافي الربح',
+        '✨ تحسين دقة البيانات مع تتبع المصروفات بشكل صحيح',
+        '🔧 إصلاح دالة قاعدة البيانات لاستخدام أعمدة عرض المصروفات الصحيحة',
+        '🌐 الحفاظ على الدعم الكامل ثنائي اللغة (الإنجليزية/العربية)',
+        '✅ جميع الأعمدة السبعة تستجيب لتصفية الموقع كما هو متوقع'
+      ]
+    }
+  },
+  {
+    id: '6',
+    date: '2025-10-12',
+    version: '1.4.0',
+    category: 'feature',
+    titleEn: 'User Access Management - Noushad Permissions',
+    titleAr: 'إدارة وصول المستخدم - أذونات نوشاد',
+    descriptionEn: 'Configured restricted access permissions for Noushad with selective branch access. Noushad can now access 3 branches with full customer, vehicle, and loan management capabilities.',
+    descriptionAr: 'تم تكوين أذونات الوصول المقيد لنوشاد مع وصول انتقائي للفروع. يمكن لنوشاد الآن الوصول إلى 3 فروع مع قدرات كاملة لإدارة العملاء والمركبات والقروض.',
+    changes: {
+      en: [
+        '🔐 Added Noushad user permissions (noushadm.online@gmail.com)',
+        '🏢 Branch Access: 3 branches (Frozen, Nashad-Frozen, Nisam-Frozen)',
+        '🚫 JTB 5936 branch restricted (key difference from Ahmed Kutty)',
+        '👥 Customer Owners: 4 owners (Nashad: 13, Nisam: 7, Frozen Counter: 1, Unassigned: 2)',
+        '🚗 Vehicle Departments: Frozen department only (9 vehicles)',
+        '💰 Loan Filtering: Overdue loans + loans expiring within 30 days',
+        '🌐 Preferred Language: English',
+        '✅ All permissions enforced via RLS at database level'
+      ],
+      ar: [
+        '🔐 إضافة أذونات مستخدم نوشاد (noushadm.online@gmail.com)',
+        '🏢 الوصول للفروع: 3 فروع (الثلاجة، نشاد-الثلاجة، نسام-الثلاجة)',
+        '🚫 فرع JTB 5936 مقيد (الفرق الرئيسي عن أحمد كوتي)',
+        '👥 أصحاب العملاء: 4 أصحاب (نشاد: 13، نسام: 7، عداد المجمدات: 1، غير معين: 2)',
+        '🚗 أقسام المركبات: قسم الثلاجة فقط (9 مركبات)',
+        '💰 تصفية القروض: القروض المتأخرة + القروض التي تنتهي خلال 30 يوماً',
+        '🌐 اللغة المفضلة: الإنجليزية',
+        '✅ جميع الأذونات مطبقة عبر RLS على مستوى قاعدة البيانات'
+      ]
+    }
+  },
+  {
+    id: '5',
+    date: '2025-10-12',
+    version: '1.3.0',
+    category: 'feature',
+    titleEn: 'Last 7 Days Performance Summary',
+    titleAr: 'ملخص أداء آخر 7 أيام',
+    descriptionEn: 'Added a new summary table showing key performance metrics for the last 7 days. This table provides quick insights into recent sales, expenses, and profitability trends.',
+    descriptionAr: 'تمت إضافة جدول ملخص جديد يعرض مقاييس الأداء الرئيسية للأيام السبعة الماضية. يوفر هذا الجدول رؤى سريعة حول المبيعات والمصروفات واتجاهات الربحية الأخيرة.',
+    changes: {
+      en: [
+        '📊 New summary table positioned above detailed analysis tables',
+        '💰 Shows Total Sales, Taxable Sales, Expenses, Gross Profit, and GP%',
+        '📅 Always displays last 7 calendar days from today',
+        '🏢 Responds to branch/location filter (master filter)',
+        '🚫 Does NOT respond to date range picker - fixed 7-day window',
+        '⚡ Real-time calculation with optimized database function',
+        '🌐 Bilingual support with RTL layout for Arabic',
+        '✅ RLS policies enforced for user permissions'
+      ],
+      ar: [
+        '📊 جدول ملخص جديد موضوع فوق جداول التحليل التفصيلي',
+        '💰 يعرض إجمالي المبيعات، المبيعات الخاضعة للضريبة، المصروفات، إجمالي الربح، ونسبة الربح الإجمالي',
+        '📅 يعرض دائماً آخر 7 أيام تقويمية من اليوم',
+        '🏢 يستجيب لتصفية الفرع/الموقع (التصفية الرئيسية)',
+        '🚫 لا يستجيب لمحدد نطاق التاريخ - نافذة ثابتة 7 أيام',
+        '⚡ حساب في الوقت الفعلي مع دالة قاعدة بيانات محسّنة',
+        '🌐 دعم ثنائي اللغة مع تخطيط RTL للعربية',
+        '✅ تطبيق سياسات RLS لأذونات المستخدم'
+      ]
+    }
+  },
+  {
+    id: '4',
+    date: '2025-10-12',
+    version: '1.2.1',
+    category: 'improvement',
+    titleEn: 'Accurate Vendor Payables - Opening Stock Excluded',
+    titleAr: 'حسابات دقيقة للموردين - استبعاد المخزون الافتتاحي',
+    descriptionEn: 'Fixed vendor payables calculation by excluding "Opening Stock" vendor, which represents initial inventory value rather than actual liabilities. This provides a more accurate financial position.',
+    descriptionAr: 'تم إصلاح حساب مستحقات الموردين باستبعاد مورد "المخزون الافتتاحي" الذي يمثل قيمة المخزون الأولي وليس التزامات فعلية. يوفر هذا وضعاً مالياً أكثر دقة.',
+    changes: {
+      en: [
+        '💰 Excluded "Opening Stock" vendor from vendor payables (SAR 1,009,309 reduction)',
+        '📊 More accurate Total Liabilities on Balance Sheet',
+        '✅ Net Worth now reflects true financial position',
+        '🔒 RLS policies still apply - users see only their allowed branches',
+        '🗄️ Database view updated with security_invoker maintained',
+        '📈 Improved financial reporting accuracy'
+      ],
+      ar: [
+        '💰 استبعاد مورد "المخزون الافتتاحي" من مستحقات الموردين (تخفيض 1,009,309 ريال)',
+        '📊 إجمالي الالتزامات أكثر دقة في الميزانية العمومية',
+        '✅ صافي القيمة يعكس الآن الوضع المالي الحقيقي',
+        '🔒 سياسات RLS لا تزال سارية - يرى المستخدمون فروعهم المسموح بها فقط',
+        '🗄️ تحديث عرض قاعدة البيانات مع الحفاظ على security_invoker',
+        '📈 تحسين دقة التقارير المالية'
+      ]
+    }
+  },
+  {
     id: '3',
     date: '2025-10-12',
     version: '1.2.0',
