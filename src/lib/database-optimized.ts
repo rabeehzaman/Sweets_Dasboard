@@ -55,6 +55,30 @@ export async function getActiveBranches(startDate?: Date, endDate?: Date): Promi
 }
 
 // =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
+
+/**
+ * Convert branch names to location IDs for optimized filtering
+ * Uses indexed location_id column instead of branch names
+ */
+async function convertBranchNamesToLocationIds(branchNames: string[]): Promise<string[]> {
+  if (!branchNames || branchNames.length === 0) return []
+
+  const { data, error } = await supabase
+    .from('branch')
+    .select('location_id, location_name')
+    .in('location_name', branchNames)
+
+  if (error) {
+    console.error('❌ Error converting branch names to location IDs:', error)
+    return []
+  }
+
+  return data?.map(b => b.location_id).filter(Boolean) || []
+}
+
+// =============================================================================
 // TYPES
 // =============================================================================
 
@@ -163,16 +187,21 @@ export interface PaginationInfo {
 export async function getOptimizedKPIs(
   startDate?: string,
   endDate?: string,
-  branchFilter?: string
+  branchFilters?: string[]
 ): Promise<OptimizedKPIs | null> {
   try {
-    console.log('🎯 Fetching KPIs with 2025-only RPC:', { startDate, endDate, branchFilter })
+    console.log('🎯 Fetching KPIs with optimized RPC:', { startDate, endDate, branchFilters })
 
-    // Try 2025 function first, fallback to original if it doesn't exist
-    let { data, error } = await supabase.rpc('get_dashboard_kpis_2025', {
+    // Convert branch names to location IDs for indexed filtering
+    const locationIds = branchFilters && branchFilters.length > 0
+      ? await convertBranchNamesToLocationIds(branchFilters)
+      : null
+
+    // Try optimized 2025 function first, fallback to original if it doesn't exist
+    let { data, error } = await supabase.rpc('get_dashboard_kpis_2025_optimized', {
       start_date: startDate || '2025-01-01',
       end_date: endDate || formatDateLocal(new Date()),
-      branch_filter: branchFilter || null
+      location_ids: locationIds
     })
 
     // If 2025 function doesn't exist or returns no data, try the original function
@@ -182,7 +211,7 @@ export async function getOptimizedKPIs(
       const fallback = await supabase.rpc('get_dashboard_kpis', {
         start_date: startDate || null,
         end_date: endDate || null,
-        branch_filter: branchFilter || null
+        branch_filter: branchFilters && branchFilters.length === 1 ? branchFilters[0] : null
       })
       data = fallback.data
       error = fallback.error
@@ -349,7 +378,7 @@ export async function getProfitByInvoiceTotals(
 export async function getOptimizedProfitByItem(
   startDate?: string,
   endDate?: string,
-  branchFilter?: string,
+  branchFilters?: string[],
   itemFilter?: string,
   customerFilter?: string,
   invoiceFilter?: string,
@@ -357,13 +386,18 @@ export async function getOptimizedProfitByItem(
   pageOffset: number = 0
 ): Promise<{ data: OptimizedTransaction[], pagination: PaginationInfo } | null> {
   try {
-    console.log('📊 Fetching profit by item (2025 only):', { startDate, endDate, branchFilter, itemFilter, customerFilter, invoiceFilter, pageLimit, pageOffset })
+    console.log('📊 Fetching profit by item (optimized):', { startDate, endDate, branchFilters, itemFilter, customerFilter, invoiceFilter, pageLimit, pageOffset })
 
-    // Try 2025 function first, fallback to original if it doesn't exist
-    let { data, error } = await supabase.rpc('get_profit_by_item_2025_filtered', {
+    // Convert branch names to location IDs for indexed filtering
+    const locationIds = branchFilters && branchFilters.length > 0
+      ? await convertBranchNamesToLocationIds(branchFilters)
+      : null
+
+    // Try optimized function first, fallback to original if it doesn't exist
+    let { data, error } = await supabase.rpc('get_profit_by_item_2025_filtered_optimized', {
       start_date: startDate || '2025-01-01',
       end_date: endDate || formatDateLocal(new Date()),
-      branch_filter: branchFilter || null,
+      location_ids: locationIds,
       item_filter: itemFilter || null,
       customer_filter: customerFilter || null,
       invoice_filter: invoiceFilter || null,
@@ -371,19 +405,19 @@ export async function getOptimizedProfitByItem(
       page_offset: pageOffset
     })
 
-    // If 2025 function doesn't exist or returns no data, try the original function
+    // If optimized function doesn't exist or returns no data, try the original function
     if (error || !data || data.length === 0) {
-      console.log('⚠️ get_profit_by_item_2025_filtered failed, trying original function:', error?.message)
+      console.log('⚠️ get_profit_by_item_2025_filtered_optimized failed, trying fallback:', error?.message)
       // Build a search query from the filters for the original function
       let searchQuery = null
       if (itemFilter) searchQuery = itemFilter
-      else if (customerFilter) searchQuery = customerFilter  
+      else if (customerFilter) searchQuery = customerFilter
       else if (invoiceFilter) searchQuery = invoiceFilter
 
       const fallback = await supabase.rpc('get_profit_by_item_filtered', {
         start_date: startDate || null,
         end_date: endDate || null,
-        branch_filter: branchFilter || null,
+        branch_filter: branchFilters && branchFilters.length === 1 ? branchFilters[0] : null,
         search_query: searchQuery,
         page_limit: pageLimit,
         page_offset: pageOffset
@@ -439,27 +473,32 @@ export async function getOptimizedProfitByItem(
 export async function getOptimizedProfitByCustomer(
   startDate?: string,
   endDate?: string,
-  branchFilter?: string,
+  branchFilters?: string[],
   customerFilter?: string
 ): Promise<OptimizedCustomer[] | null> {
   try {
-    console.log('👥 Fetching profit by customer (2025 only):', { startDate, endDate, branchFilter, customerFilter })
+    console.log('👥 Fetching profit by customer (optimized):', { startDate, endDate, branchFilters, customerFilter })
 
-    // Try 2025 function first, fallback to original if it doesn't exist
-    let { data, error } = await supabase.rpc('get_profit_by_customer_2025', {
+    // Convert branch names to location IDs for indexed filtering
+    const locationIds = branchFilters && branchFilters.length > 0
+      ? await convertBranchNamesToLocationIds(branchFilters)
+      : null
+
+    // Try optimized function first, fallback to original if it doesn't exist
+    let { data, error } = await supabase.rpc('get_profit_by_customer_2025_optimized', {
       start_date: startDate || '2025-01-01',
       end_date: endDate || formatDateLocal(new Date()),
-      branch_filter: branchFilter || null,
+      location_ids: locationIds,
       customer_filter: customerFilter || null
     })
 
-    // If 2025 function doesn't exist or returns no data, try the original function
+    // If optimized function doesn't exist or returns no data, try the original function
     if (error || !data || data.length === 0) {
-      console.log('⚠️ get_profit_by_customer_2025 failed, trying original function:', error?.message)
+      console.log('⚠️ get_profit_by_customer_2025_optimized failed, trying fallback:', error?.message)
       const fallback = await supabase.rpc('get_profit_by_customer_filtered', {
         start_date: startDate || null,
         end_date: endDate || null,
-        branch_filter: branchFilter || null,
+        branch_filter: branchFilters && branchFilters.length === 1 ? branchFilters[0] : null,
         search_query: customerFilter || null
       })
       data = fallback.data
@@ -485,21 +524,20 @@ export async function getOptimizedProfitByCustomer(
 export async function getOptimizedProfitByInvoice(
   startDate?: string,
   endDate?: string,
-  branchFilter?: string,
+  branchFilters?: string[],
   customerFilter?: string,
   invoiceFilter?: string,
   pageLimit: number = 10000,
   pageOffset: number = 0
 ): Promise<{ data: OptimizedInvoice[], pagination: PaginationInfo } | null> {
   try {
-    console.log('📋 Fetching profit by invoice (2025 only):', { startDate, endDate, branchFilter, customerFilter, invoiceFilter, pageLimit, pageOffset })
+    console.log('📋 Fetching profit by invoice (2025 only):', { startDate, endDate, branchFilters, customerFilter, invoiceFilter, pageLimit, pageOffset })
 
-    // Try 2025 function first, fallback to original if it doesn't exist
-    // Note: Our RPC function returns TABLE, not paginated results
+    // Use the RPC function for all cases (multi-branch or single branch)
     let { data, error } = await supabase.rpc('get_profit_by_invoice_2025_filtered', {
       start_date: startDate || '2025-01-01',
       end_date: endDate || formatDateLocal(new Date()),
-      branch_filter: branchFilter || null,
+      branch_filters: (branchFilters && branchFilters.length > 0) ? branchFilters : null,
       customer_filter: customerFilter || null
     })
 
@@ -511,7 +549,7 @@ export async function getOptimizedProfitByInvoice(
       const fallback = await supabase.rpc('get_profit_by_invoice_filtered', {
         start_date: startDate || null,
         end_date: endDate || null,
-        branch_filter: branchFilter || null,
+        branch_filter: branchFilters && branchFilters.length === 1 ? branchFilters[0] : null,
         customer_filter: customerFilter || null
       })
       data = fallback.data
@@ -1176,16 +1214,16 @@ export interface FilterOption {
 export async function getItemFilterOptions(
   startDate?: string,
   endDate?: string,
-  branchFilter?: string
+  branchFilters?: string[]
 ): Promise<FilterOption[]> {
   try {
-    console.log('📋 Fetching item filter options (2025 only):', { startDate, endDate, branchFilter })
+    console.log('📋 Fetching item filter options (2025 only):', { startDate, endDate, branchFilters })
 
     // Try 2025 function first, fallback to original if it doesn't exist
     let { data, error } = await supabase.rpc('get_item_filter_options_2025', {
       start_date: startDate || '2025-01-01',
       end_date: endDate || formatDateLocal(new Date()),
-      branch_filter: branchFilter || null
+      branch_filters: (branchFilters && branchFilters.length > 0) ? branchFilters : null
     })
 
     // If 2025 function doesn't exist, try the original function
@@ -1194,7 +1232,7 @@ export async function getItemFilterOptions(
       const fallback = await supabase.rpc('get_item_filter_options', {
         start_date: startDate || null,
         end_date: endDate || null,
-        branch_filter: branchFilter || null
+        branch_filter: branchFilters && branchFilters.length === 1 ? branchFilters[0] : null
       })
       data = fallback.data
       error = fallback.error
@@ -1226,16 +1264,21 @@ export async function getItemFilterOptions(
 export async function getCustomerFilterOptions(
   startDate?: string,
   endDate?: string,
-  branchFilter?: string
+  branchFilters?: string[]
 ): Promise<FilterOption[]> {
   try {
-    console.log('👥 Fetching customer filter options (2025 only):', { startDate, endDate, branchFilter })
+    console.log('👥 Fetching customer filter options (2025 only):', { startDate, endDate, branchFilters })
 
-    // Try 2025 function first, fallback to original if it doesn't exist
+    // Convert branch names to location IDs for indexed filtering
+    const locationIds = branchFilters && branchFilters.length > 0
+      ? await convertBranchNamesToLocationIds(branchFilters)
+      : null
+
+    // Try optimized 2025 function with location_ids parameter
     let { data, error } = await supabase.rpc('get_customer_filter_options_2025', {
-      start_date: startDate || '2025-01-01',
-      end_date: endDate || formatDateLocal(new Date()),
-      branch_filter: branchFilter || null
+      p_start_date: startDate || '2025-01-01',
+      p_end_date: endDate || formatDateLocal(new Date()),
+      p_location_ids: locationIds
     })
 
     // If 2025 function doesn't exist, try the original function
@@ -1244,7 +1287,7 @@ export async function getCustomerFilterOptions(
       const fallback = await supabase.rpc('get_customer_filter_options', {
         start_date: startDate || null,
         end_date: endDate || null,
-        branch_filter: branchFilter || null
+        branch_filter: branchFilters && branchFilters.length === 1 ? branchFilters[0] : null
       })
       data = fallback.data
       error = fallback.error
@@ -1276,16 +1319,21 @@ export async function getCustomerFilterOptions(
 export async function getInvoiceFilterOptions(
   startDate?: string,
   endDate?: string,
-  branchFilter?: string
+  branchFilters?: string[]
 ): Promise<FilterOption[]> {
   try {
-    console.log('📄 Fetching invoice filter options (2025 only):', { startDate, endDate, branchFilter })
+    console.log('📄 Fetching invoice filter options (2025 only):', { startDate, endDate, branchFilters })
 
-    // Try 2025 function first, fallback to original if it doesn't exist
+    // Convert branch names to location IDs for indexed filtering
+    const locationIds = branchFilters && branchFilters.length > 0
+      ? await convertBranchNamesToLocationIds(branchFilters)
+      : null
+
+    // Try optimized 2025 function with location_ids parameter
     let { data, error } = await supabase.rpc('get_invoice_filter_options_2025', {
-      start_date: startDate || '2025-01-01',
-      end_date: endDate || formatDateLocal(new Date()),
-      branch_filter: branchFilter || null
+      p_start_date: startDate || '2025-01-01',
+      p_end_date: endDate || formatDateLocal(new Date()),
+      p_location_ids: locationIds
     })
 
     // If 2025 function doesn't exist, try the original function
@@ -1294,7 +1342,7 @@ export async function getInvoiceFilterOptions(
       const fallback = await supabase.rpc('get_invoice_filter_options', {
         start_date: startDate || null,
         end_date: endDate || null,
-        branch_filter: branchFilter || null
+        branch_filter: branchFilters && branchFilters.length === 1 ? branchFilters[0] : null
       })
       data = fallback.data
       error = fallback.error

@@ -36,120 +36,97 @@ export function useOptimizedKPIs(dateRange?: DateRange, locationIds?: string[]) 
   const [kpis, setKpis] = useState<OptimizedKPIs | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Create stable dependency key for locationIds array (sort a copy to avoid mutation)
   const locationKey = locationIds ? [...locationIds].sort().join(',') : ''
 
   useEffect(() => {
-    async function loadKPIs() {
+    // Cancel any previous pending requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    // Clear any pending debounce timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    // Create new abort controller for this request
+    abortControllerRef.current = new AbortController()
+    const signal = abortControllerRef.current.signal
+
+    // Debounce the actual load by 300ms
+    debounceTimerRef.current = setTimeout(async () => {
       try {
+        // Check if already aborted
+        if (signal.aborted) return
+
         setLoading(true)
         setError(null)
 
         const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : undefined
         const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : undefined
 
-        // Handle multiple locations by fetching each and aggregating
-        if (locationIds && locationIds.length >= 2) {
-          console.log('🚀 Loading KPIs for multiple locations:', { startDate, endDate, locations: locationIds })
+        // Pass location array directly to database - NO client-side filtering
+        console.log('🚀 Loading optimized KPIs with database filtering:', { startDate, endDate, locationIds })
 
-          // Fetch KPIs for each location
-          const kpisPromises = locationIds.map(locationId =>
-            getOptimizedKPIs(startDate, endDate, locationId)
-          )
-          const allKpis = await Promise.all(kpisPromises)
+        const result = await getOptimizedKPIs(startDate, endDate, locationIds)
 
-          console.log('🔍 DEBUG allKpis array before aggregation:', allKpis)
+        // Check if aborted after async operation
+        if (signal.aborted) return
 
-          // Aggregate KPIs from all locations
-          // NOTE: RPC returns snake_case properties, need to access them correctly
-          const aggregated = allKpis.reduce((acc, curr, index) => {
-            console.log(`🔍 DEBUG reduce iteration ${index}:`, { acc, curr })
-            if (!curr) return acc
-            if (!acc) return curr
-
-            return {
-              totalTaxableSales: (acc.total_taxable_sales || acc.totalTaxableSales || 0) + (curr.total_taxable_sales || 0),
-              totalRevenue: (acc.total_revenue || acc.totalRevenue || 0) + (curr.total_revenue || 0),
-              totalCost: (acc.total_cost || acc.totalCost || 0) + (curr.total_cost || 0),
-              grossProfit: (acc.gross_profit || acc.grossProfit || 0) + (curr.gross_profit || 0),
-              totalExpenses: (acc.total_expenses || acc.totalExpenses || 0) + (curr.total_expenses || 0),
-              netProfit: (acc.net_profit || acc.netProfit || 0) + (curr.net_profit || 0),
-              grossProfitMargin: 0, // Will recalculate below
-              netProfitMargin: 0, // Will recalculate below
-              totalStockValue: (acc.total_stock_value || acc.totalStockValue || 0) + (curr.total_stock_value || 0),
-              netVatPayable: (acc.net_vat_payable || acc.netVatPayable || 0) + (curr.net_vat_payable || 0),
-              totalInvoices: (acc.total_invoices || acc.totalInvoices || 0) + (curr.total_invoices || 0),
-              uniqueInvoices: (acc.total_invoices || acc.uniqueInvoices || 0) + (curr.total_invoices || 0),
-              totalQuantity: (acc.total_quantity || acc.totalQuantity || 0) + (curr.total_quantity || 0),
-              averageOrderValue: 0, // Will recalculate below
-              dailyAvgSales: 0, // Will recalculate below
-              dateRange: acc.dateRange || curr.dateRange
-            }
-          }, null as OptimizedKPIs | null)
-
-          if (aggregated && aggregated.totalRevenue) {
-            // Recalculate percentage-based metrics
-            aggregated.grossProfitMargin = (aggregated.grossProfit / aggregated.totalRevenue) * 100
-            aggregated.netProfitMargin = (aggregated.netProfit / aggregated.totalRevenue) * 100
-            aggregated.averageOrderValue = aggregated.uniqueInvoices > 0
-              ? aggregated.totalRevenue / aggregated.uniqueInvoices
-              : 0
-
-            // Calculate date range for daily average
-            const from = dateRange?.from || new Date()
-            const to = dateRange?.to || new Date()
-            const days = Math.max(1, Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24)))
-            aggregated.dailyAvgSales = aggregated.totalRevenue / days
+        if (result) {
+          // Convert snake_case to camelCase to match KPI card expectations
+          const camelCaseKpis: OptimizedKPIs = {
+            totalTaxableSales: result.total_taxable_sales || 0,
+            totalRevenue: result.total_revenue || 0,
+            totalCost: result.total_cost || 0,
+            grossProfit: result.gross_profit || 0,
+            totalExpenses: result.total_expenses || 0,
+            netProfit: result.net_profit || 0,
+            grossProfitMargin: result.gross_profit_margin || 0,
+            netProfitMargin: result.net_profit_margin || 0,
+            totalStockValue: result.total_stock_value || 0,
+            netVatPayable: result.net_vat_payable || 0,
+            totalInvoices: result.total_invoices || 0,
+            uniqueInvoices: result.total_invoices || 0, // Use total_invoices for uniqueInvoices
+            totalQuantity: result.total_quantity || 0,
+            averageOrderValue: result.average_order_value || 0,
+            dailyAvgSales: result.daily_avg_sales || 0,
+            dateRange: result.dateRange
           }
-
-          console.log('🔍 DEBUG aggregated KPIs object:', aggregated)
-          setKpis(aggregated)
-          console.log('✅ Aggregated KPIs loaded for multiple locations:', { locations: locationIds.length })
+          setKpis(camelCaseKpis)
+          console.log('✅ KPIs loaded successfully')
         } else {
-          // Single location or all locations
-          const branchFilter = locationIds && locationIds.length === 1 ? locationIds[0] : undefined
-          console.log('🚀 Loading optimized KPIs:', { startDate, endDate, branchFilter })
-
-          const result = await getOptimizedKPIs(startDate, endDate, branchFilter)
-
-          if (result) {
-            // Convert snake_case to camelCase to match KPI card expectations
-            const camelCaseKpis: OptimizedKPIs = {
-              totalTaxableSales: result.total_taxable_sales || 0,
-              totalRevenue: result.total_revenue || 0,
-              totalCost: result.total_cost || 0,
-              grossProfit: result.gross_profit || 0,
-              totalExpenses: result.total_expenses || 0,
-              netProfit: result.net_profit || 0,
-              grossProfitMargin: result.gross_profit_margin || 0,
-              netProfitMargin: result.net_profit_margin || 0,
-              totalStockValue: result.total_stock_value || 0,
-              netVatPayable: result.net_vat_payable || 0,
-              totalInvoices: result.total_invoices || 0,
-              uniqueInvoices: result.total_invoices || 0, // Use total_invoices for uniqueInvoices
-              totalQuantity: result.total_quantity || 0,
-              averageOrderValue: result.average_order_value || 0,
-              dailyAvgSales: result.daily_avg_sales || 0,
-              dateRange: result.dateRange
-            }
-            setKpis(camelCaseKpis)
-            console.log('✅ KPIs loaded successfully')
-          } else {
-            setError('Failed to load KPIs')
-            console.error('❌ KPIs loading failed')
-          }
+          setError('Failed to load KPIs')
+          console.error('❌ KPIs loading failed')
         }
       } catch (err) {
+        // Don't update state if request was aborted
+        if (signal.aborted) return
+
         console.error('❌ Error loading KPIs:', err)
         setError('Failed to load KPIs')
         setKpis(null)
       } finally {
-        setLoading(false)
+        // Don't update state if request was aborted
+        if (!signal.aborted) {
+          setLoading(false)
+        }
+      }
+    }, 300) // 300ms debounce
+
+    // Cleanup function
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
       }
     }
-
-    loadKPIs()
   }, [dateRange?.from?.getTime(), dateRange?.to?.getTime(), locationKey])
 
   return { kpis, loading, error }
@@ -167,7 +144,6 @@ export function useOptimizedProfitByItem(
   customerFilter?: string,
   invoiceFilter?: string
 ) {
-  const branchFilter = locationIds && locationIds.length === 1 ? locationIds[0] : undefined
   const [data, setData] = useState<OptimizedTransaction[]>([])
   const [allData, setAllData] = useState<OptimizedTransaction[]>([])
   const [loading, setLoading] = useState(true)
@@ -190,26 +166,14 @@ export function useOptimizedProfitByItem(
       const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : undefined
       const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : undefined
 
-      console.log('📊 Loading profit by item page:', { offset, pageSize, startDate, endDate, branchFilter, itemFilter, customerFilter, invoiceFilter, locationIds })
+      console.log('📊 Loading profit by item page with database filtering:', { offset, pageSize, startDate, endDate, locationIds, itemFilter, customerFilter, invoiceFilter })
 
-      const result = await getOptimizedProfitByItem(startDate, endDate, branchFilter, itemFilter, customerFilter, invoiceFilter, pageSize, offset)
+      const result = await getOptimizedProfitByItem(startDate, endDate, locationIds, itemFilter, customerFilter, invoiceFilter, pageSize, offset)
 
       if (result) {
-        // Client-side filtering when multiple locations are selected
-        let filteredData = result.data
-        if (locationIds && locationIds.length >= 2) {
-          filteredData = result.data.filter(item =>
-            item.branch_name && locationIds.includes(item.branch_name)
-          )
-          console.log('🔍 Filtered items by locations:', { original: result.data.length, filtered: filteredData.length, locations: locationIds })
-        }
-
-        setData(filteredData)
-        setPagination({
-          ...result.pagination,
-          totalCount: filteredData.length
-        })
-        console.log('✅ Profit by item loaded:', { records: filteredData.length, total: filteredData.length })
+        setData(result.data)
+        setPagination(result.pagination)
+        console.log('✅ Profit by item loaded:', { records: result.data.length, total: result.pagination.totalCount })
       } else {
         setError('Failed to load profit by item data')
         setData([])
@@ -238,24 +202,15 @@ export function useOptimizedProfitByItem(
       const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : undefined
       const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : undefined
 
-      console.log('📊 Loading ALL profit by item data:', { startDate, endDate, branchFilter, itemFilter, customerFilter, invoiceFilter })
+      console.log('📊 Loading ALL profit by item data with database filtering:', { startDate, endDate, locationIds, itemFilter, customerFilter, invoiceFilter })
 
       // Load all data by requesting a very large page size
-      const result = await getOptimizedProfitByItem(startDate, endDate, branchFilter, itemFilter, customerFilter, invoiceFilter, 10000, 0)
+      const result = await getOptimizedProfitByItem(startDate, endDate, locationIds, itemFilter, customerFilter, invoiceFilter, 10000, 0)
 
       if (result) {
-        // Client-side filtering when multiple locations are selected
-        let filteredData = result.data
-        if (locationIds && locationIds.length >= 2) {
-          filteredData = result.data.filter(item =>
-            item.branch_name && locationIds.includes(item.branch_name)
-          )
-          console.log('🔍 Filtered all items by locations:', { original: result.data.length, filtered: filteredData.length })
-        }
-
-        setAllData(filteredData)
+        setAllData(result.data)
         setShowingAll(true)
-        console.log('✅ All profit by item data loaded:', { records: filteredData.length })
+        console.log('✅ All profit by item data loaded:', { records: result.data.length })
       } else {
         setError('Failed to load all profit by item data')
       }
@@ -316,7 +271,6 @@ export function useOptimizedProfitByItem(
 // =============================================================================
 
 export function useOptimizedProfitByCustomer(dateRange?: DateRange, locationIds?: string[], customerFilter?: string) {
-  const branchFilter = locationIds && locationIds.length === 1 ? locationIds[0] : undefined
   const [data, setData] = useState<OptimizedCustomer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -330,22 +284,13 @@ export function useOptimizedProfitByCustomer(dateRange?: DateRange, locationIds?
         const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : undefined
         const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : undefined
 
-        console.log('👥 Loading profit by customer:', { startDate, endDate, branchFilter, customerFilter, locationIds })
+        console.log('👥 Loading profit by customer with database filtering:', { startDate, endDate, locationIds, customerFilter })
 
-        const result = await getOptimizedProfitByCustomer(startDate, endDate, branchFilter, customerFilter)
+        const result = await getOptimizedProfitByCustomer(startDate, endDate, locationIds, customerFilter)
 
         if (result) {
-          // Client-side filtering when multiple locations are selected
-          let filteredData = result
-          if (locationIds && locationIds.length >= 2) {
-            filteredData = result.filter(customer =>
-              customer.branch_name && locationIds.includes(customer.branch_name)
-            )
-            console.log('🔍 Filtered customers by locations:', { original: result.length, filtered: filteredData.length, locations: locationIds })
-          }
-
-          setData(filteredData)
-          console.log('✅ Profit by customer loaded:', { customers: filteredData.length })
+          setData(result)
+          console.log('✅ Profit by customer loaded:', { customers: result.length })
         } else {
           setError('Failed to load profit by customer data')
           setData([])
@@ -376,7 +321,6 @@ export function useOptimizedProfitByInvoice(
   customerFilter?: string,
   invoiceFilter?: string
 ) {
-  const branchFilter = locationIds && locationIds.length === 1 ? locationIds[0] : undefined
   const [data, setData] = useState<OptimizedInvoice[]>([])
   const [allData, setAllData] = useState<OptimizedInvoice[]>([])
   const [loading, setLoading] = useState(true)
@@ -390,6 +334,8 @@ export function useOptimizedProfitByInvoice(
     hasMore: false,
     totalPages: 0
   })
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   const loadPage = async (offset: number = 0) => {
     try {
@@ -399,26 +345,14 @@ export function useOptimizedProfitByInvoice(
       const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : undefined
       const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : undefined
 
-      console.log('📋 Loading profit by invoice page:', { offset, pageSize, startDate, endDate, branchFilter, customerFilter, invoiceFilter })
+      console.log('📋 Loading profit by invoice page with database filtering:', { offset, pageSize, startDate, endDate, locationIds, customerFilter, invoiceFilter })
 
-      const result = await getOptimizedProfitByInvoice(startDate, endDate, branchFilter, customerFilter, invoiceFilter, pageSize, offset)
+      const result = await getOptimizedProfitByInvoice(startDate, endDate, locationIds, customerFilter, invoiceFilter, pageSize, offset)
 
       if (result) {
-        // Client-side filtering when multiple locations are selected
-        let filteredData = result.data
-        if (locationIds && locationIds.length >= 2) {
-          filteredData = result.data.filter(invoice =>
-            invoice.branch_name && locationIds.includes(invoice.branch_name)
-          )
-          console.log('🔍 Filtered invoices by locations:', { original: result.data.length, filtered: filteredData.length, locations: locationIds })
-        }
-
-        setData(filteredData)
-        setPagination({
-          ...result.pagination,
-          totalCount: filteredData.length
-        })
-        console.log('✅ Profit by invoice loaded:', { records: filteredData.length, total: filteredData.length })
+        setData(result.data)
+        setPagination(result.pagination)
+        console.log('✅ Profit by invoice loaded:', { records: result.data.length, total: result.pagination.totalCount })
       } else {
         setError('Failed to load profit by invoice data')
         setData([])
@@ -447,24 +381,15 @@ export function useOptimizedProfitByInvoice(
       const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : undefined
       const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : undefined
 
-      console.log('📋 Loading ALL profit by invoice data:', { startDate, endDate, branchFilter, customerFilter, invoiceFilter })
+      console.log('📋 Loading ALL profit by invoice data with database filtering:', { startDate, endDate, locationIds, customerFilter, invoiceFilter })
 
       // Load all data by requesting a very large page size
-      const result = await getOptimizedProfitByInvoice(startDate, endDate, branchFilter, customerFilter, invoiceFilter, 10000, 0)
+      const result = await getOptimizedProfitByInvoice(startDate, endDate, locationIds, customerFilter, invoiceFilter, 10000, 0)
 
       if (result) {
-        // Client-side filtering when multiple locations are selected
-        let filteredData = result.data
-        if (locationIds && locationIds.length >= 2) {
-          filteredData = result.data.filter(invoice =>
-            invoice.branch_name && locationIds.includes(invoice.branch_name)
-          )
-          console.log('🔍 Filtered all invoices by locations:', { original: result.data.length, filtered: filteredData.length })
-        }
-
-        setAllData(filteredData)
+        setAllData(result.data)
         setShowingAll(true)
-        console.log('✅ All profit by invoice data loaded:', { records: filteredData.length })
+        console.log('✅ All profit by invoice data loaded:', { records: result.data.length })
       } else {
         setError('Failed to load all profit by invoice data')
       }
@@ -477,10 +402,34 @@ export function useOptimizedProfitByInvoice(
   }
 
   useEffect(() => {
+    // Cancel any previous pending requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    // Clear any pending debounce timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
     // Reset states when filters change
     setShowingAll(false)
     setAllData([])
-    loadPage(0) // Load first page when dependencies change
+
+    // Debounce the load by 300ms
+    debounceTimerRef.current = setTimeout(() => {
+      loadPage(0) // Load first page when dependencies change
+    }, 300)
+
+    // Cleanup function
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
+    }
   }, [dateRange, locationIds, pageSize, customerFilter, invoiceFilter])
 
   const nextPage = () => {
@@ -651,7 +600,6 @@ export function useProfitByInvoiceTotals(dateRange?: DateRange, locationIds?: st
 // =============================================================================
 
 export function useItemFilterOptions(dateRange?: DateRange, locationIds?: string[]) {
-  const branchFilter = locationIds && locationIds.length === 1 ? locationIds[0] : undefined
   const [options, setOptions] = useState<FilterOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -665,9 +613,9 @@ export function useItemFilterOptions(dateRange?: DateRange, locationIds?: string
         const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : undefined
         const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : undefined
 
-        console.log("📋 Loading item filter options:", { startDate, endDate, branchFilter })
+        console.log("📋 Loading item filter options with database filtering:", { startDate, endDate, locationIds })
 
-        const result = await getItemFilterOptions(startDate, endDate, branchFilter)
+        const result = await getItemFilterOptions(startDate, endDate, locationIds)
         setOptions(result)
         console.log("✅ Item filter options loaded:", { count: result.length })
       } catch (err) {
@@ -686,7 +634,6 @@ export function useItemFilterOptions(dateRange?: DateRange, locationIds?: string
 }
 
 export function useCustomerFilterOptions(dateRange?: DateRange, locationIds?: string[]) {
-  const branchFilter = locationIds && locationIds.length === 1 ? locationIds[0] : undefined
   const [options, setOptions] = useState<FilterOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -700,13 +647,10 @@ export function useCustomerFilterOptions(dateRange?: DateRange, locationIds?: st
         const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : undefined
         const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : undefined
 
-        console.log("👥 Loading customer filter options:", { startDate, endDate, branchFilter, locationIds })
+        console.log("👥 Loading customer filter options with database filtering:", { startDate, endDate, locationIds })
 
-        const result = await getCustomerFilterOptions(startDate, endDate, branchFilter)
+        const result = await getCustomerFilterOptions(startDate, endDate, locationIds)
 
-        // Note: Customer options don't have branch_name, so we can't filter them directly
-        // The server will handle this through the branchFilter parameter
-        // For multiple locations, we show all customers (they'll be filtered when data is displayed)
         setOptions(result)
         console.log("✅ Customer filter options loaded:", { count: result.length })
       } catch (err) {
@@ -725,7 +669,6 @@ export function useCustomerFilterOptions(dateRange?: DateRange, locationIds?: st
 }
 
 export function useInvoiceFilterOptions(dateRange?: DateRange, locationIds?: string[]) {
-  const branchFilter = locationIds && locationIds.length === 1 ? locationIds[0] : undefined
   const [options, setOptions] = useState<FilterOption[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -739,9 +682,9 @@ export function useInvoiceFilterOptions(dateRange?: DateRange, locationIds?: str
         const startDate = dateRange?.from ? formatDateForRPC(dateRange.from) : undefined
         const endDate = dateRange?.to ? formatDateForRPC(dateRange.to) : undefined
 
-        console.log("📄 Loading invoice filter options:", { startDate, endDate, branchFilter })
+        console.log("📄 Loading invoice filter options with database filtering:", { startDate, endDate, locationIds })
 
-        const result = await getInvoiceFilterOptions(startDate, endDate, branchFilter)
+        const result = await getInvoiceFilterOptions(startDate, endDate, locationIds)
         setOptions(result)
         console.log("✅ Invoice filter options loaded:", { count: result.length })
       } catch (err) {

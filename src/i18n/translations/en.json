@@ -796,21 +796,6 @@
       "status": "Status"
     }
   },
-  "last7Days": {
-    "title": "Last 7 Days Performance",
-    "loading": "Loading...",
-    "loadingData": "Loading data...",
-    "errorLoadingData": "Error loading data",
-    "noData": "No data available",
-    "noDataLast7Days": "No data available for the last 7 days",
-    "totalSales": "Total Sales",
-    "taxableSales": "Taxable Sales",
-    "costOfGoodsSold": "Cost of Goods Sold",
-    "grossProfit": "Gross Profit",
-    "gpPercentage": "GP%",
-    "expenses": "Expenses",
-    "netProfit": "Net Profit"
-  },
   "user": {
     "admin": "Admin",
     "profile": "Profile",

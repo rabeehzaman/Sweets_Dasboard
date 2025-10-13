@@ -4,7 +4,6 @@ import * as React from "react"
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout"
 import { KPICards, ExtendedKPICards } from "@/components/dashboard/kpi-cards"
 import { OptimizedTabbedTables } from "@/components/dashboard/optimized-tabbed-tables"
-import { Last7DaysSummary } from "@/components/dashboard/last-7-days-summary"
 import { DateFilter, type DateRange } from "@/components/dashboard/date-filter"
 import { LocationFilter } from "@/components/filters/location-filter"
 import { useLocationFilter } from "@/contexts/location-filter-context"
@@ -53,9 +52,6 @@ export default function Home() {
 
       {/* Extended KPIs */}
       <ExtendedKPICards dateRange={dateRange} locationIds={selectedLocations} kpis={kpis} loading={loading} error={error} />
-
-      {/* Last 7 Days Summary - Does NOT respond to date filter, only location filter */}
-      <Last7DaysSummary locationIds={selectedLocations} />
 
       {/* Optimized Tabbed Data Tables */}
       <div className="table-container">

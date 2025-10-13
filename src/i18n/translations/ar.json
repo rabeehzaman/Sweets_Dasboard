@@ -796,21 +796,6 @@
       "status": "الحالة"
     }
   },
-  "last7Days": {
-    "title": "أداء آخر 7 أيام",
-    "loading": "جاري التحميل...",
-    "loadingData": "جاري تحميل البيانات...",
-    "errorLoadingData": "خطأ في تحميل البيانات",
-    "noData": "لا توجد بيانات متاحة",
-    "noDataLast7Days": "لا توجد بيانات للأيام السبعة الماضية",
-    "totalSales": "إجمالي المبيعات",
-    "taxableSales": "المبيعات الخاضعة للضريبة",
-    "costOfGoodsSold": "تكلفة البضاعة المباعة",
-    "grossProfit": "إجمالي الربح",
-    "gpPercentage": "نسبة الربح الإجمالي",
-    "expenses": "المصروفات",
-    "netProfit": "صافي الربح"
-  },
   "user": {
     "admin": "مدير",
     "profile": "الملف الشخصي",
