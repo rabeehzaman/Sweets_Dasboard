@@ -17,6 +17,146 @@ export interface Update {
 
 export const updates: Update[] = [
   {
+    id: '21',
+    date: '2025-10-13',
+    version: '1.9.3',
+    category: 'improvement',
+    titleEn: 'Filtered GINV and Opening Balance Invoices from Profit Analysis',
+    titleAr: 'تصفية فواتير GINV والرصيد الافتتاحي من تحليل الربح',
+    descriptionEn: 'Improved profit analysis accuracy by excluding GINV invoices and opening balance entries, which are non-operational transactions. This provides cleaner reporting focused on actual business operations.',
+    descriptionAr: 'تحسين دقة تحليل الربح باستبعاد فواتير GINV وإدخالات الرصيد الافتتاحي، وهي معاملات غير تشغيلية. يوفر هذا تقارير أنظف تركز على العمليات التجارية الفعلية.',
+    changes: {
+      en: [
+        '🔍 Excluded 106 GINV invoices (SAR 149,662) from profit analysis',
+        '🔍 Excluded 2 Opening Balance entries (SAR 1,330) from profit analysis',
+        '📊 Profit analysis now shows 583 operational transactions (SAR 244,289.82)',
+        '✅ Cleaner data focused on actual business operations',
+        '🎯 More accurate profit margins without non-operational entries',
+        '📈 Dependent views (profit_totals_view, profit_by_branch_view) auto-updated',
+        '⚡ No performance impact - pure filtering improvement',
+        '🗄️ Database views updated with NOT ILIKE filters',
+        '📋 Migration: filter_ginv_opening_invoices'
+      ],
+      ar: [
+        '🔍 استبعاد 106 فاتورة GINV (149,662 ريال) من تحليل الربح',
+        '🔍 استبعاد 2 إدخال رصيد افتتاحي (1,330 ريال) من تحليل الربح',
+        '📊 تحليل الربح الآن يعرض 583 معاملة تشغيلية (244,289.82 ريال)',
+        '✅ بيانات أنظف تركز على العمليات التجارية الفعلية',
+        '🎯 هوامش ربح أكثر دقة بدون إدخالات غير تشغيلية',
+        '📈 العروض التابعة (profit_totals_view، profit_by_branch_view) محدثة تلقائياً',
+        '⚡ لا يوجد تأثير على الأداء - تحسين تصفية نقي',
+        '🗄️ تحديث عروض قاعدة البيانات مع فلاتر NOT ILIKE',
+        '📋 الترحيل: filter_ginv_opening_invoices'
+      ]
+    }
+  },
+  {
+    id: '20',
+    date: '2025-10-13',
+    version: '1.9.2',
+    category: 'improvement',
+    titleEn: 'Restored Loan Filter Rules for Restricted Users',
+    titleAr: 'استعادة قواعد تصفية القروض للمستخدمين المقيدين',
+    descriptionEn: 'Restored loan filtering capability for restricted users (Ahmed Kutty). Instead of hiding the entire loans page, users now see filtered loan data showing only overdue loans and loans expiring within 30 days.',
+    descriptionAr: 'تمت استعادة قدرة تصفية القروض للمستخدمين المقيدين (أحمد كوتي). بدلاً من إخفاء صفحة القروض بالكامل، يرى المستخدمون الآن بيانات القروض المصفاة التي تظهر فقط القروض المتأخرة والقروض التي تنتهي خلال 30 يوماً.',
+    changes: {
+      en: [
+        '🔄 Restored loan_filter_rules for Ahmed Kutty',
+        '✅ Show overdue loans (past maturity date)',
+        '✅ Show loans expiring within 30 days',
+        '❌ Hide fully paid loans (status = \'closed\')',
+        '❌ Hide active loans with > 30 days remaining',
+        '🔐 Admin users bypass filtering and see all loans',
+        '⚡ Data filtering approach instead of page hiding',
+        '🗄️ No code changes needed - filtering logic already implemented',
+        '📋 Migration: restore_ahmed_loan_filter_rules'
+      ],
+      ar: [
+        '🔄 استعادة loan_filter_rules لأحمد كوتي',
+        '✅ إظهار القروض المتأخرة (بعد تاريخ الاستحقاق)',
+        '✅ إظهار القروض المنتهية خلال 30 يوماً',
+        '❌ إخفاء القروض المدفوعة بالكامل (الحالة = \'مغلق\')',
+        '❌ إخفاء القروض النشطة مع أكثر من 30 يوماً متبقية',
+        '🔐 المستخدمون الإداريون يتجاوزون التصفية ويرون جميع القروض',
+        '⚡ نهج تصفية البيانات بدلاً من إخفاء الصفحة',
+        '🗄️ لا حاجة لتغييرات في الكود - منطق التصفية مطبق بالفعل',
+        '📋 الترحيل: restore_ahmed_loan_filter_rules'
+      ]
+    }
+  },
+  {
+    id: '19',
+    date: '2025-10-13',
+    version: '1.9.1',
+    category: 'bugfix',
+    titleEn: 'Fixed Overview Page VAT Calculation - Invoice-Level VAT (V2)',
+    titleAr: 'إصلاح حساب ضريبة القيمة المضافة في صفحة النظرة العامة - ضريبة مستوى الفاتورة (الإصدار 2)',
+    descriptionEn: 'Resolved critical issue where Overview page Net VAT Payable was displaying SAR 20,789 instead of SAR 8,098. The bug had two parts: (V1) missing "M" suffix handling and Opening Balance exclusion, (V2) architectural issue calculating VAT from line items (356 records) instead of invoices (125 records). Dashboard KPIs now match VAT Return perfectly.',
+    descriptionAr: 'تم حل مشكلة حرجة حيث كانت صافي ضريبة القيمة المضافة المستحقة في صفحة النظرة العامة تعرض 20,789 ريال بدلاً من 8,098 ريال. كان للخطأ جزءان: (الإصدار 1) عدم معالجة لاحقة "M" واستبعاد الرصيد الافتتاحي، (الإصدار 2) مشكلة معمارية في حساب الضريبة من بنود الفاتورة (356 سجل) بدلاً من الفواتير (125 سجل). مؤشرات لوحة التحكم الآن تطابق إرجاع ضريبة القيمة المضافة تماماً.',
+    changes: {
+      en: [
+        '🐛 Fixed Dashboard KPIs VAT calculation (156% error → 0% error)',
+        '🏗️ V2 Fix: Changed from line-item level (356 records) to invoice level (125 records)',
+        '💰 V1 Fix: Added "M" (millions) suffix handling to all VAT calculations',
+        '✅ V1 Fix: Opening Balance bills (8 total) now properly excluded',
+        '🔧 Applied 3-tier parsing: M (×1,000,000) → K (×1,000) → default',
+        '✨ Added credit notes VAT deduction (previously missing)',
+        '⚡ October 2025: Dashboard KPIs = VAT Return = SAR 8,098.48 (perfect match)',
+        '📊 Output VAT now: 14,156.61 SAR (was incorrectly 26,847.54 SAR)',
+        '🗄️ get_dashboard_kpis_2025() now uses invoices table like get_vat_return()',
+        '🛡️ No breaking changes - pure calculation fix',
+        '📋 Migration: fix_dashboard_kpis_vat_calculation_v2'
+      ],
+      ar: [
+        '🐛 إصلاح حساب ضريبة القيمة المضافة في مؤشرات لوحة التحكم (خطأ 156% → 0%)',
+        '🏗️ إصلاح الإصدار 2: تغيير من مستوى بند الفاتورة (356 سجل) إلى مستوى الفاتورة (125 سجل)',
+        '💰 إصلاح الإصدار 1: إضافة معالجة لاحقة "M" (الملايين) لجميع حسابات ضريبة القيمة المضافة',
+        '✅ إصلاح الإصدار 1: فواتير الرصيد الافتتاحي (8 إجمالي) الآن مستبعدة بشكل صحيح',
+        '🔧 تطبيق تحليل ثلاثي المستويات: M (×1,000,000) → K (×1,000) → افتراضي',
+        '✨ إضافة خصم ضريبة القيمة المضافة للإشعارات الدائنة (مفقود سابقاً)',
+        '⚡ أكتوبر 2025: مؤشرات لوحة التحكم = إرجاع ضريبة القيمة المضافة = 8,098.48 ريال (تطابق تام)',
+        '📊 ضريبة المخرجات الآن: 14,156.61 ريال (كانت خطأً 26,847.54 ريال)',
+        '🗄️ get_dashboard_kpis_2025() الآن تستخدم جدول الفواتير مثل get_vat_return()',
+        '🛡️ لا توجد تغييرات كاسرة - إصلاح حساب نقي',
+        '📋 الترحيل: fix_dashboard_kpis_vat_calculation_v2'
+      ]
+    }
+  },
+  {
+    id: '18',
+    date: '2025-10-13',
+    version: '1.9.0',
+    category: 'bugfix',
+    titleEn: 'Fixed VAT Return Calculation - Millions Suffix & Opening Balance',
+    titleAr: 'إصلاح حساب إرجاع ضريبة القيمة المضافة - لاحقة الملايين والرصيد الافتتاحي',
+    descriptionEn: 'Resolved critical issue where Net VAT Refundable was displaying SAR 53,242,210.45 instead of the correct SAR 8,098.48. The calculation error was caused by two bugs: missing "M" (millions) suffix handling and Opening Balance bills not being properly excluded from VAT calculations.',
+    descriptionAr: 'تم حل مشكلة حرجة حيث كان صافي ضريبة القيمة المضافة القابلة للاسترداد يعرض 53,242,210.45 ريال بدلاً من القيمة الصحيحة 8,098.48 ريال. كان خطأ الحساب ناتجاً عن خطأين: عدم معالجة لاحقة "M" (الملايين) وعدم استبعاد فواتير الرصيد الافتتاحي بشكل صحيح من حسابات ضريبة القيمة المضافة.',
+    changes: {
+      en: [
+        '🐛 Fixed massive VAT calculation error (53M → 8K SAR)',
+        '💰 Opening Balance bill "SAR 1.08M" now parsed correctly as 1,080,000 instead of 1.08',
+        '🔧 Added "M" (millions) suffix handling to all VAT calculations',
+        '✅ Opening Balance bills (8 total) now properly excluded from VAT',
+        '📊 October 2025 Net VAT Payable now shows correct SAR 8,098.48',
+        '🗄️ Updated get_vat_return() function for invoices, credit notes, and bills',
+        '🛡️ Applied fix to both single-branch and multi-branch function overloads',
+        '⚡ No performance impact - pure calculation fix',
+        '📋 Migration: fix_vat_return_millions_suffix_and_opening_balance'
+      ],
+      ar: [
+        '🐛 إصلاح خطأ حساب ضريبة القيمة المضافة الضخم (53 مليون → 8 آلاف ريال)',
+        '💰 فاتورة الرصيد الافتتاحي "SAR 1.08M" الآن تُحلل بشكل صحيح كـ 1,080,000 بدلاً من 1.08',
+        '🔧 إضافة معالجة لاحقة "M" (الملايين) لجميع حسابات ضريبة القيمة المضافة',
+        '✅ فواتير الرصيد الافتتاحي (8 إجمالي) الآن مستبعدة بشكل صحيح من ضريبة القيمة المضافة',
+        '📊 صافي ضريبة القيمة المضافة المستحقة لأكتوبر 2025 الآن يعرض القيمة الصحيحة 8,098.48 ريال',
+        '🗄️ تحديث دالة get_vat_return() للفواتير وإشعارات الائتمان والفواتير',
+        '🛡️ تطبيق الإصلاح على كل من إصدارات الدالة لفرع واحد وفروع متعددة',
+        '⚡ لا يوجد تأثير على الأداء - إصلاح حساب نقي',
+        '📋 الترحيل: fix_vat_return_millions_suffix_and_opening_balance'
+      ]
+    }
+  },
+  {
     id: '17',
     date: '2025-10-13',
     version: '1.8.0',

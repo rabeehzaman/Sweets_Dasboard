@@ -635,6 +635,23 @@ CAST(REGEXP_REPLACE(COALESCE(field, '0'), '[^0-9.]', '', 'g') AS NUMERIC)
 
 ## Recent Updates
 
+### October 13, 2025 - Restored Loan Filter Rules for Ahmed Kutty
+**Issue**: Ahmed's loan_filter_rules were reset to NULL, losing configured filtering
+**Root Cause**: On October 12, approach changed from data filtering to page hiding (hidden_pages), leaving loan_filter_rules NULL
+**Discovery**: User noticed loan restrictions were gone and requested Option 1 (restore filtering)
+**Fix Applied**:
+- Executed database UPDATE to restore loan_filter_rules: `{"show_overdue": true, "remaining_days_threshold": 30}`
+- Created migration file: `migrations/restore-ahmed-loan-filters.sql`
+- Added What's New entry (ID 20, version 1.9.2)
+- Updated CLAUDE.md documentation
+**Result**:
+- ✅ Ahmed now sees only filtered loan data (overdue + expiring < 30 days)
+- ✅ Loans page visible (hidden_pages = NULL)
+- ✅ No code changes needed - filtering logic already implemented in `use-loans.ts`
+- ✅ Admin users bypass filtering and see all loans
+**Migration**: `restore_ahmed_loan_filter_rules` executed successfully
+**Impact**: Ahmed's loan access restored to original configuration (data filtering instead of page hiding)
+
 ### October 12, 2025 - What's New Update Protocol
 **Enhancement**: Added comprehensive documentation protocol for maintaining the What's New page
 **Implementation**:
