@@ -457,17 +457,17 @@ export function VendorAgingBalance({ locationIds }: VendorAgingBalanceProps = {}
         </div>
         
         {/* Desktop View */}
-        <div className="hidden md:block rounded-md border overflow-hidden">
-          <Table>
+        <div className="hidden md:block rounded-md border [&_td]:whitespace-normal [&_th]:whitespace-normal [&_[data-slot='table-container']]:overflow-hidden">
+          <Table className="table-fixed">
             <TableHeader>
               <TableRow className="bg-orange-50 dark:bg-orange-900/40 border-b dark:border-gray-700">
-                <TableHead className="font-semibold text-foreground">{t("vendors.aging.vendor_details")}</TableHead>
-                <TableHead className="text-right font-semibold text-foreground">{t("vendors.aging.total_outstanding")}</TableHead>
-                <TableHead className="text-right font-semibold text-foreground">{t("vendors.aging.current_0_30")}</TableHead>
-                <TableHead className="text-right font-semibold text-foreground">{t("vendors.aging.days_31_60")}</TableHead>
-                <TableHead className="text-right font-semibold text-foreground">{t("vendors.aging.days_61_90")}</TableHead>
-                <TableHead className="text-right font-semibold text-foreground">{t("vendors.aging.over_90")}</TableHead>
-                <TableHead className="text-center font-semibold text-foreground">{t("vendors.aging.risk_level")}</TableHead>
+                <TableHead className="font-semibold text-foreground whitespace-normal">{t("vendors.aging.vendor_details")}</TableHead>
+                <TableHead className="text-right font-semibold text-foreground whitespace-normal">{t("vendors.aging.total_outstanding")}</TableHead>
+                <TableHead className="text-right font-semibold text-foreground whitespace-normal">{t("vendors.aging.current_0_30")}</TableHead>
+                <TableHead className="text-right font-semibold text-foreground whitespace-normal">{t("vendors.aging.days_31_60")}</TableHead>
+                <TableHead className="text-right font-semibold text-foreground whitespace-normal">{t("vendors.aging.days_61_90")}</TableHead>
+                <TableHead className="text-right font-semibold text-foreground whitespace-normal">{t("vendors.aging.over_90")}</TableHead>
+                <TableHead className="text-center font-semibold text-foreground whitespace-normal">{t("vendors.aging.risk_level")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

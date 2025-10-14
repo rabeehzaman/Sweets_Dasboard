@@ -232,14 +232,14 @@ export function VendorFinancialInsights({ className }: VendorFinancialInsightsPr
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[180px]">{t("vendors.performance.vendor")}</TableHead>
-                <TableHead className="text-right w-[90px]">{t("vendors.financial_insights.ytd_billed")}</TableHead>
-                <TableHead className="text-right w-[90px]">{t("vendors.financial_insights.ytd_paid")}</TableHead>
-                <TableHead className="text-right w-[90px]">{t("vendors.performance.outstanding")}</TableHead>
-                <TableHead className="text-center w-[70px]">{t("vendors.financial_insights.pay_rate")}</TableHead>
-                <TableHead className="text-center w-[80px]">{t("vendors.financial_insights.cash_days")}</TableHead>
-                <TableHead className="text-center w-[80px]">{t("vendors.financial_insights.velocity")}</TableHead>
-                <TableHead className="text-center w-[100px]">{t("vendors.performance.status")}</TableHead>
+                <TableHead className="min-w-[180px]">{t("vendors.performance.vendor")}</TableHead>
+                <TableHead className="text-right">{t("vendors.financial_insights.ytd_billed")}</TableHead>
+                <TableHead className="text-right">{t("vendors.financial_insights.ytd_paid")}</TableHead>
+                <TableHead className="text-right">{t("vendors.performance.outstanding")}</TableHead>
+                <TableHead className="text-center">{t("vendors.financial_insights.pay_rate")}</TableHead>
+                <TableHead className="text-center">{t("vendors.financial_insights.cash_days")}</TableHead>
+                <TableHead className="text-center">{t("vendors.financial_insights.velocity")}</TableHead>
+                <TableHead className="text-center">{t("vendors.performance.status")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

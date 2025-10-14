@@ -194,15 +194,15 @@ export function VendorPerformanceScorecard({ className }: VendorPerformanceScore
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[180px]">{t("vendors.performance.vendor")}</TableHead>
-                <TableHead className="text-center w-[70px]">{t("vendors.performance.score")}</TableHead>
-                <TableHead className="text-right w-[70px]">{t("vendors.performance.bills")}</TableHead>
-                <TableHead className="text-right w-[80px]">{t("vendors.performance.pay_days")}</TableHead>
-                <TableHead className="text-right w-[80px]">{t("vendors.performance.overdue")} %</TableHead>
-                <TableHead className="text-right w-[80px]">{t("vendors.performance.business")} %</TableHead>
-                <TableHead className="text-right w-[80px]">{t("vendors.performance.pay_rate")}</TableHead>
-                <TableHead className="text-right w-[90px]">{t("vendors.performance.outstanding")}</TableHead>
-                <TableHead className="text-center w-[100px]">{t("vendors.performance.status")}</TableHead>
+                <TableHead className="min-w-[180px]">{t("vendors.performance.vendor")}</TableHead>
+                <TableHead className="text-center">{t("vendors.performance.score")}</TableHead>
+                <TableHead className="text-right">{t("vendors.performance.bills")}</TableHead>
+                <TableHead className="text-right">{t("vendors.performance.pay_days")}</TableHead>
+                <TableHead className="text-right">{t("vendors.performance.overdue")} %</TableHead>
+                <TableHead className="text-right">{t("vendors.performance.business")} %</TableHead>
+                <TableHead className="text-right">{t("vendors.performance.pay_rate")}</TableHead>
+                <TableHead className="text-right">{t("vendors.performance.outstanding")}</TableHead>
+                <TableHead className="text-center">{t("vendors.performance.status")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

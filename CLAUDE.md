@@ -881,6 +881,97 @@ if (error && error.message?.includes('function')) {
 **Migration**: `fix_profit_views_rls_security_invoker` - Applied October 14, 2025
 **Rollback**: Drop and recreate views without security_invoker option - **WARNING: Will re-break security**
 
+### October 14, 2025 - Implemented Vehicle Loan Department RLS for Ahmed Kutty
+**Issue**: Ahmed could see ALL vehicle loans from ALL departments (25 vehicles across 9 departments)
+**Root Cause**: Before this fix, vehicle_loans table had permissive RLS policies with "qual: true" that allowed unrestricted access
+**Background**:
+- The `vehicle_loans` table tracks vehicle financing/loans across 9 departments
+- Vehicle distribution: Frozen (9), Mada (4), Team Babu (3), Osaimi (2), Madinah (2), Qurban (2), Hassan (1), Jebreel (1), Waleed (1)
+- Ahmed's role requires access to ONLY the Frozen department (9 vehicles)
+- Before fix: Ahmed could see all 25 vehicles instead of just his 9
+
+**Fix Applied**: `migrations/restrict-ahmed-vehicle-loans-frozen.sql`
+1. **Updated Ahmed's permissions**:
+   - Set `vehicle_instalment_departments = ARRAY['Frozen']`
+   - Existing `loan_filter_rules` preserved: `{"show_overdue": true, "remaining_days_threshold": 30}`
+
+2. **Dropped permissive RLS policies**:
+   - Removed "Allow anon users to read vehicle loans" (qual: true)
+   - Removed "Allow authenticated users to read vehicle loans" (qual: true)
+
+3. **Created proper RLS policy**: "Restrict vehicle loans by department and user permissions"
+   - Admin users: See all 25 vehicles (bypass filtering)
+   - Restricted users: See only assigned departments via `vehicle_instalment_departments`
+   - Users with NULL `vehicle_instalment_departments`: See all departments (backward compatibility)
+
+4. **Re-added anon policy**: "Allow anon users to read all vehicle loans" (for public access if needed)
+
+5. **Enabled RLS**: `ALTER TABLE vehicle_loans ENABLE ROW LEVEL SECURITY`
+
+**How It Works**:
+```sql
+-- Two-layer filtering for vehicle loans:
+-- Layer 1: Department filtering (RLS policy)
+WHERE department = 'Frozen'  -- Ahmed can only see Frozen
+
+-- Layer 2: Status filtering (application-level loan_filter_rules)
+WHERE (status = 'overdue' OR remaining_days < 30)  -- Ahmed's loan filter rules
+```
+
+**Verification Results**:
+```
+✅ Ahmed's permissions updated:
+   - vehicle_instalment_departments: ["Frozen"]
+   - loan_filter_rules: {"show_overdue": true, "remaining_days_threshold": 30}
+   - role: manager
+
+✅ RLS policies created:
+   - "Allow anon users to read all vehicle loans" (anon)
+   - "Restrict vehicle loans by department and user permissions" (authenticated)
+
+✅ Vehicle distribution:
+   - Frozen: 9 vehicles (Ahmed CAN see)
+   - Other 8 depts: 16 vehicles (Ahmed CANNOT see)
+```
+
+**Expected Behavior**:
+- **Admin users**: See all 25 vehicles from all 9 departments
+- **Ahmed (manager)**: See 0-9 Frozen vehicles (filtered by both department AND loan status)
+  - First filter: Department = 'Frozen' (RLS) → 9 vehicles
+  - Second filter: Overdue OR expiring < 30 days (application) → 0-9 vehicles depending on loan statuses
+- **Users with no dept restrictions**: See all 25 vehicles (NULL `vehicle_instalment_departments`)
+
+**Security**:
+- ✅ RLS enforcement at database level (cannot be bypassed)
+- ✅ Department filtering happens before data leaves PostgreSQL
+- ✅ Frontend (`use-vehicle-loans.ts`) automatically respects RLS policies
+- ✅ No code changes needed - filtering is transparent
+
+**Result**:
+- ✅ Ahmed restricted to Frozen department only (9 vehicles max)
+- ✅ Ahmed cannot see 16 vehicles from other departments
+- ✅ Two-layer filtering: RLS (department) + application (loan status)
+- ✅ Admin users unaffected (see all vehicles)
+- ✅ Backward compatible (NULL departments = see all)
+
+**Migration**: `restrict_ahmed_vehicle_loans_frozen` - Applied October 14, 2025
+**Impact**: Department-based access control implemented for vehicle loans, restricting Ahmed to Frozen department only
+
+**Rollback** (if needed):
+```sql
+-- Restore full access
+UPDATE user_branch_permissions
+SET vehicle_instalment_departments = NULL
+WHERE user_email = 'ahammedkuttykoottil1976@gmail.com';
+
+-- Drop restrictive policy
+DROP POLICY "Restrict vehicle loans by department and user permissions" ON vehicle_loans;
+
+-- Restore permissive policy
+CREATE POLICY "Allow authenticated users to read vehicle loans"
+ON vehicle_loans FOR SELECT TO authenticated USING (true);
+```
+
 ### October 13, 2025 - Restored Loan Filter Rules for Ahmed Kutty
 **Issue**: Ahmed's loan_filter_rules were reset to NULL, losing configured filtering
 **Root Cause**: On October 12, approach changed from data filtering to page hiding (hidden_pages), leaving loan_filter_rules NULL

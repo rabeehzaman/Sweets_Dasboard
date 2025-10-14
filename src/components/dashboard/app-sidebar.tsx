@@ -117,12 +117,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
             <TrendingUp className="size-4" />
           </div>
-          <div className={`flex flex-col gap-0.5 leading-none ${isArabic ? 'text-right' : ''}`}>
+          <div className={`flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden ${isArabic ? 'text-right' : ''}`}>
             <span className="font-semibold">{t("dashboard.title")}</span>
             <span className="text-xs text-muted-foreground">{t("dashboard.subtitle")}</span>
           </div>
         </div>
-        <div className="px-2 py-2">
+        <div className="px-2 py-2 group-data-[collapsible=icon]:hidden">
           <SimpleLanguageSwitcher />
         </div>
       </SidebarHeader>
