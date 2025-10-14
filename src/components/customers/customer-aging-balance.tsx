@@ -245,7 +245,7 @@ export function CustomerAgingBalance({ selectedOwners = [] }: CustomerAgingBalan
         {/* Desktop View */}
         <div className="hidden md:block w-full max-w-full">
           <div className="overflow-x-auto rounded-md border border-border">
-            <Table className="min-w-[800px]">
+            <Table>
             <TableHeader>
               <TableRow className="bg-orange-50 dark:bg-orange-950/70 border-b-2 border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-950/90">
                 <TableHead className="min-w-12 font-bold text-orange-900 dark:text-orange-100 py-4">S/N</TableHead>

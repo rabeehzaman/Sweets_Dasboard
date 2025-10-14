@@ -111,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isArabic } = useLocale()
 
   return (
-    <Sidebar side={isArabic ? "right" : "left"} {...props}>
+    <Sidebar side={isArabic ? "right" : "left"} collapsible="icon" {...props}>
       <SidebarHeader>
         <div className={`flex items-center gap-2 px-2 py-2 ${isArabic ? 'flex-row-reverse' : ''}`}>
           <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">

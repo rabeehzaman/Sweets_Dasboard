@@ -853,7 +853,7 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
               
               {/* Desktop View - Enhanced with Expandable Invoice Items */}
               <div className="hidden md:block overflow-x-auto">
-                <Table className="min-w-[800px]">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t("tables.headers.date")}</TableHead>
@@ -1008,7 +1008,7 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
               
               {/* Desktop View */}
               <div className="hidden md:block overflow-x-auto">
-                <Table className="min-w-[600px]">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <SortableHeader column="name">{t("tables.headers.name")}</SortableHeader>

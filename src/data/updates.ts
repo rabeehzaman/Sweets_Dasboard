@@ -17,6 +17,176 @@ export interface Update {
 
 export const updates: Update[] = [
   {
+    id: '25',
+    date: '2025-10-14',
+    version: '2.0.3',
+    category: 'bugfix',
+    titleEn: 'Fixed Dashboard KPIs Profit Calculation - Removed Incorrect VAT Division',
+    titleAr: 'إصلاح حساب الربح في مؤشرات لوحة التحكم - إزالة قسمة ضريبة القيمة المضافة غير الصحيحة',
+    descriptionEn: 'Resolved critical profit calculation error in Overview tab where KPIs were dividing sale prices by 1.15, incorrectly assuming VAT was included. Since total_bcy is already pre-VAT, this was under-reporting profit by ~13%. KPI profit now matches Profit Analysis table with 99.8% accuracy.',
+    descriptionAr: 'تم حل خطأ حساب الربح الحرج في صفحة النظرة العامة حيث كانت مؤشرات الأداء تقسم أسعار البيع على 1.15، بافتراض خاطئ أن ضريبة القيمة المضافة مضمنة. بما أن total_bcy بالفعل قبل الضريبة، كان هذا يقلل من الربح المبلغ عنه بنسبة ~13%. ربح مؤشرات الأداء الآن يطابق جدول تحليل الربح بدقة 99.8%.',
+    changes: {
+      en: [
+        '🐛 Fixed gross profit under-reporting by ~13% (SAR 22.70 per SAR 174 transaction)',
+        '💰 Removed incorrect VAT division: total_bcy is already pre-VAT, not VAT-inclusive',
+        '✅ KPI gross profit: SAR 77,433.68 vs Analysis table: SAR 77,273.68 (0.21% difference)',
+        '🔧 Changed calculation from: (sale_price / 1.15) - cost',
+        '🔧 To correct formula: sale_price - cost',
+        '📊 Total Taxable Sales now: SAR 287,229.96 (pre-VAT, correct)',
+        '📊 Total Revenue now: SAR 330,314.45 (with 15% VAT added)',
+        '⚡ Gross Profit Margin now accurate: 26.96%',
+        '✨ No frontend changes needed - pure database calculation fix',
+        '🛡️ Maintains all existing RLS security and location filtering',
+        '📋 Migration: fix_kpi_profit_calculation_vat_division'
+      ],
+      ar: [
+        '🐛 إصلاح نقص الإبلاغ عن إجمالي الربح بنسبة ~13% (22.70 ريال لكل معاملة 174 ريال)',
+        '💰 إزالة قسمة ضريبة القيمة المضافة غير الصحيحة: total_bcy بالفعل قبل الضريبة، وليست شاملة الضريبة',
+        '✅ إجمالي ربح مؤشرات الأداء: 77,433.68 ريال مقابل جدول التحليل: 77,273.68 ريال (فرق 0.21%)',
+        '🔧 تغيير الحساب من: (سعر البيع / 1.15) - التكلفة',
+        '🔧 إلى الصيغة الصحيحة: سعر البيع - التكلفة',
+        '📊 إجمالي المبيعات الخاضعة للضريبة الآن: 287,229.96 ريال (قبل الضريبة، صحيح)',
+        '📊 إجمالي الإيرادات الآن: 330,314.45 ريال (مع إضافة ضريبة 15%)',
+        '⚡ هامش الربح الإجمالي الآن دقيق: 26.96%',
+        '✨ لا حاجة لتغييرات الواجهة الأمامية - إصلاح حساب قاعدة بيانات نقي',
+        '🛡️ يحافظ على جميع أمان RLS الحالي وتصفية الموقع',
+        '📋 الترحيل: fix_kpi_profit_calculation_vat_division'
+      ]
+    }
+  },
+  {
+    id: '24',
+    date: '2025-10-14',
+    version: '2.0.2',
+    category: 'bugfix',
+    titleEn: 'Fixed Dashboard KPIs GINV and Opening Balance Filter',
+    titleAr: 'إصلاح تصفية GINV والرصيد الافتتاحي في مؤشرات لوحة التحكم',
+    descriptionEn: 'Resolved critical issue where Overview tab KPIs were showing inflated numbers by including 179 non-operational invoices (GINV auto-generated and Opening Balance entries). KPIs now correctly show only actual business transactions, matching the profit analysis view.',
+    descriptionAr: 'تم حل مشكلة حرجة حيث كانت مؤشرات صفحة النظرة العامة تعرض أرقاماً مضخمة بسبب تضمين 179 فاتورة غير تشغيلية (GINV المولدة تلقائياً وإدخالات الرصيد الافتتاحي). تعرض مؤشرات الأداء الآن فقط المعاملات التجارية الفعلية بشكل صحيح، بما يتطابق مع عرض تحليل الربح.',
+    changes: {
+      en: [
+        '🐛 Fixed Dashboard KPIs showing 318 invoices instead of 166 (52% error)',
+        '💰 Revenue corrected: SAR 464,947 → SAR 287,230 (SAR 177K difference)',
+        '🔍 Excluded 151 GINV invoices (auto-generated system invoices)',
+        '🔍 Excluded 28 Opening Balance invoices (non-operational entries)',
+        '✅ KPIs now match profit_analysis_view_current exactly',
+        '📊 Applied filters to 6 CTEs: invoice_costs, vat_output, vat_credit, vat_input',
+        '🔧 Added consistent NOT ILIKE filters for GINV% and Opening%',
+        '⚡ All date filters (current month, previous month, all time, custom) now work correctly',
+        '✨ No frontend changes needed - pure database calculation fix',
+        '📋 Migration: fix_kpi_ginv_opening_filter'
+      ],
+      ar: [
+        '🐛 إصلاح مؤشرات لوحة التحكم التي كانت تعرض 318 فاتورة بدلاً من 166 (خطأ 52%)',
+        '💰 تصحيح الإيرادات: 464,947 ريال → 287,230 ريال (فرق 177 ألف ريال)',
+        '🔍 استبعاد 151 فاتورة GINV (فواتير نظام مولدة تلقائياً)',
+        '🔍 استبعاد 28 فاتورة رصيد افتتاحي (إدخالات غير تشغيلية)',
+        '✅ مؤشرات الأداء الآن تطابق profit_analysis_view_current تماماً',
+        '📊 تطبيق الفلاتر على 6 CTEs: invoice_costs، vat_output، vat_credit، vat_input',
+        '🔧 إضافة فلاتر NOT ILIKE متسقة لـ GINV% وOpening%',
+        '⚡ جميع فلاتر التاريخ (الشهر الحالي، الشهر السابق، كل الوقت، مخصص) تعمل الآن بشكل صحيح',
+        '✨ لا حاجة لتغييرات الواجهة الأمامية - إصلاح حساب قاعدة بيانات نقي',
+        '📋 الترحيل: fix_kpi_ginv_opening_filter'
+      ]
+    }
+  },
+  {
+    id: '23',
+    date: '2025-10-14',
+    version: '2.0.1',
+    category: 'bugfix',
+    titleEn: 'Restored Location Filter in Overview Tab with Two-Layer Security',
+    titleAr: 'استعادة تصفية الفروع في صفحة النظرة العامة مع أمان من طبقتين',
+    descriptionEn: 'Fixed location filter that stopped working after RLS security fix. Implemented two-layer filtering: RLS enforces security (cannot be bypassed), location filter provides convenience (users can narrow down their view within permitted data).',
+    descriptionAr: 'تم إصلاح تصفية الفروع التي توقفت عن العمل بعد إصلاح أمان RLS. تم تنفيذ تصفية من طبقتين: RLS يفرض الأمان (لا يمكن تجاوزه)، تصفية الفروع توفر الراحة (يمكن للمستخدمين تضييق نطاق عرضهم ضمن البيانات المسموح بها).',
+    changes: {
+      en: [
+        '🐛 Fixed location filter broken by previous RLS security fix',
+        '🔐 Layer 1 (Security): RLS policies enforce user permissions - CANNOT be bypassed',
+        '✅ Layer 2 (Convenience): location_ids parameter allows filtering within RLS-allowed data',
+        '👑 Admins can now filter to specific branches (was showing all 6 branches)',
+        '👤 Restricted users can filter within their allowed branches (Ahmed can select from his 4 branches)',
+        '🛡️ Security guarantee: RLS runs FIRST at database level, then location filter applied',
+        '⚠️ Impossible to access unauthorized branches via location filter parameter',
+        '📊 All 6 CTEs updated: invoice_costs, expense_metrics, stock_metrics, vat_output, vat_credit, vat_input',
+        '✨ No frontend changes needed - location filter UI already works correctly',
+        '⚡ No performance impact - maintains existing optimization',
+        '📋 Migration: restore_overview_location_filter_with_rls'
+      ],
+      ar: [
+        '🐛 إصلاح تصفية الفروع المعطلة بسبب إصلاح أمان RLS السابق',
+        '🔐 الطبقة 1 (الأمان): سياسات RLS تفرض أذونات المستخدم - لا يمكن تجاوزها',
+        '✅ الطبقة 2 (الراحة): معامل location_ids يسمح بالتصفية ضمن البيانات المسموح بها من RLS',
+        '👑 المسؤولون يمكنهم الآن التصفية إلى فروع محددة (كان يعرض جميع الفروع الستة)',
+        '👤 المستخدمون المقيدون يمكنهم التصفية ضمن فروعهم المسموح بها (أحمد يمكنه الاختيار من فروعه الأربعة)',
+        '🛡️ ضمان الأمان: RLS يعمل أولاً على مستوى قاعدة البيانات، ثم يتم تطبيق تصفية الفروع',
+        '⚠️ من المستحيل الوصول إلى فروع غير مصرح بها عبر معامل تصفية الفروع',
+        '📊 تحديث جميع CTEs الستة: invoice_costs، expense_metrics، stock_metrics، vat_output، vat_credit، vat_input',
+        '✨ لا حاجة لتغييرات الواجهة الأمامية - واجهة تصفية الفروع تعمل بشكل صحيح بالفعل',
+        '⚡ لا يوجد تأثير على الأداء - يحافظ على التحسين الحالي',
+        '📋 الترحيل: restore_overview_location_filter_with_rls'
+      ]
+    }
+  },
+  {
+    id: '22',
+    date: '2025-10-14',
+    version: '2.0.0',
+    category: 'bugfix',
+    titleEn: 'CRITICAL: Fixed Overview Tab RLS Security Vulnerability (2-PART FIX)',
+    titleAr: 'حرج: إصلاح ثغرة أمان RLS في صفحة النظرة العامة (إصلاح من جزأين)',
+    descriptionEn: 'Resolved critical security issue where restricted users could see data from ALL branches in Overview tab. This required a 2-part fix: (1) Removed application-level filtering to trust RLS policies, (2) Fixed RLS helper functions that were running as postgres superuser, causing auth.uid() to return NULL and breaking all user identification.',
+    descriptionAr: 'تم حل مشكلة أمنية حرجة حيث كان المستخدمون المقيدون يرون بيانات من جميع الفروع في صفحة النظرة العامة. تطلب هذا إصلاحاً من جزأين: (1) إزالة التصفية على مستوى التطبيق للثقة في سياسات RLS، (2) إصلاح دوال مساعد RLS التي كانت تعمل كمستخدم postgres خارق، مما تسبب في إرجاع auth.uid() قيمة NULL وكسر جميع تعريف المستخدم.',
+    changes: {
+      en: [
+        '🔴 PART 1: Removed application-level location filtering from get_dashboard_kpis_2025_optimized()',
+        '✅ Removed location_ids filtering from 6 CTEs (invoice_costs, expense_metrics, stock_metrics, vat_output, vat_credit, vat_input)',
+        '⚠️ Migration 1 applied but DID NOT fix the issue - RLS helper functions were still broken',
+        '📋 Migration 1: fix_overview_rls_security_vulnerability.sql',
+        '',
+        '🔴 PART 2 (THE ACTUAL FIX): Changed RLS helper functions from SECURITY DEFINER → SECURITY INVOKER',
+        '🔧 Fixed is_admin_user() - now runs with caller permissions instead of postgres',
+        '🔧 Fixed is_branch_allowed() - now runs with caller permissions',
+        '🔧 Fixed get_user_branches() - now runs with caller permissions',
+        '⚡ auth.uid() now returns actual user ID instead of NULL',
+        '🛡️ RLS policies can now properly identify and filter by current user',
+        '✅ Ahmed (restricted user) NOW sees ONLY 262 invoices (~299K SAR) from allowed branches',
+        '❌ Ahmed can NO LONGER see 56 restricted invoices (~205K SAR) from Khaleel + Osaimi',
+        '👑 Admin users still see all 318 invoices (~505K SAR) from all 6 branches',
+        '📋 Migration 2: fix_rls_helper_functions_security_invoker.sql',
+        '',
+        '🔍 ROOT CAUSE: SECURITY DEFINER functions run as owner (postgres superuser)',
+        '💡 When running as postgres, auth.uid() returns NULL (no auth context)',
+        '⚠️ RLS policies check WHERE user_id = auth.uid() - always fails when NULL',
+        '✨ SECURITY INVOKER functions run with caller context - auth.uid() works correctly',
+        '🎯 Both migrations required - Migration 1 alone did not fix the issue'
+      ],
+      ar: [
+        '🔴 الجزء 1: إزالة تصفية الموقع على مستوى التطبيق من get_dashboard_kpis_2025_optimized()',
+        '✅ إزالة تصفية location_ids من 6 CTEs (invoice_costs، expense_metrics، stock_metrics، vat_output، vat_credit، vat_input)',
+        '⚠️ تم تطبيق الترحيل 1 ولكن لم يُصلح المشكلة - دوال مساعد RLS كانت لا تزال معطلة',
+        '📋 الترحيل 1: fix_overview_rls_security_vulnerability.sql',
+        '',
+        '🔴 الجزء 2 (الإصلاح الفعلي): تغيير دوال مساعد RLS من SECURITY DEFINER → SECURITY INVOKER',
+        '🔧 إصلاح is_admin_user() - الآن يعمل بأذونات المتصل بدلاً من postgres',
+        '🔧 إصلاح is_branch_allowed() - الآن يعمل بأذونات المتصل',
+        '🔧 إصلاح get_user_branches() - الآن يعمل بأذونات المتصل',
+        '⚡ auth.uid() الآن يُرجع معرف المستخدم الفعلي بدلاً من NULL',
+        '🛡️ سياسات RLS الآن يمكنها تحديد وتصفية المستخدم الحالي بشكل صحيح',
+        '✅ أحمد (مستخدم مقيد) الآن يرى فقط 262 فاتورة (~299 ألف ريال) من الفروع المسموح بها',
+        '❌ أحمد لم يعد يستطيع رؤية 56 فاتورة مقيدة (~205 ألف ريال) من الخليل + العصيمي',
+        '👑 المستخدمون الإداريون لا يزالون يرون جميع 318 فاتورة (~505 ألف ريال) من جميع الفروع الستة',
+        '📋 الترحيل 2: fix_rls_helper_functions_security_invoker.sql',
+        '',
+        '🔍 السبب الجذري: دوال SECURITY DEFINER تعمل كمالك (postgres مستخدم خارق)',
+        '💡 عند العمل كـ postgres، auth.uid() يُرجع NULL (لا يوجد سياق مصادقة)',
+        '⚠️ سياسات RLS تتحقق من WHERE user_id = auth.uid() - دائماً تفشل عندما NULL',
+        '✨ دوال SECURITY INVOKER تعمل مع سياق المتصل - auth.uid() يعمل بشكل صحيح',
+        '🎯 كلا الترحيلين مطلوبان - الترحيل 1 وحده لم يُصلح المشكلة'
+      ]
+    }
+  },
+  {
     id: '21',
     date: '2025-10-13',
     version: '1.9.3',

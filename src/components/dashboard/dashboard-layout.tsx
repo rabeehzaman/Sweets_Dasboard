@@ -24,7 +24,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const displayName = isArabic ? permissions?.displayNameAr : permissions?.displayNameEn
 
   return (
-    <SidebarProvider defaultOpen={false}>
+    <SidebarProvider defaultOpen={true}>
       <AppSidebar />
       <SidebarInset>
         <header className={`flex h-auto min-h-16 shrink-0 items-center justify-between gap-2 border-b px-3 sm:px-4 py-2 sm:py-0 flex-wrap sm:flex-nowrap ${isArabic ? 'flex-row-reverse' : ''}`}>
