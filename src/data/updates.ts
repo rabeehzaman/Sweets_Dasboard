@@ -17,6 +17,34 @@ export interface Update {
 
 export const updates: Update[] = [
   {
+    id: '27',
+    date: '2025-10-18',
+    version: '2.1.1',
+    category: 'bugfix',
+    titleEn: 'Fixed Number Display on Laptop Screens in P&L Statement',
+    titleAr: 'إصلاح عرض الأرقام على شاشات الكمبيوتر المحمول في بيان الأرباح والخسائر',
+    descriptionEn: 'Fixed issue where large numbers were stacking vertically (digit-by-digit) on laptop screens in the Statement of Profit and Loss. The layout now shows 4 columns on laptops instead of 6, providing better spacing for financial metrics.',
+    descriptionAr: 'تم إصلاح مشكلة حيث كانت الأرقام الكبيرة تتراص عمودياً (رقم بعد رقم) على شاشات الكمبيوتر المحمول في بيان الأرباح والخسائر. يعرض التخطيط الآن 4 أعمدة على أجهزة الكمبيوتر المحمول بدلاً من 6، مما يوفر مساحة أفضل للمقاييس المالية.',
+    changes: {
+      en: [
+        '🎨 Adjusted grid layout: 4 columns on laptops (1280-1535px) instead of 6',
+        '✨ Removed break-all CSS that caused vertical number stacking',
+        '🔢 Added tabular-nums for better number alignment',
+        '📱 Responsive font sizing: smaller on laptops, larger on big screens',
+        '✅ Numbers now display horizontally on single line',
+        '⚡ Improved readability of financial metrics on all screen sizes'
+      ],
+      ar: [
+        '🎨 تعديل تخطيط الشبكة: 4 أعمدة على الكمبيوتر المحمول (1280-1535 بكسل) بدلاً من 6',
+        '✨ إزالة CSS break-all الذي تسبب في تكديس الأرقام عمودياً',
+        '🔢 إضافة tabular-nums لمحاذاة أفضل للأرقام',
+        '📱 حجم خط متجاوب: أصغر على الكمبيوتر المحمول، أكبر على الشاشات الكبيرة',
+        '✅ الأرقام تُعرض الآن أفقياً على سطر واحد',
+        '⚡ تحسين قابلية قراءة المقاييس المالية على جميع أحجام الشاشات'
+      ]
+    }
+  },
+  {
     id: '26',
     date: '2025-10-14',
     version: '2.1.0',

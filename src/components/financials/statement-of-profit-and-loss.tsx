@@ -136,7 +136,7 @@ export function StatementOfProfitAndLoss({ dateRange, locationIds }: StatementOf
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Key Metrics Cards */}
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 w-full max-w-full overflow-x-hidden">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 w-full max-w-full overflow-x-hidden">
           {/* Total Sales */}
           <Card className="w-full max-w-full">
             <CardContent className="p-4 sm:p-6 w-full max-w-full overflow-x-hidden">
@@ -145,7 +145,7 @@ export function StatementOfProfitAndLoss({ dateRange, locationIds }: StatementOf
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex items-center space-x-2">
-                <p className="text-xl sm:text-2xl font-bold break-all">{formatCurrencyTable(totalSales)}</p>
+                <p className="text-lg xl:text-xl 2xl:text-2xl font-bold tabular-nums">{formatCurrencyTable(totalSales)}</p>
                 <Badge variant="default" className="text-xs">
                   {t("financials.profit_loss.revenue")}
                 </Badge>
@@ -164,7 +164,7 @@ export function StatementOfProfitAndLoss({ dateRange, locationIds }: StatementOf
                 <TrendingDown className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex items-center space-x-2">
-                <p className="text-xl sm:text-2xl font-bold break-all">{formatCurrencyTable(costOfGoodsSold)}</p>
+                <p className="text-lg xl:text-xl 2xl:text-2xl font-bold tabular-nums">{formatCurrencyTable(costOfGoodsSold)}</p>
                 <Badge variant="destructive" className="text-xs">
                   {t("financials.profit_loss.cogs")}
                 </Badge>
@@ -183,7 +183,7 @@ export function StatementOfProfitAndLoss({ dateRange, locationIds }: StatementOf
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex items-center space-x-2">
-                <p className="text-xl sm:text-2xl font-bold break-all">{formatCurrencyTable(grossProfit)}</p>
+                <p className="text-lg xl:text-xl 2xl:text-2xl font-bold tabular-nums">{formatCurrencyTable(grossProfit)}</p>
                 <Badge variant={grossProfit >= 0 ? "default" : "destructive"} className="text-xs">
                   {grossProfit >= 0 ? t("financials.profit_loss.profit") : t("financials.profit_loss.loss")}
                 </Badge>
@@ -202,7 +202,7 @@ export function StatementOfProfitAndLoss({ dateRange, locationIds }: StatementOf
                 <Calculator className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex items-center space-x-2">
-                <p className="text-xl sm:text-2xl font-bold break-all">{grossProfitMargin.toFixed(1)}%</p>
+                <p className="text-lg xl:text-xl 2xl:text-2xl font-bold tabular-nums">{grossProfitMargin.toFixed(1)}%</p>
                 <Badge variant={grossProfitMargin >= 0 ? "default" : "destructive"} className="text-xs">
                   {grossProfitMargin >= 0 ? t("financials.profit_loss.positive") : t("financials.profit_loss.negative")}
                 </Badge>
@@ -221,7 +221,7 @@ export function StatementOfProfitAndLoss({ dateRange, locationIds }: StatementOf
                 <Receipt className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex items-center space-x-2">
-                <p className="text-xl sm:text-2xl font-bold break-all">{formatCurrencyTable(totalExpenses)}</p>
+                <p className="text-lg xl:text-xl 2xl:text-2xl font-bold tabular-nums">{formatCurrencyTable(totalExpenses)}</p>
                 <Badge variant="secondary" className="text-xs">
                   {t("financials.profit_loss.operating")}
                 </Badge>
@@ -240,7 +240,7 @@ export function StatementOfProfitAndLoss({ dateRange, locationIds }: StatementOf
                 <Target className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="flex items-center space-x-2">
-                <p className="text-xl sm:text-2xl font-bold break-all">{formatCurrencyTable(netProfit)}</p>
+                <p className="text-lg xl:text-xl 2xl:text-2xl font-bold tabular-nums">{formatCurrencyTable(netProfit)}</p>
                 <Badge variant={netProfit >= 0 ? "default" : "destructive"} className="text-xs">
                   {netProfit >= 0 ? t("financials.profit_loss.profit") : t("financials.profit_loss.loss")}
                 </Badge>
