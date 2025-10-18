@@ -24,7 +24,7 @@ export function LoansTable({ loans }: LoansTableProps) {
 
   // Filter loans
   const filteredLoans = loans.filter((loan) => {
-    const matchesSearch = loan.personInCharge.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesSearch = loan.bank.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesBank = bankFilter === "all" || loan.bank === bankFilter
     const matchesStatus = statusFilter === "all" || loan.status === statusFilter
     return matchesSearch && matchesBank && matchesStatus
@@ -95,7 +95,6 @@ export function LoansTable({ loans }: LoansTableProps) {
   const handleExport = () => {
     // Prepare CSV data
     const headers = [
-      t("loans.table.person_in_charge"),
       t("loans.table.bank"),
       t("loans.table.initiation_date"),
       t("loans.table.maturity_date"),
@@ -107,7 +106,6 @@ export function LoansTable({ loans }: LoansTableProps) {
     ]
 
     const rows = sortedLoans.map(loan => [
-      loan.personInCharge,
       loan.bank,
       formatDate(loan.initiationDate),
       formatDate(loan.maturityDate),
@@ -206,11 +204,10 @@ export function LoansTable({ loans }: LoansTableProps) {
                         : "border-blue-300 dark:border-blue-800"
                     }`}
                   >
-                    {/* Header: Person & Status */}
+                    {/* Header: Loan Number & Status */}
                     <div className="bg-muted/30 p-3 flex justify-between items-start gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-sm truncate">{loan.personInCharge}</div>
-                        <div className="text-xs text-muted-foreground mt-0.5">
+                        <div className="font-semibold text-sm">
                           {t("loans.table.loan")} #{index + 1}
                         </div>
                       </div>
@@ -307,7 +304,6 @@ export function LoansTable({ loans }: LoansTableProps) {
             <TableHeader>
               <TableRow>
                 <TableHead className="w-[50px]">#</TableHead>
-                <TableHead>{t("loans.table.person_in_charge")}</TableHead>
                 <TableHead>{t("loans.table.bank")}</TableHead>
                 <TableHead>{t("loans.table.initiation_date")}</TableHead>
                 <TableHead>{t("loans.table.maturity_date")}</TableHead>
@@ -321,7 +317,7 @@ export function LoansTable({ loans }: LoansTableProps) {
             <TableBody>
               {sortedLoans.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     {t("loans.no_loans")}
                   </TableCell>
                 </TableRow>
@@ -329,7 +325,6 @@ export function LoansTable({ loans }: LoansTableProps) {
                 sortedLoans.map((loan, index) => (
                   <TableRow key={loan.id} className={loan.status === "closed" ? "opacity-60" : ""}>
                     <TableCell className="font-medium">{index + 1}</TableCell>
-                    <TableCell className="font-medium">{loan.personInCharge}</TableCell>
                     <TableCell>{getBankBadge(loan.bank)}</TableCell>
                     <TableCell>{formatDate(loan.initiationDate)}</TableCell>
                     <TableCell>{formatDate(loan.maturityDate)}</TableCell>

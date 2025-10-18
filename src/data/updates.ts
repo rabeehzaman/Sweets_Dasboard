@@ -17,6 +17,44 @@ export interface Update {
 
 export const updates: Update[] = [
   {
+    id: '26',
+    date: '2025-10-14',
+    version: '2.1.0',
+    category: 'feature',
+    titleEn: 'Vehicle Loan Department-Based Access Control',
+    titleAr: 'التحكم في الوصول لقروض المركبات حسب القسم',
+    descriptionEn: 'Implemented department-based Row Level Security for vehicle loans. Restricted users now see only vehicle loans from their assigned departments, while maintaining additional loan status filtering. This provides granular access control for vehicle financing management.',
+    descriptionAr: 'تم تطبيق أمان مستوى الصف على أساس القسم لقروض المركبات. المستخدمون المقيدون الآن يرون فقط قروض المركبات من أقسامهم المعينة، مع الحفاظ على تصفية حالة القروض الإضافية. يوفر هذا تحكماً دقيقاً في الوصول لإدارة تمويل المركبات.',
+    changes: {
+      en: [
+        '🔐 Implemented department-based RLS on vehicle_loans table',
+        '✅ Ahmed (manager): Restricted to Frozen department only (9 vehicles max)',
+        '❌ Ahmed cannot see 16 vehicles from 8 other departments',
+        '👑 Admin users: See all 25 vehicles from all 9 departments (bypass restrictions)',
+        '⚡ Two-layer filtering: RLS (department) → Application (loan status)',
+        '📊 Frozen dept breakdown: Hassan (1), Jebreel (1), Mada (4), Madinah (2), Osaimi (2), Qurban (2), Team Babu (3), Waleed (1)',
+        '🔧 Dropped permissive RLS policies, created restrictive policy',
+        '🛡️ Security enforced at database level - cannot be bypassed',
+        '✨ No code changes needed - filtering transparent to frontend',
+        '💾 Backward compatible: NULL department permissions = see all',
+        '📋 Migration: restrict_ahmed_vehicle_loans_frozen'
+      ],
+      ar: [
+        '🔐 تطبيق RLS على أساس القسم في جدول vehicle_loans',
+        '✅ أحمد (مدير): مقيد لقسم الثلاجة فقط (9 مركبات كحد أقصى)',
+        '❌ أحمد لا يمكنه رؤية 16 مركبة من 8 أقسام أخرى',
+        '👑 المستخدمون الإداريون: يرون جميع 25 مركبة من جميع الأقسام التسعة (تجاوز القيود)',
+        '⚡ تصفية من طبقتين: RLS (القسم) ← التطبيق (حالة القرض)',
+        '📊 تقسيم الأقسام: حسن (1)، جبريل (1)، مدى (4)، المدينة (2)، العصيمي (2)، قربان (2)، فريق بابو (3)، وليد (1)',
+        '🔧 إزالة سياسات RLS المتساهلة، إنشاء سياسة تقييدية',
+        '🛡️ الأمان مطبق على مستوى قاعدة البيانات - لا يمكن تجاوزه',
+        '✨ لا حاجة لتغييرات في الكود - التصفية شفافة للواجهة الأمامية',
+        '💾 متوافق مع الإصدارات السابقة: أذونات القسم NULL = رؤية الكل',
+        '📋 الترحيل: restrict_ahmed_vehicle_loans_frozen'
+      ]
+    }
+  },
+  {
     id: '25',
     date: '2025-10-14',
     version: '2.0.3',
