@@ -89,6 +89,20 @@ export type EntityType =
   | 'other_income'
   | 'deposit';
 
+// Translation key mapping for entity types
+export const ENTITY_TYPE_TRANSLATION_KEYS: Record<string, string> = {
+  invoice: 'pages.cash.entity_types.invoice',
+  bill: 'pages.cash.entity_types.bill',
+  credit_note: 'pages.cash.entity_types.credit_note',
+  expense: 'pages.cash.entity_types.expense',
+  transfer_fund: 'pages.cash.entity_types.transfer_fund',
+  opening_balance: 'pages.cash.entity_types.opening_balance',
+  journal: 'pages.cash.entity_types.journal',
+  vendor_payment: 'pages.cash.entity_types.vendor_payment',
+  customer_payment: 'pages.cash.entity_types.customer_payment',
+};
+
+// Legacy: Keep for backwards compatibility, but prefer using translation keys
 export const ENTITY_TYPE_LABELS: Record<EntityType, string> = {
   invoice_payment: 'Invoice Payment',
   bill_payment: 'Bill Payment',

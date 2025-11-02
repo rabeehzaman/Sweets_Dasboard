@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import type { CashTransaction } from '@/types/cash';
-import { ENTITY_TYPE_LABELS, ENTITY_TYPE_COLORS } from '@/types/cash';
+import { ENTITY_TYPE_LABELS, ENTITY_TYPE_COLORS, ENTITY_TYPE_TRANSLATION_KEYS } from '@/types/cash';
 import { formatCurrency } from '@/lib/formatting';
+import { useLocale } from '@/i18n/locale-provider';
 import {
   Table,
   TableBody,
@@ -35,6 +36,8 @@ export function CashTransactionsTable({
   pagination,
   onPageChange
 }: CashTransactionsTableProps) {
+  const { t } = useLocale();
+
   // Use server-side pagination if available, otherwise fallback to client-side
   const totalPages = pagination?.totalPages || Math.ceil(transactions.length / 50);
   const currentPage = pagination?.currentPage || 1;
@@ -59,9 +62,9 @@ export function CashTransactionsTable({
       <div className="rounded-lg border bg-card">
         <div className="p-12 text-center">
           <Banknote className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No Transactions Found</h3>
+          <h3 className="text-lg font-semibold mb-2">{t("pages.cash.table.no_transactions")}</h3>
           <p className="text-sm text-muted-foreground">
-            Try adjusting your filters to see more transactions.
+            {t("pages.cash.table.adjust_filters")}
           </p>
         </div>
       </div>
@@ -73,14 +76,14 @@ export function CashTransactionsTable({
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">
-            Cash Transactions ({totalCount.toLocaleString()} records)
+            {t("pages.cash.kpis.transactions")} ({totalCount.toLocaleString()} {t("pages.cash.table.records_count")})
           </h3>
           <div className="flex gap-2">
             <Button variant="outline" size="sm">
-              Export Excel
+              {t("pages.cash.table.export_excel")}
             </Button>
             <Button variant="outline" size="sm">
-              Export CSV
+              {t("pages.cash.table.export_csv")}
             </Button>
           </div>
         </div>
@@ -89,15 +92,15 @@ export function CashTransactionsTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Trans #</TableHead>
-                <TableHead>Account</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Party</TableHead>
-                <TableHead>Branch</TableHead>
-                <TableHead className="text-right">Debit (In)</TableHead>
-                <TableHead className="text-right">Credit (Out)</TableHead>
-                <TableHead>Reference</TableHead>
+                <TableHead>{t("pages.cash.table.date")}</TableHead>
+                <TableHead>{t("pages.cash.table.trans_number")}</TableHead>
+                <TableHead>{t("pages.cash.table.account")}</TableHead>
+                <TableHead>{t("pages.cash.table.type")}</TableHead>
+                <TableHead>{t("pages.cash.table.party")}</TableHead>
+                <TableHead>{t("pages.cash.table.branch")}</TableHead>
+                <TableHead className="text-right">{t("pages.cash.table.debit_in")}</TableHead>
+                <TableHead className="text-right">{t("pages.cash.table.credit_out")}</TableHead>
+                <TableHead>{t("pages.cash.table.reference")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -108,8 +111,8 @@ export function CashTransactionsTable({
                 let partyName = '-';
                 if (transaction.entity_type === 'transfer_fund' && transaction.transfer_account_name) {
                   partyName = transaction.debit_or_credit === 'debit'
-                    ? `From: ${transaction.transfer_account_name}`
-                    : `To: ${transaction.transfer_account_name}`;
+                    ? `${t("pages.cash.table.from")} ${transaction.transfer_account_name}`
+                    : `${t("pages.cash.table.to_transfer")} ${transaction.transfer_account_name}`;
                 } else {
                   partyName = transaction.customer_name || transaction.vendor_name || '-';
                 }
@@ -136,7 +139,9 @@ export function CashTransactionsTable({
                     </TableCell>
                     <TableCell>
                       <Badge className={ENTITY_TYPE_COLORS[entityType]}>
-                        {ENTITY_TYPE_LABELS[entityType] || transaction.entity_type}
+                        {ENTITY_TYPE_TRANSLATION_KEYS[transaction.entity_type]
+                          ? t(ENTITY_TYPE_TRANSLATION_KEYS[transaction.entity_type])
+                          : (ENTITY_TYPE_LABELS[entityType] || transaction.entity_type)}
                       </Badge>
                     </TableCell>
                     <TableCell className="max-w-[200px] truncate" title={partyName}>
@@ -179,8 +184,8 @@ export function CashTransactionsTable({
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-4">
             <div className="text-sm text-muted-foreground">
-              Showing {((currentPage - 1) * 50) + 1} to {Math.min(currentPage * 50, totalCount)} of{' '}
-              {totalCount} transactions
+              {t("pages.cash.table.showing")} {((currentPage - 1) * 50) + 1} {t("pages.cash.table.to")} {Math.min(currentPage * 50, totalCount)} {t("pages.cash.table.of")}{' '}
+              {totalCount} {t("pages.cash.table.transactions_count")}
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -189,10 +194,10 @@ export function CashTransactionsTable({
                 onClick={() => onPageChange?.(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
               >
-                Previous
+                {t("pages.cash.table.previous")}
               </Button>
               <div className="text-sm">
-                Page {currentPage} of {totalPages}
+                {t("pages.cash.table.page")} {currentPage} {t("pages.cash.table.of")} {totalPages}
               </div>
               <Button
                 variant="outline"
@@ -200,7 +205,7 @@ export function CashTransactionsTable({
                 onClick={() => onPageChange?.(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages}
               >
-                Next
+                {t("pages.cash.table.next")}
               </Button>
             </div>
           </div>
