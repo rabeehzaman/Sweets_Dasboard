@@ -13,9 +13,10 @@ import {
 } from '@/components/ui/select';
 import { Search, X } from 'lucide-react';
 import type { CashFilters } from '@/types/cash';
-import { ENTITY_TYPE_LABELS } from '@/types/cash';
+import { ENTITY_TYPE_LABELS, ENTITY_TYPE_TRANSLATION_KEYS } from '@/types/cash';
 import { useCashAccounts } from '@/hooks/use-cash-transactions';
 import { supabase } from '@/lib/supabase';
+import { useLocale } from '@/i18n/locale-provider';
 
 interface CashFiltersProps {
   filters: CashFilters;
@@ -23,6 +24,7 @@ interface CashFiltersProps {
 }
 
 export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersProps) {
+  const { t } = useLocale();
   const { data: accounts = [], isLoading: isLoadingAccounts } = useCashAccounts();
   const [branches, setBranches] = useState<Array<{location_id: string; location_name: string}>>([]);
   const [isLoadingBranches, setIsLoadingBranches] = useState(true);
@@ -76,11 +78,11 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
   return (
     <div className="rounded-lg border bg-card p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Filters</h3>
+        <h3 className="text-lg font-semibold">{t("pages.cash.filters.title")}</h3>
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={handleClearFilters}>
             <X className="h-4 w-4 mr-1" />
-            Clear Filters
+            {t("pages.cash.filters.clear_filters")}
           </Button>
         )}
       </div>
@@ -88,7 +90,7 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {/* Date Range */}
         <div className="space-y-2">
-          <Label htmlFor="start-date">Start Date</Label>
+          <Label htmlFor="start-date">{t("common.date")} ({t("common.from")})</Label>
           <Input
             id="start-date"
             type="date"
@@ -100,7 +102,7 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="end-date">End Date</Label>
+          <Label htmlFor="end-date">{t("common.date")} ({t("common.to")})</Label>
           <Input
             id="end-date"
             type="date"
@@ -113,7 +115,7 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
 
         {/* Account Filter */}
         <div className="space-y-2">
-          <Label htmlFor="account">Account</Label>
+          <Label htmlFor="account">{t("pages.cash.filters.account")}</Label>
           <Select
             value={filters.accountIds?.[0] || 'all'}
             onValueChange={(value) =>
@@ -124,14 +126,14 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
             }
           >
             <SelectTrigger id="account">
-              <SelectValue placeholder="All Accounts" />
+              <SelectValue placeholder={t("pages.cash.filters.all_accounts")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Accounts</SelectItem>
+              <SelectItem value="all">{t("pages.cash.filters.all_accounts")}</SelectItem>
               {!isLoadingAccounts && (
                 <>
                   <SelectItem value="bank" disabled className="font-semibold">
-                    🏦 Bank Accounts
+                    🏦 {t("pages.cash.kpis.bank_accounts")}
                   </SelectItem>
                   {accounts
                     .filter((a) => a.account_type === 'Bank')
@@ -141,7 +143,7 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
                       </SelectItem>
                     ))}
                   <SelectItem value="cash" disabled className="font-semibold">
-                    💵 Cash Accounts
+                    💵 {t("pages.cash.kpis.cash_accounts")}
                   </SelectItem>
                   {accounts
                     .filter((a) => a.account_type === 'Cash')
@@ -158,7 +160,7 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
 
         {/* Branch Filter */}
         <div className="space-y-2">
-          <Label htmlFor="branch">Branch</Label>
+          <Label htmlFor="branch">{t("pages.cash.filters.branch")}</Label>
           <Select
             value={filters.locationIds?.[0] || 'all'}
             onValueChange={(value) =>
@@ -169,10 +171,10 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
             }
           >
             <SelectTrigger id="branch">
-              <SelectValue placeholder="All Branches" />
+              <SelectValue placeholder={t("pages.cash.filters.all_branches")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Branches</SelectItem>
+              <SelectItem value="all">{t("pages.cash.filters.all_branches")}</SelectItem>
               {!isLoadingBranches &&
                 branches.map((branch) => (
                   <SelectItem key={branch.location_id} value={branch.location_id}>
@@ -185,7 +187,7 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
 
         {/* Transaction Type Filter */}
         <div className="space-y-2">
-          <Label htmlFor="type">Transaction Type</Label>
+          <Label htmlFor="type">{t("pages.cash.filters.transaction_type")}</Label>
           <Select
             value={filters.entityTypes?.[0] || 'all'}
             onValueChange={(value) =>
@@ -196,13 +198,15 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
             }
           >
             <SelectTrigger id="type">
-              <SelectValue placeholder="All Types" />
+              <SelectValue placeholder={t("pages.cash.filters.all_types")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="all">{t("pages.cash.filters.all_types")}</SelectItem>
               {Object.entries(ENTITY_TYPE_LABELS).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
-                  {label}
+                  {ENTITY_TYPE_TRANSLATION_KEYS[key]
+                    ? t(ENTITY_TYPE_TRANSLATION_KEYS[key])
+                    : label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -211,7 +215,7 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
 
         {/* Debit/Credit Filter */}
         <div className="space-y-2">
-          <Label htmlFor="direction">Direction</Label>
+          <Label htmlFor="direction">{t("pages.cash.filters.direction")}</Label>
           <Select
             value={filters.debitOrCredit || 'all'}
             onValueChange={(value) =>
@@ -222,19 +226,19 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
             }
           >
             <SelectTrigger id="direction">
-              <SelectValue placeholder="All" />
+              <SelectValue placeholder={t("pages.cash.filters.all_directions")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Transactions</SelectItem>
-              <SelectItem value="debit">Debits Only (Money Out)</SelectItem>
-              <SelectItem value="credit">Credits Only (Money In)</SelectItem>
+              <SelectItem value="all">{t("pages.cash.filters.all_directions")}</SelectItem>
+              <SelectItem value="debit">{t("pages.cash.filters.debit")}</SelectItem>
+              <SelectItem value="credit">{t("pages.cash.filters.credit")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Min Amount */}
         <div className="space-y-2">
-          <Label htmlFor="min-amount">Min Amount (SAR)</Label>
+          <Label htmlFor="min-amount">{t("common.amount")} ({t("common.from")}) (SAR)</Label>
           <Input
             id="min-amount"
             type="number"
@@ -251,7 +255,7 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
 
         {/* Max Amount */}
         <div className="space-y-2">
-          <Label htmlFor="max-amount">Max Amount (SAR)</Label>
+          <Label htmlFor="max-amount">{t("common.amount")} ({t("common.to")}) (SAR)</Label>
           <Input
             id="max-amount"
             type="number"
@@ -269,13 +273,13 @@ export function CashFiltersComponent({ filters, onFiltersChange }: CashFiltersPr
 
       {/* Search */}
       <div className="space-y-2">
-        <Label htmlFor="search">Search</Label>
+        <Label htmlFor="search">{t("pages.cash.filters.search")}</Label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             id="search"
             type="text"
-            placeholder="Search by transaction number, reference, customer, or vendor..."
+            placeholder={t("pages.cash.filters.search_placeholder")}
             value={localSearch}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-9"
