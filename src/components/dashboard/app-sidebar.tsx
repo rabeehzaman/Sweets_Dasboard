@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { usePathname, useRouter } from "next/navigation"
-import { Home, Users, TrendingUp, Building2, Receipt, Calculator, User, LogOut, Shield, Sparkles, ReceiptText, Car, Banknote } from "lucide-react"
+import { Home, Users, TrendingUp, Building2, Receipt, Calculator, User, LogOut, Shield, Sparkles, ReceiptText, Car, Banknote, Wallet } from "lucide-react"
 import { useLocale } from "@/i18n/locale-provider"
 import { SimpleLanguageSwitcher } from "@/components/language-switcher"
 import { cssAnimations, createStaggeredClasses } from "@/lib/css-animations"
@@ -79,6 +79,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           title: t("nav.loans"),
           url: "/loans",
           icon: Banknote,
+        },
+        {
+          title: t("nav.cash"),
+          url: "/cash",
+          icon: Wallet,
         },
         {
           title: t("nav.financials"),
