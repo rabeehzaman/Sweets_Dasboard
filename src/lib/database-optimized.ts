@@ -543,17 +543,39 @@ export async function getOptimizedProfitByInvoice(
 
     // If 2025 function doesn't exist or returns no data, try the original function
     // Note: Check for empty array properly
+    // IMPORTANT: Only fallback for single branch or no branch filters
+    // Multi-branch filtering not supported by legacy function
     if (error || !data || (Array.isArray(data) && data.length === 0)) {
-      console.log('⚠️ get_profit_by_invoice_2025_filtered failed, trying original function:', error?.message)
+      // Only attempt fallback if we have 0 or 1 branches selected
+      // Legacy function only supports single branch filtering
+      if (!branchFilters || branchFilters.length <= 1) {
+        console.log('⚠️ get_profit_by_invoice_2025_filtered failed, trying original function:', error?.message)
 
-      const fallback = await supabase.rpc('get_profit_by_invoice_filtered', {
-        start_date: startDate || null,
-        end_date: endDate || null,
-        branch_filter: branchFilters && branchFilters.length === 1 ? branchFilters[0] : null,
-        customer_filter: customerFilter || null
-      })
-      data = fallback.data
-      error = fallback.error
+        const fallback = await supabase.rpc('get_profit_by_invoice_filtered', {
+          start_date: startDate || null,
+          end_date: endDate || null,
+          branch_filter: branchFilters && branchFilters.length === 1 ? branchFilters[0] : null,
+          customer_filter: customerFilter || null
+        })
+        data = fallback.data
+        error = fallback.error
+      } else {
+        // Multi-branch filter requested but primary function failed
+        // Don't fallback as it would lose the multi-branch filter
+        console.error('❌ Multi-branch filtering failed and fallback not compatible:', error?.message)
+        console.error('Selected branches:', branchFilters)
+        // Return empty results rather than incorrect filtered results
+        return {
+          data: [],
+          pagination: {
+            totalCount: 0,
+            pageSize: pageLimit,
+            currentOffset: pageOffset,
+            hasMore: false,
+            totalPages: 0
+          }
+        }
+      }
     }
 
     if (error) {
