@@ -107,12 +107,14 @@ export function CashTransactionsTable({
               {transactions.map((transaction) => {
                 const entityType = transaction.entity_type as keyof typeof ENTITY_TYPE_LABELS;
 
-                // For transfer_fund, show transfer account; otherwise show customer/vendor
+                // Determine party name based on transaction type
                 let partyName = '-';
                 if (transaction.entity_type === 'transfer_fund' && transaction.transfer_account_name) {
                   partyName = transaction.debit_or_credit === 'debit'
                     ? `${t("pages.cash.table.from")} ${transaction.transfer_account_name}`
                     : `${t("pages.cash.table.to_transfer")} ${transaction.transfer_account_name}`;
+                } else if (transaction.entity_type === 'expense' && transaction.expense_account_name) {
+                  partyName = transaction.expense_account_name;
                 } else {
                   partyName = transaction.customer_name || transaction.vendor_name || '-';
                 }

@@ -42,6 +42,9 @@ export interface CashTransaction {
 
   // Transfer details (for transfer_fund transactions)
   transfer_account_name: string | null;
+
+  // Expense details (for expense transactions)
+  expense_account_name: string | null;
 }
 
 export interface CashKPIs {
