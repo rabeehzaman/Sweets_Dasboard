@@ -4,9 +4,10 @@ import * as React from "react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { FileText, Warehouse, ChevronDown, ChevronRight, TrendingUp, TrendingDown, Download, Building2, Package, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { FileText, Warehouse, ChevronDown, ChevronRight, TrendingUp, TrendingDown, Download, Building2, Package, ArrowUpDown, ArrowUp, ArrowDown, Search } from "lucide-react"
 import { 
   useOptimizedProfitByInvoice, 
   useOptimizedStockReport,
@@ -41,6 +42,7 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
   
   // Stock report filter
   const [warehouseFilter, setWarehouseFilter] = React.useState<string | undefined>(undefined)
+  const [stockSearchQuery, setStockSearchQuery] = React.useState<string>('')
 
   // Stock table sorting state
   type StockSortColumn = 'name' | 'stock_qty' | 'stock_pcs' | 'unit_cost' | 'total_cost' | 'total_cost_vat'
@@ -113,11 +115,21 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
 
   const displayInvoiceData = showAllInvoices ? invoiceData : invoiceData.slice(0, itemsPerPage)
 
-  // Apply sorting to stock data
+  // Apply search filtering and sorting to stock data
   const displayStockData = React.useMemo(() => {
     if (!stockData || stockData.length === 0) return stockData
 
-    const sorted = [...stockData].sort((a, b) => {
+    // First, filter by search query if present
+    let filtered = stockData
+    if (stockSearchQuery.trim()) {
+      const searchLower = stockSearchQuery.toLowerCase()
+      filtered = stockData.filter(item =>
+        (item.product_name || '').toLowerCase().includes(searchLower)
+      )
+    }
+
+    // Then, sort the filtered data
+    const sorted = [...filtered].sort((a, b) => {
       let aValue: number | string = 0
       let bValue: number | string = 0
 
@@ -161,7 +173,7 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
     })
 
     return sorted
-  }, [stockData, stockSortColumn, stockSortDirection])
+  }, [stockData, stockSortColumn, stockSortDirection, stockSearchQuery])
 
   // Helper function to toggle invoice expansion
   const toggleInvoiceExpansion = React.useCallback((invoiceNo: string, event?: React.MouseEvent | React.KeyboardEvent) => {
@@ -928,6 +940,16 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-muted/50 p-3 rounded-lg">
               <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">{t("common.filter")}:</span>
               <div className="flex flex-col sm:flex-row gap-2 flex-1 min-w-0">
+                <div className="relative w-full sm:w-[250px] sm:max-w-[250px] min-w-0">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    type="text"
+                    placeholder={t("common.search_products") || "Search products..."}
+                    value={stockSearchQuery}
+                    onChange={(e) => setStockSearchQuery(e.target.value)}
+                    className="pl-9 min-h-[44px]"
+                  />
+                </div>
                 <SearchableSelect
                   options={warehouseFilterOptions}
                   value={warehouseFilter}
@@ -938,11 +960,14 @@ export function OptimizedTabbedTables({ dateRange, locationIds }: OptimizedTabbe
                   loading={warehouseFilterOptionsLoading}
                 />
               </div>
-              {warehouseFilter && (
-                <Button 
-                  variant="outline" 
+              {(warehouseFilter || stockSearchQuery) && (
+                <Button
+                  variant="outline"
                   size="sm"
-                  onClick={() => setWarehouseFilter(undefined)}
+                  onClick={() => {
+                    setWarehouseFilter(undefined)
+                    setStockSearchQuery('')
+                  }}
                   className="whitespace-nowrap"
                 >
                   {t("common.cancel")}
