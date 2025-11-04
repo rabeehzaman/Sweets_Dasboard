@@ -115,8 +115,20 @@ export function CashTransactionsTable({
                     : `${t("pages.cash.table.to_transfer")} ${transaction.transfer_account_name}`;
                 } else if (transaction.entity_type === 'expense' && transaction.expense_account_name) {
                   partyName = transaction.expense_account_name;
+                } else if (transaction.entity_type === 'journal' && transaction.journal_account_name) {
+                  partyName = transaction.journal_account_name;
                 } else {
                   partyName = transaction.customer_name || transaction.vendor_name || '-';
+                }
+
+                // Determine reference display (enhanced for journal entries)
+                let referenceDisplay = transaction.reference_no || transaction.reference_number || '-';
+                // For journal entries with loan accounts, append "EMI" if reference looks like a month/year pattern
+                if (transaction.entity_type === 'journal' &&
+                    transaction.journal_account_name?.toUpperCase().includes('LOAN') &&
+                    transaction.reference_no &&
+                    /\w+\s+\d{4}/i.test(transaction.reference_no)) {
+                  referenceDisplay = `${transaction.reference_no} EMI`;
                 }
 
                 return (
@@ -172,8 +184,8 @@ export function CashTransactionsTable({
                         <span className="text-muted-foreground">-</span>
                       )}
                     </TableCell>
-                    <TableCell className="max-w-[150px] truncate" title={transaction.reference_no || '-'}>
-                      {transaction.reference_no || '-'}
+                    <TableCell className="max-w-[150px] truncate" title={referenceDisplay}>
+                      {referenceDisplay}
                     </TableCell>
                   </TableRow>
                 );

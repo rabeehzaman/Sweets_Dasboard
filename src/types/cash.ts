@@ -45,6 +45,9 @@ export interface CashTransaction {
 
   // Expense details (for expense transactions)
   expense_account_name: string | null;
+
+  // Journal details (for journal transactions)
+  journal_account_name: string | null;
 }
 
 export interface CashKPIs {
